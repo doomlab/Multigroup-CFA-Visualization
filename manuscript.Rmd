@@ -1,0 +1,258 @@
+---
+title             : "Visualizing and Interpreting Multi-Group Confirmatory Factor Analysis"
+shorttitle        : "VISUAL MGCFA"
+
+author: 
+  - name          : "Erin M. Buchanan"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "326 Market St., Harrisburg, PA, USA"
+    email         : "ebuchanan@harrisburgu.edu"
+    role: # Contributorship roles (e.g., CRediT, https://credit.niso.org/)
+      - "Conceptualization"
+      - "Writing - Original Draft Preparation"
+      - "Writing - Review & Editing"
+
+affiliation:
+  - id            : "1"
+    institution   : "Harrisburg University of Science and Technology"
+
+authornote: |
+  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
+
+  Enter author note here.
+
+abstract: |
+  Latent variable modeling as a lens for psychometric theory is a popular tool for social scientists to examine measurement of constructs [@beaujean2014]. Journals such as *Assessment* regularly publish articles supporting new or previously established measures of latent constructs (e.g., depression, anxiety) wherein a measurement model is established for the scale in question. These measurement models designate the relationship between the measured, observed variables, and the underlying construct, with the assumption that these relations hold in many samples. Confirmatory factor analysis can be used to investigate the replicability and generalizability of the measurement model in new samples, while multi-group confirmatory factor analysis is used to examine the measurement model across groups within samples [@brown2015]. With the rise of the replication crisis and "psychology's renaissance" [@nelson2018], interest in divergence in measurement has increased, often focused on small parameter differences within the latent model. While the statistical procedure for examining measurement invariance is moderately well established, it is clear that the toolkit for inspecting these results is lacking. This manuscript will outline ways to visualize potential non-invariance, to supplement large numbers of tables that often overwhelm a reader within these published reports. Further, given these visualizations, readers will learn how to interpret the impact and size of the proposed non-invariance in models. While it is tempting to suggest that problems with replication and generalizability are simply issues with measurement, it is crucial to remember that all models have variability and error, even those models estimating the differences between item functioning, such as multi-group confirmatory factor analysis. This manuscript will help provide a framework for researchers interested in registered reports in this area.
+  
+keywords          : "multigroup confirmatory factor analysis, measurement invariance, visualization, effect size"
+
+floatsintext      : no
+linenumbers       : yes
+draft             : no
+mask              : no
+
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+
+classoption       : "man"
+output            : papaja::apa6_pdf
+bibliography: references.bib
+---
+
+```{r setup, include = FALSE}
+library(papaja)
+library(lavaan)
+```
+
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(84393)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+
+Outline
+
+-   talk about LVM
+
+-   talk about cfa
+
+-   talk about mgcfa
+
+-   how are measurement and replication/crisis related
+
+-   why it is a bad idea to say that replication/crisis are *because* bad measurement
+
+-   how can we visualize and interpret MGCFA to help us understand the impact of measurement differences
+
+Research Questions:
+
+By the end of this tutorial manuscript, readers will: 1. Be able to create visualizations for common steps to multi-group confirmatory factor analysis. 2. Be able to interpret the impact and size of potential non-invariance on measurement. 3. Understand the impact of measurement variability on replication and generalizability.
+
+# Methods
+
+## Design
+
+Data will be simulated based on a multivariate normal distribution using R. The data will include two groups of individuals for multi-group confirmatory factor analysis (ns = 250; N = 500). The latent variables will be assumed to be continuous normal, and the measured items will be simulated using a traditional 1-7 Likert-type scale, matching many of the types of scales published in psychology and Assessment. Each item will be assumed to be related to the latent variable with loadings approximately equal to .60 to .80 (minus scenarios in which configural non-invariance is simulated).
+
+## Variables
+
+- Number of factors: one and two latent variable models will be simulated with five measured items for each latent variable. 
+- Area of invariance: a model with non-invariance at each stage will be simulated including configural, metric, scalar, and strict non-invariance. One model with complete invariance will be used for comparison purposes. 
+- Size of invariance: the size of the invariance will be simulated at three levels.
+
+none, small, medium, large 
+two models
+metric (loadings), scalar (intercepts), strict (residuals)
+
+4X2X3
+
+since these are normally tested sequentially, we will only do one at a time 
+
+
+https://stats.stackexchange.com/questions/593243/data-simulation-in-r-for-measurement-invariance
+
+```{r}
+model.1 <- "lv =~ q1 + q2 + q3 + q4 + q5"
+
+model.2 <- "lv =~ q1 + q2 + q3 + q4 + q5
+lv2 =~ q6 + q7 + q8 + q9 + q10
+"
+
+# Packages
+library(lavaan)
+
+# specify population model for group 1 and group 2
+population_model_g1 <-'f1=~x1+.6*x2+.7*x3+0.5*x4'
+population_model_g2 <-'f1=~x1+.6*x2+.7*x3+0.4*x4'
+
+# Sumulate data
+set.seed(1234)
+model_data_g1<-lavaan::simulateData(population_model_g1,sample.nobs=500)
+model_data_g2<-lavaan::simulateData(population_model_g2,sample.nobs=500)
+
+# Add group label
+model_data_g1$group <- "Group1"
+model_data_g2$group <- "Group2"
+
+# put data into one data frame
+model_data_all <- cbind(model_data_g1,model_data_g2)
+
+```
+
+#### delete this 
+Across all studies, results indicated that the majority of the standardized factor loading differ-
+ences were below .10, and few were greater than .50. Given these results, small, medium, and large
+differences in factor loadings were operationalized as .10, .20, and .30, respectively. In other words,
+the factor loadings in the focal group were increased by .10, .20, or .30 to simulate MNE in various
+conditions. In contrast, intercept differences in the literature were larger than the factor loading
+differences, and the majority of these differences were below .20, but very few were above 1.00.
+Therefore, intercept differences across groups were operationalized as .25, .50, and .75. Figures A1
+and A2 in the online supplemental material show the distributions of differences between the
+standardized factor loadings and intercepts in the reference and focal groups.
+
+
+## Data analysis
+
+Multi-group confirmatory factor analysis will be examined across the simulated two groups of individuals using lavaan (Rosseel, 2012) focusing on the most common procedure outlined in Brown (2015). Each stage of measurement invariance (i.e., configural, metric, scalar, and strict) will be examined in the simulated data demonstrating how to visualize results using common tools, such as ggplot2 (Wickham et al., 2021). These visualizations will be compared across differences in non-invariance size to illustrate how to interpret the size of the non-invariance. Last, these effects will be examined on total score measurement (i.e., latent means) to explore the potential impacts on replication. Finally, suggestions will be provided for framing registered reports using multi-group confirmatory factor analysis.
+
+# Results
+
+# Discussion
+
+Conclusions:
+
+-   framework for submitted/interpreting reports
+
+\newpage
+
+# References
+
+::: {#refs custom-style="Bibliography"}
+:::
+
+
+Visualizing Measurement Model Parameters for Tests of (Non)Invariance/DIF: 
+Purpose, Presentation, and a New R Package
+
+Type: Tutorial 
+
+Authors: John K. Sakaluk, Brenton M. Wiernik, Flavio Azevedo, Alex J. Denison, and Erin M. Buchanan
+
+Email: jsakaluk@uwo.ca 
+
+300 Word Summary: 
+Latent variable psychometric theory remains psychology’s most popular framework for conceptualizing and studying psychological entities across its many subdisciplines. Indeed, psychologists regularly use latent variable analysis frameworks to generate a “measurement model”: a statistical statement of the relations between a given set of observed variables and their construct(s) when attempting to describe and quantify the substance of the theoretical entities that they study. A core--and tacit--assumption, however of latent variables is that the measurement parameters are consistent between groups or across a given continuous covariate, as divergent measurement model parameters otherwise threaten the validity of the estimation, testing, and comparison of structural parameters. Psychologists therefore are often tasked with testing to establish “measurement invariance” (or equivalently, to rule out “differential item functioning”) for their latent variables of interest. But whereas the estimation, testing, and comparison of measurement model parameters is commonplace, the visualization of these parameters is virtually nonexistent, largely owing to a dearth of any standardized manner by which these parameters ought to be depicted. Without any compelling visualization techniques, the process of evaluating measurement (non)invariance seems likely to persist in facilitating relatively uninformative all-or-none omnibus testing, without any possibility of researchers identifying meaningful patterns. We therefore propose to describe, apply, and develop supporting analytic materials (e.g., R functions and tutorials) to visualize measurement modeling parameters. Our approach will be amenable to either multi-group comparisons or continuous covariate examinations of measurement modeling parameters and will enable emphasizing particular parameters and/or variables, while also providing visual information about the model as a whole. Finally, our approach will emphasize accessibility, in terms of: 1) creating easy-to-use functions for interested users to adopt in their own work, which will create 2) publication-ready greyscale figures and/or; 3) figures in a colorblind-friendly palette.  
+Prior Req’d Knowledge:
+R coding
+Regression
+Latent variable theory and measurement modeling 
+
+
+What: 
+Rationale
+Easy-to-use functionality/package for visualizations of measurement modeling output for DIF/Noninvariance-Testing, including:
+Scale of measuremen-friendly for source of noninvariance
+Multi-Group
+Continuous-Covariate
+Multilevel(s) Targeting
+Measurement parameter (loading, intercept, residuals(?))
+Item level (e.g., noninvariance/DIF effect sizes?)
+Test level
+Application/didactic example
+Existing data sets? And/or?
+Simulated data sets?
+
+Guiding Programming Values
+Easy to use
+Should use df and fitted lavaan object and little else
+Easy to incorporate into pubs
+Should have a template option for APA-compliant figures (i.e., greyscale)
+Accessibility
+Should have a template(s) option for beautiful and colourblind-friendly palette(s)
+Modifiable
+Should return ggplot2::ggplot objects that the user can modify as desired; perhaps a “basic” template option that returns the geoms_ with little else?
+
+
+March 24 Meeting
+
+Introductions
+
+
+Rehash of project goals/features + Discussion
+Visualization of measurement model parameters for noninvariance/DIF testing
+Visualization types
+Response curves (latent score X, predicted item score on Y)
+IRT Sigmoidal curves
+CFA item “curves” 
+“Common” visualization style (simple intercepts/slopes) for MCCFA/RFA
+Error variance could be a band 
+Faceted by items
+Test level observed score and latent score distributions
+Densities with grouped observed + grouped latent scores
+Variance decomposition signal:noise (communality to uniqueness) “candybar plots”
+R Functions (take selection of items and group/covariate and/or MGCFA lavaan object)
+Return ggplot object
+Options for “canned” style (e.g., APA compliant) 
+Didactic example
+learnr tutorial(s) 
+
+
+Preferred workflow/systems
+lavaan:: focused
+Github repo for package
+Brenton with commit access on master branch
+Others suggest changes with pull requests
+Github issues for communication
+Use Brown terminology
+Configural
+Metric
+Scalar
+Strict
+
+
+Preferred roles
+Toy examples for dev (two group multiple groups, continuous mimic, categorical mimic, sparse groups at different levels)
+Erin’s examples 
+Install the package examples if you want: devtools::install_github(“doomlab/learnSEM”) (I have a few more too, I’ll dig them up)
+John: lavaan::HolzingerSwineford1939 and psych::bfi as preexisting/often used exemplar sets
+Plot design in ggplot
+Alex and Brenton and Flavio
+Function writing
+Alex and Brenton and John
+Package dev/maintenance
+Brenton
+learnr tutorial(s)
+Erin and John
+Writing
+John is happy to lead
+
+
+Prefered timeline
+
+
+Submission targets
+AMPPS
+BRM
+
