@@ -44,6 +44,51 @@ bibliography: references.bib
 ```{r setup, include = FALSE}
 library(papaja)
 library(lavaan)
+library(broom)
+library(dplyr)
+library(ggplot2)
+# devtools::install_github("psyteachr/introdataviz")
+library(introdataviz)
+
+# CFA function
+mgcfa <- function(data, group, model){
+  
+  group_names <- unique(data[ , group])
+  
+  model.overall <- cfa(model = model, data = data)
+  model.group1 <- cfa(model = model, data = subset(data, group == group_names[1]))
+  model.group2 <- cfa(model = model, data = subset(data, group == group_names[2]))
+  model.configural <- cfa(model = model, data = data, group = group, meanstructure = T)
+  model.metric <- cfa(model = model, data = data, group = group, group.equal = "loadings")
+  model.scalar <- cfa(model = model, data = data, group = group, group.equal = c("loadings", "intercepts"))
+  model.strict <- cfa(model = model, data = data, group = group, group.equal =  c("loadings", "intercepts", "residuals"))
+  
+  model_coef <- bind_rows(
+    tidy(model.overall, conf.level = .95) %>% mutate(model = "overall"), 
+    tidy(model.group1, conf.level = .95) %>% mutate(model = "group1"), 
+    tidy(model.group2, conf.level = .95) %>% mutate(model = "group2"), 
+    tidy(model.configural, conf.level = .95) %>% mutate(model = "configural"), 
+    tidy(model.metric, conf.level = .95) %>% mutate(model = "metric"), 
+    tidy(model.scalar, conf.level = .95) %>% mutate(model = "scalar"), 
+    tidy(model.strict, conf.level = .95) %>% mutate(model = "strict")
+  )
+    
+  model_fit <- bind_rows(
+    glance(model.overall) %>% mutate(model = "overall"), 
+    glance(model.group1) %>% mutate(model = "group1"), 
+    glance(model.group2) %>% mutate(model = "group2"), 
+    glance(model.configural) %>% mutate(model = "configural"), 
+    glance(model.metric) %>% mutate(model = "metric"), 
+    glance(model.scalar) %>% mutate(model = "scalar"), 
+    glance(model.strict) %>% mutate(model = "strict")
+    )
+  
+  return(list(
+    "model_coef" = model_coef,
+    "model_fit" = model_fit
+  ))
+  
+}
 ```
 
 ```{r analysis-preferences}
@@ -93,8 +138,174 @@ since these are normally tested sequentially, we will only do one at a time
 
 https://stats.stackexchange.com/questions/593243/data-simulation-in-r-for-measurement-invariance
 
+```{r create-data}
+library(lavaan)
+
+# build invariant model one factor
+model.invariant.g1 <- "lv =~ .9*q1 + .4*q2 + .6*q3 + .3*q4 + .6*q5"
+model.invariant.g2 <- "lv =~ .87*q1 + .43*q2 + .54*q3 + .4*q4 + .61*q5"
+model.overall <- "lv =~ q1 + q2 + q3 + q4 + q5"
+
+# simulate data
+df.invariant <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa") %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.invariant.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa") %>% 
+    mutate(group = "Group 2") 
+)
+
+```
+
+```{r run-cfa}
+# invariant CFA
+results.invariant <- mgcfa(df.invariant, "group", model.overall)
+```
+
+```{r invariant-picture}
+graph.data <- results.invariant$model_coef %>% # put in tidy coefficients
+  filter(model == "configural") %>% # pick a model
+  filter(grepl("q4", term)) %>%  # pick a question
+  mutate(group = factor(group, levels = c(1,2), labels = c("Group 1", "Group 2"))) 
+
+graph.data$low <- graph.data$estimate - 2*graph.data$estimate
+graph.data$high <- graph.data$estimate + 2*graph.data$estimate
+
+# X = latent variable (so interpretation is z-score)
+# Y = observed variable
+# set x and y limits
+x_limits <- c(-1,1)
+y_limits <- c(min(df.invariant$q4), max(df.invariant$q4))
+
+# make ribbon data y = slope*x + intercept
+ribbondata <- bind_rows(
+  data.frame(
+  x = seq(from = x_limits[1] - 1,  
+          to = x_limits[2] + 1, 
+          by = .05), 
+  group = unique(graph.data$group)[1]
+) %>% 
+  mutate(ymin = (graph.data %>% filter(op == "=~") %>% 
+               slice_head() %>% pull(estimate) * x) - 
+           (2*graph.data %>% filter(op == "=~") %>% 
+                  slice_head() %>% pull(std.error)) +
+           graph.data %>% filter(op == "~1") %>% 
+               slice_head() %>% pull(estimate), 
+         ymax = (graph.data %>% filter(op == "=~") %>% 
+               slice_head() %>% pull(estimate) * x) + 
+           (2*graph.data %>% filter(op == "=~") %>% 
+                  slice_head() %>% pull(std.error)) +
+           graph.data %>% filter(op == "~1") %>% 
+               slice_head() %>% pull(estimate)), 
+  data.frame(
+    x = seq(from = x_limits[1] - 1,  
+            to = x_limits[2] + 1, 
+            by = .05), 
+    group = unique(graph.data$group)[2]
+  ) %>% 
+    mutate(ymin = (graph.data %>% filter(op == "=~") %>% 
+                 slice_tail() %>% pull(estimate) * x) - 
+             (2*graph.data %>% filter(op == "=~") %>% 
+                    slice_tail() %>% pull(std.error)) +
+             graph.data %>% filter(op == "~1") %>% 
+                 slice_tail() %>% pull(estimate), 
+           ymax = (graph.data %>% filter(op == "=~") %>% 
+                 slice_tail() %>% pull(estimate) * x) + 
+             (2*graph.data %>% filter(op == "=~") %>% 
+                    slice_tail() %>% pull(std.error)) +
+             graph.data %>% filter(op == "~1") %>% 
+                 slice_tail() %>% pull(estimate))
+)
+
+pointdata <- data.frame(
+  x = c(0,0),
+  y = graph.data %>% filter(op == "~1") %>% pull(estimate), 
+  group = graph.data %>% filter(op == "~1") %>% pull(group),
+  ymin = graph.data %>% filter(op == "~1") %>% pull(estimate) - 
+    2 * graph.data %>% filter(op == "~1") %>% pull(std.error), 
+  ymax = graph.data %>% filter(op == "~1") %>% pull(estimate) + 
+    2 * graph.data %>% filter(op == "~1") %>% pull(std.error)
+)
+
+linedata <- data.frame(
+  slope = graph.data %>% filter(op == "=~") %>% pull(estimate), 
+  intercept = graph.data %>% filter(op == "~1") %>% pull(estimate), 
+  group = graph.data %>% filter(op == "~1") %>% pull(group)
+)
+
+violindata <- data.frame(
+  y = c(rnorm(n = 1000, 
+            mean = graph.data %>% filter(op == "~~") %>% 
+              slice_head() %>% pull(estimate), 
+            sd = graph.data %>% filter(op == "~~") %>% 
+              slice_head() %>% pull(std.error)), 
+        rnorm(n = 1000, 
+            mean = graph.data %>% filter(op == "~~") %>% 
+              slice_tail() %>% pull(estimate), 
+            sd = graph.data %>% filter(op == "~~") %>% 
+              slice_tail() %>% pull(std.error))),
+  group = c(rep(graph.data %>% filter(op == "~~") %>% 
+              slice_head() %>% pull(group), 100),
+            rep(graph.data %>% filter(op == "~~") %>% 
+              slice_tail() %>% pull(group), 100)), 
+  x = 1
+)
+
+latent_means <- data.frame(
+  predict(model.overall.model), 
+  group = df.invariant$group
+)
+
+variance_plot <- 
+  ggplot(violindata, aes(x = 1, y = y, color = group, fill = group)) + 
+  geom_split_violin() + 
+  theme_void() + 
+  theme(legend.position = "none") + 
+  stat_summary(fun = "mean",
+               geom = "crossbar", 
+               width = 0.5,
+               colour = "black")
+
+intercept_plot <- 
+  ggplot() + 
+  # basic set up
+  theme_classic() + 
+  xlab("Latent Variable") + 
+  ylab("Observed Variable") + 
+  coord_cartesian(xlim = x_limits, ylim = y_limits) + 
+  # plot the intercepts 
+  geom_point(data = pointdata, 
+             aes(x = x, y = y, color = group), 
+             inherit.aes = FALSE) + 
+  geom_errorbar(data = pointdata,
+                aes(x = x, ymin = ymin, ymax = ymax, color = group), 
+                inherit.aes = FALSE, width = .10) + 
+  # plot the slopes
+  geom_abline(data = linedata,
+              aes(slope = slope, intercept = intercept, color = group)) + 
+  geom_ribbon(data = ribbondata, 
+              aes(x = x, ymin = ymin, ymax = ymax, fill = group), 
+              inherit.aes = FALSE, alpha = .2) + 
+  scale_color_discrete(name = "Group") + 
+  scale_fill_discrete(name = "Group") + 
+  geom_vline(xintercept = 0)
+  
+# latent means
+mean_plot <- ggplot(latent_means, aes(x = lv, fill = group)) + 
+  geom_density(alpha = .2) + 
+  theme_classic() + 
+  xlab("Latent Variable") + 
+  ylab("Density") + 
+  geom_vline(data = latent_means %>% group_by(group) %>% summarize(mean = mean(lv)), 
+             aes(xintercept = mean, color = group)) + 
+  theme(legend.position = "none") 
+```
+
+
+
 ```{r}
-model.1 <- "lv =~ q1 + q2 + q3 + q4 + q5"
+
 
 model.2 <- "lv =~ q1 + q2 + q3 + q4 + q5
 lv2 =~ q6 + q7 + q8 + q9 + q10
