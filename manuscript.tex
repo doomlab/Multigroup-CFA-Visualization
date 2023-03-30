@@ -1,0 +1,628 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  man]{apa6}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newlength{\cslentryspacingunit} % times entry-spacing
+\setlength{\cslentryspacingunit}{\parskip}
+\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+  \let\oldpar\par
+  \def\par{\hangindent=\cslhangindent\oldpar}
+  \fi
+  % set entry spacing
+  \setlength{\parskip}{#2\cslentryspacingunit}
+ }%
+ {}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{english}
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+% Manuscript styling
+\usepackage{upgreek}
+\captionsetup{font=singlespacing,justification=justified}
+
+% Table formatting
+\usepackage{longtable}
+\usepackage{lscape}
+% \usepackage[counterclockwise]{rotating}   % Landscape page setup for large tables
+\usepackage{multirow}		% Table styling
+\usepackage{tabularx}		% Control Column width
+\usepackage[flushleft]{threeparttable}	% Allows for three part tables with a specified notes section
+\usepackage{threeparttablex}            % Lets threeparttable work with longtable
+
+% Create new environments so endfloat can handle them
+% \newenvironment{ltable}
+%   {\begin{landscape}\centering\begin{threeparttable}}
+%   {\end{threeparttable}\end{landscape}}
+\newenvironment{lltable}{\begin{landscape}\centering\begin{ThreePartTable}}{\end{ThreePartTable}\end{landscape}}
+
+% Enables adjusting longtable caption width to table width
+% Solution found at http://golatex.de/longtable-mit-caption-so-breit-wie-die-tabelle-t15767.html
+\makeatletter
+\newcommand\LastLTentrywidth{1em}
+\newlength\longtablewidth
+\setlength{\longtablewidth}{1in}
+\newcommand{\getlongtablewidth}{\begingroup \ifcsname LT@\roman{LT@tables}\endcsname \global\longtablewidth=0pt \renewcommand{\LT@entry}[2]{\global\advance\longtablewidth by ##2\relax\gdef\LastLTentrywidth{##2}}\@nameuse{LT@\roman{LT@tables}} \fi \endgroup}
+
+% \setlength{\parindent}{0.5in}
+% \setlength{\parskip}{0pt plus 0pt minus 0pt}
+
+% Overwrite redefinition of paragraph and subparagraph by the default LaTeX template
+% See https://github.com/crsh/papaja/issues/292
+\makeatletter
+\renewcommand{\paragraph}{\@startsection{paragraph}{4}{\parindent}%
+  {0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+  {-1em}%
+  {\normalfont\normalsize\bfseries\itshape\typesectitle}}
+
+\renewcommand{\subparagraph}[1]{\@startsection{subparagraph}{5}{1em}%
+  {0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+  {-\z@\relax}%
+  {\normalfont\normalsize\itshape\hspace{\parindent}{#1}\textit{\addperi}}{\relax}}
+\makeatother
+
+\makeatletter
+\usepackage{etoolbox}
+\patchcmd{\maketitle}
+  {\section{\normalfont\normalsize\abstractname}}
+  {\section*{\normalfont\normalsize\abstractname}}
+  {}{\typeout{Failed to patch abstract.}}
+\patchcmd{\maketitle}
+  {\section{\protect\normalfont{\@title}}}
+  {\section*{\protect\normalfont{\@title}}}
+  {}{\typeout{Failed to patch title.}}
+\makeatother
+
+\usepackage{xpatch}
+\makeatletter
+\xapptocmd\appendix
+  {\xapptocmd\section
+    {\addcontentsline{toc}{section}{\appendixname\ifoneappendix\else~\theappendix\fi\\: #1}}
+    {}{\InnerPatchFailed}%
+  }
+{}{\PatchFailed}
+\keywords{multigroup confirmatory factor analysis, measurement invariance, visualization, effect size}
+\DeclareDelayedFloatFlavor{ThreePartTable}{table}
+\DeclareDelayedFloatFlavor{lltable}{table}
+\DeclareDelayedFloatFlavor*{longtable}{table}
+\makeatletter
+\renewcommand{\efloat@iwrite}[1]{\immediate\expandafter\protected@write\csname efloat@post#1\endcsname{}}
+\makeatother
+\usepackage{lineno}
+
+\linenumbers
+\usepackage{csquotes}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Visualizing and Interpreting Multi-Group Confirmatory Factor Analysis},
+  pdfauthor={Erin M. Buchanan1},
+  pdflang={en-EN},
+  pdfkeywords={multigroup confirmatory factor analysis, measurement invariance, visualization, effect size},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Visualizing and Interpreting Multi-Group Confirmatory Factor Analysis}
+\author{Erin M. Buchanan\textsuperscript{1}}
+\date{}
+
+
+\shorttitle{VISUAL MGCFA}
+
+\authornote{
+
+Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
+
+Enter author note here.
+
+The authors made the following contributions. Erin M. Buchanan: Conceptualization, Writing - Original Draft Preparation, Writing - Review \& Editing.
+
+Correspondence concerning this article should be addressed to Erin M. Buchanan, 326 Market St., Harrisburg, PA, USA. E-mail: \href{mailto:ebuchanan@harrisburgu.edu}{\nolinkurl{ebuchanan@harrisburgu.edu}}
+
+}
+
+\affiliation{\vspace{0.5cm}\textsuperscript{1} Harrisburg University of Science and Technology}
+
+\abstract{%
+Latent variable modeling as a lens for psychometric theory is a popular tool for social scientists to examine measurement of constructs (Beaujean, 2014). Journals such as \emph{Assessment} regularly publish articles supporting new or previously established measures of latent constructs (e.g., depression, anxiety) wherein a measurement model is established for the scale in question. These measurement models designate the relationship between the measured, observed variables, and the underlying construct, with the assumption that these relations hold in many samples. Confirmatory factor analysis can be used to investigate the replicability and generalizability of the measurement model in new samples, while multi-group confirmatory factor analysis is used to examine the measurement model across groups within samples (Brown, 2015). With the rise of the replication crisis and ``psychology's renaissance'' (Nelson, Simmons, \& Simonsohn, 2018), interest in divergence in measurement has increased, often focused on small parameter differences within the latent model. While the statistical procedure for examining measurement invariance is moderately well established, it is clear that the toolkit for inspecting these results is lacking. This manuscript will outline ways to visualize potential non-invariance, to supplement large numbers of tables that often overwhelm a reader within these published reports. Further, given these visualizations, readers will learn how to interpret the impact and size of the proposed non-invariance in models. While it is tempting to suggest that problems with replication and generalizability are simply issues with measurement, it is crucial to remember that all models have variability and error, even those models estimating the differences between item functioning, such as multi-group confirmatory factor analysis. This manuscript will help provide a framework for researchers interested in registered reports in this area.
+}
+
+
+
+\begin{document}
+\maketitle
+
+Outline
+
+\begin{itemize}
+\item
+  talk about LVM
+\item
+  talk about cfa
+\item
+  talk about mgcfa
+\item
+  how are measurement and replication/crisis related
+\item
+  why it is a bad idea to say that replication/crisis are \emph{because} bad measurement
+\item
+  how can we visualize and interpret MGCFA to help us understand the impact of measurement differences
+\end{itemize}
+
+By the end of this tutorial manuscript, readers will:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Be able to create visualizations for common steps to multi-group confirmatory factor analysis.
+\item
+  Be able to interpret the impact and size of potential non-invariance on measurement.
+\item
+  Understand the impact of measurement variability on replication and generalizability.
+\end{enumerate}
+
+\hypertarget{method}{%
+\section{Method}\label{method}}
+
+\hypertarget{design-and-analysis}{%
+\subsection{Design and Analysis}\label{design-and-analysis}}
+
+Data was simulated using the \texttt{simulateData} function in the \emph{R} package \texttt{lavaan} (Rosseel, 2012) assuming multivariate normality using a \(\mu\) of 0 and \(\sigma\) of 1 for the data. This function allows you to write \texttt{lavaan} syntax for your model with estimated values to generate data for observed variables. The data included two groups of individuals (``Group 1'', ``Group 2'') for a multi-group confirmatory factor analysis (\$n\_\{group\}\$ = 250, \emph{N} = 500). The latent variables were assumed to be continuous normal. The model consisted of five observed items predicted by one latent variable (\texttt{lv\ =\textasciitilde{}\ q1\ +\ q2\ +\ q3\ +\ q4\ +\ q5}); however, the demonstration in this manuscript extends to multiple latent variables and other combinations of observed variables. Each item was assumed to be related to the latent variable with loadings approximately equal to .40 to .80, except when cases of non-invariance on the loadings was assumed.
+
+The Brown (2015) steps of testing measurement invariance are demonstrated in this manuscript for illustration purposes, but in line with Stark, Chernyshenko, and Drasgow (2006) suggestions, the visualizations show the impact of loadings and intercepts together. The configural model was analyzed nesting both groups into the same CFA model requiring that both groups show the same model structure, but all other parameters are free to vary between groups. The metric model constrained the factor loadings of each group to be equal within the model. The scalar model then constrained the item intercepts (i.e., item mean) to be equal across groups. Finally, the strict model constrained the item variances (i.e., error variances) to be equal for each item across groups. These models are normally tested sequentially, and a convenience function \texttt{mgcfa} is provided in the supplemental documents for this manuscript.
+
+The data was then simulated to represent invariance across all model steps, small, medium, and large invariance using \(d_{MACS}\) estimated sizes from Nye, Bradburn, Olenick, Bialko, and Drasgow (2019). While \(d_{MACS}\) is used primarily for an effect size of the (non)-invariance for intercepts and loadings together, a similar approach was taken for the estimation of small, medium, and large effects on the residuals. The effect size is presented for all models, calculated from the \emph{dmacs} package Nye \& Drasgow (2011). Only one item in each model was manipulated from the invariant model to create the non-invariant models.
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/invariant-pic-1.pdf}
+\caption{\label{fig:invariant-pic}Invariant Model Visualization}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/small-load-pic-1.pdf}
+\caption{\label{fig:small-load-pic}Small Loadings Model Visualization}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/med-load-pic-1.pdf}
+\caption{\label{fig:med-load-pic}Medium Loadings Model Visualization}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/large-load-pic-1.pdf}
+\caption{\label{fig:large-load-pic}Large Loadings Model Visualization}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/small-int-pic-1.pdf}
+\caption{\label{fig:small-int-pic}Small Intercepts Model Visualization}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/med-int-pic-1.pdf}
+\caption{\label{fig:med-int-pic}Medium Intercepts Model Visualization}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/large-int-pic-1.pdf}
+\caption{\label{fig:large-int-pic}Large Intercepts Model Visualization}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/small-res-pic-1.pdf}
+\caption{\label{fig:small-res-pic}Small Residuals Model Visualization}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/med-res-pic-1.pdf}
+\caption{\label{fig:med-res-pic}Medium Residuals Model Visualization}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/large-res-pic-1.pdf}
+\caption{\label{fig:large-res-pic}Large Residuals Model Visualization}
+\end{figure}
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+Conclusions:
+
+\begin{itemize}
+\tightlist
+\item
+  framework for submitted/interpreting reports
+\end{itemize}
+
+\newpage
+
+\hypertarget{references}{%
+\section{References}\label{references}}
+
+\hypertarget{refs}{}
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-beaujean2014}{}}%
+Beaujean, A. A. (2014). \emph{Latent variable modeling using r: A step by step guide}. New York: Routledge/Taylor \& Francis Group.
+
+\leavevmode\vadjust pre{\hypertarget{ref-brown2015}{}}%
+Brown, T. A. (2015). \emph{Confirmatory factor analysis for applied research} (Second edition). New York ; London: The Guilford Press.
+
+\leavevmode\vadjust pre{\hypertarget{ref-dueber2023}{}}%
+Dueber, D. (2023). \emph{Dmacs}. Retrieved from \url{https://github.com/ddueber/dmacs}
+
+\leavevmode\vadjust pre{\hypertarget{ref-nelson2018}{}}%
+Nelson, L. D., Simmons, J., \& Simonsohn, U. (2018). Psychology's renaissance. \emph{Annual Review of Psychology}, \emph{69}(1), 511--534. \url{https://doi.org/10.1146/annurev-psych-122216-011836}
+
+\leavevmode\vadjust pre{\hypertarget{ref-nye2019}{}}%
+Nye, C. D., Bradburn, J., Olenick, J., Bialko, C., \& Drasgow, F. (2019). How Big Are My Effects? Examining the Magnitude of Effect Sizes in Studies of Measurement Equivalence. \emph{Organizational Research Methods}, \emph{22}(3), 678--709. \url{https://doi.org/10.1177/1094428118761122}
+
+\leavevmode\vadjust pre{\hypertarget{ref-nye2011}{}}%
+Nye, C. D., \& Drasgow, F. (2011). Effect size indices for analyses of measurement equivalence: Understanding the practical importance of differences between groups. \emph{Journal of Applied Psychology}, \emph{96}(5), 966--980. \url{https://doi.org/10.1037/a0022955}
+
+\leavevmode\vadjust pre{\hypertarget{ref-rosseel2012}{}}%
+Rosseel, Y. (2012). Lavaan: An r package for structural equation modeling. \emph{Journal of Statistical Software}, \emph{48}(1), 1--36. \url{https://doi.org/10.18637/jss.v048.i02}
+
+\leavevmode\vadjust pre{\hypertarget{ref-stark2006}{}}%
+Stark, S., Chernyshenko, O. S., \& Drasgow, F. (2006). Detecting differential item functioning with confirmatory factor analysis and item response theory: Toward a unified strategy. \emph{Journal of Applied Psychology}, \emph{91}(6), 1292--1306. \url{https://doi.org/10.1037/0021-9010.91.6.1292}
+
+\end{CSLReferences}
+
+\newpage
+
+\hypertarget{appendix}{%
+\section{Appendix}\label{appendix}}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-1}Model Fit for Invariant Model}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,505.72 & 7,547.87 & 0.99 & 0.99 & 0.02 & 0.02\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,751.95 & 3,787.17 & 0.98 & 0.96 & 0.04 & 0.04\\
+configural & 7,527.70 & 7,654.14 & 0.98 & 0.96 & 0.04 & 0.03\\
+metric & 7,529.39 & 7,638.97 & 0.95 & 0.93 & 0.06 & 0.05\\
+scalar & 7,522.90 & 7,615.62 & 0.96 & 0.96 & 0.04 & 0.05\\
+strict & 7,519.51 & 7,591.16 & 0.96 & 0.96 & 0.04 & 0.06\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-2}Model Fit for Small Differences in Loadings}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,527.67 & 7,569.81 & 0.98 & 0.96 & 0.04 & 0.03\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,767.83 & 3,803.05 & 0.98 & 0.96 & 0.05 & 0.04\\
+configural & 7,543.58 & 7,670.02 & 0.98 & 0.95 & 0.05 & 0.03\\
+metric & 7,548.90 & 7,658.48 & 0.94 & 0.92 & 0.07 & 0.06\\
+scalar & 7,541.81 & 7,634.53 & 0.95 & 0.95 & 0.05 & 0.06\\
+strict & 7,541.66 & 7,613.31 & 0.93 & 0.94 & 0.05 & 0.07\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-3}Model Fit for Medium Differences in Loadings}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,544.55 & 7,586.70 & 0.97 & 0.94 & 0.05 & 0.03\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,774.92 & 3,810.14 & 1.00 & 1.00 & 0.02 & 0.03\\
+configural & 7,550.67 & 7,677.11 & 0.99 & 0.98 & 0.04 & 0.03\\
+metric & 7,562.71 & 7,672.29 & 0.93 & 0.89 & 0.07 & 0.06\\
+scalar & 7,556.86 & 7,649.58 & 0.93 & 0.93 & 0.06 & 0.06\\
+strict & 7,558.05 & 7,629.70 & 0.91 & 0.92 & 0.06 & 0.08\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-4}Model Fit for Large Differences in Loadings}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,652.99 & 7,695.14 & 0.98 & 0.97 & 0.04 & 0.03\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,847.21 & 3,882.42 & 0.97 & 0.94 & 0.08 & 0.04\\
+configural & 7,622.96 & 7,749.40 & 0.97 & 0.94 & 0.06 & 0.03\\
+metric & 7,659.19 & 7,768.77 & 0.85 & 0.79 & 0.12 & 0.08\\
+scalar & 7,652.60 & 7,745.32 & 0.86 & 0.85 & 0.10 & 0.09\\
+strict & 7,660.63 & 7,732.27 & 0.82 & 0.85 & 0.10 & 0.12\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-5}Model Fit for Small Differences in Intercepts}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,509.69 & 7,551.83 & 1.00 & 0.99 & 0.02 & 0.02\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,760.41 & 3,795.63 & 0.93 & 0.86 & 0.08 & 0.05\\
+configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
+metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
+scalar & 7,531.34 & 7,624.06 & 0.94 & 0.93 & 0.06 & 0.05\\
+strict & 7,523.54 & 7,595.18 & 0.95 & 0.96 & 0.04 & 0.05\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-6}Model Fit for Medium Differences in Intercepts}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,532.77 & 7,574.92 & 1.00 & 1.00 & 0.01 & 0.02\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,760.41 & 3,795.63 & 0.93 & 0.86 & 0.08 & 0.05\\
+configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
+metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
+scalar & 7,554.20 & 7,646.92 & 0.85 & 0.83 & 0.09 & 0.07\\
+strict & 7,546.38 & 7,618.03 & 0.86 & 0.88 & 0.08 & 0.07\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-7}Model Fit for Large Differences in Intercepts}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,569.17 & 7,611.31 & 1.00 & 1.00 & 0.00 & 0.02\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,760.41 & 3,795.63 & 0.93 & 0.86 & 0.08 & 0.05\\
+configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
+metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
+scalar & 7,590.29 & 7,683.01 & 0.70 & 0.66 & 0.13 & 0.10\\
+strict & 7,582.47 & 7,654.12 & 0.71 & 0.75 & 0.11 & 0.10\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-8}Model Fit for Small Differences in Residuals}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,439.49 & 7,481.64 & 1.00 & 1.01 & 0.00 & 0.02\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,683.32 & 3,718.53 & 1.00 & 1.01 & 0.00 & 0.02\\
+configural & 7,459.07 & 7,585.51 & 0.99 & 0.98 & 0.03 & 0.03\\
+metric & 7,461.41 & 7,570.99 & 0.97 & 0.95 & 0.05 & 0.05\\
+scalar & 7,455.85 & 7,548.58 & 0.97 & 0.97 & 0.04 & 0.05\\
+strict & 7,453.48 & 7,525.12 & 0.96 & 0.97 & 0.04 & 0.05\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-9}Model Fit for Medium Differences in Residuals}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,368.57 & 7,410.71 & 1.00 & 1.00 & 0.00 & 0.02\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,587.77 & 3,622.99 & 1.00 & 1.03 & 0.00 & 0.02\\
+configural & 7,363.52 & 7,489.96 & 1.00 & 0.99 & 0.02 & 0.02\\
+metric & 7,366.63 & 7,476.21 & 0.97 & 0.96 & 0.05 & 0.05\\
+scalar & 7,360.15 & 7,452.87 & 0.98 & 0.98 & 0.03 & 0.05\\
+strict & 7,382.53 & 7,454.18 & 0.88 & 0.90 & 0.08 & 0.07\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:unnamed-chunk-10}Model Fit for Large Differences in Residuals}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+overall & 7,284.21 & 7,326.36 & 1.00 & 1.01 & 0.00 & 0.02\\
+group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
+group2 & 3,443.47 & 3,478.69 & 0.95 & 0.90 & 0.07 & 0.04\\
+configural & 7,219.22 & 7,345.66 & 0.96 & 0.92 & 0.06 & 0.03\\
+metric & 7,216.38 & 7,325.96 & 0.96 & 0.94 & 0.05 & 0.04\\
+scalar & 7,210.65 & 7,303.37 & 0.96 & 0.96 & 0.04 & 0.05\\
+strict & 7,297.89 & 7,369.54 & 0.59 & 0.65 & 0.13 & 0.18\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\end{document}

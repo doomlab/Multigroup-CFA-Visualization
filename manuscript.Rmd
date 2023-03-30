@@ -41,15 +41,20 @@ output            : papaja::apa6_pdf
 bibliography: references.bib
 ---
 
-```{r setup, include = FALSE}
+```{r libraries, include = FALSE}
 library(papaja)
 library(lavaan)
 library(broom)
 library(dplyr)
 library(ggplot2)
 # devtools::install_github("psyteachr/introdataviz")
+# devtools::install_github("ddueber/dmacs")
 library(introdataviz)
+library(dmacs)
+library(cowplot)
+```
 
+```{r cfa-function, include = FALSE}
 # CFA function
 mgcfa <- function(data, group, model){
   
@@ -85,8 +90,214 @@ mgcfa <- function(data, group, model){
   
   return(list(
     "model_coef" = model_coef,
-    "model_fit" = model_fit
+    "model_fit" = model_fit,
+    "model.overall" = model.overall,
+    "model.group1" = model.group1,
+    "model.group2" = model.group2,
+    "model.configural" = model.configural,
+    "model.metric" = model.metric,
+    "model.scalar" = model.scalar,
+    "model.strict" = model.strict
   ))
+  
+}
+```
+
+```{r test-function, eval = F, include = F}
+# temp test
+data_coef = results.large.res$model_coef
+model_step = "configural" 
+item_name = "q4"
+x_limits = c(-1,1)
+y_limits = c(min(df.large.res$q4), max(df.large.res$q4))
+ci_level = .95
+model_results = results.invariant$model.configural
+lv_name = "lv"
+```
+
+```{r plot-function, include = FALSE}
+plot_mgcfa <- function(data_coef, # output from model_coef
+                       model_step, # which model
+                       item_name, # name of observed item
+                       x_limits = c(-1,1), # LV limits to graph
+                       y_limits, # Y min and max in data 
+                       ci_level, # what ci do you want
+                       model_results, # what model results do you want 
+                       lv_name # which latent is the observed variable on
+                       ){
+  
+  # calculate cutoff
+  cutoff <- qt(p = (1-ci_level)/2, 
+               df = sum(unlist(model_results@Data@nobs)), 
+               lower.tail = F)
+  
+  # first get the data
+  graph.data <- data_coef %>% # put in tidy coefficients
+  filter(model == model_step) %>% # pick a model
+  filter(grepl(item_name, term)) %>%  # pick a question
+  mutate(group = factor(group, levels = names(table(data_coef$group)), labels = c("Group 1", "Group 2"))) 
+  
+  # make ribbon data y = slope*x + intercept for ci for slopes 
+  ribbondata <- bind_rows(
+    data.frame(
+    x = seq(from = x_limits[1] - 1,  
+            to = x_limits[2] + 1, 
+            by = .05), 
+    group = unique(graph.data$group)[1]
+  ) %>% 
+    mutate(ymin = (graph.data %>% filter(op == "=~") %>% 
+                 slice_head() %>% pull(estimate) * x) - 
+             (cutoff*graph.data %>% filter(op == "=~") %>% 
+                    slice_head() %>% pull(std.error)) +
+             graph.data %>% filter(op == "~1") %>% 
+                 slice_head() %>% pull(estimate), 
+           ymax = (graph.data %>% filter(op == "=~") %>% 
+                 slice_head() %>% pull(estimate) * x) + 
+             (cutoff*graph.data %>% filter(op == "=~") %>% 
+                    slice_head() %>% pull(std.error)) +
+             graph.data %>% filter(op == "~1") %>% 
+                 slice_head() %>% pull(estimate)), 
+    data.frame(
+      x = seq(from = x_limits[1] - 1,  
+              to = x_limits[2] + 1, 
+              by = .05), 
+      group = unique(graph.data$group)[2]
+    ) %>% 
+      mutate(ymin = (graph.data %>% filter(op == "=~") %>% 
+                   slice_tail() %>% pull(estimate) * x) - 
+               (cutoff*graph.data %>% filter(op == "=~") %>% 
+                      slice_tail() %>% pull(std.error)) +
+               graph.data %>% filter(op == "~1") %>% 
+                   slice_tail() %>% pull(estimate), 
+             ymax = (graph.data %>% filter(op == "=~") %>% 
+                   slice_tail() %>% pull(estimate) * x) + 
+               (cutoff*graph.data %>% filter(op == "=~") %>% 
+                      slice_tail() %>% pull(std.error)) +
+               graph.data %>% filter(op == "~1") %>% 
+                   slice_tail() %>% pull(estimate))
+  )
+  
+  # make point data to draw on the intercepts 
+  pointdata <- data.frame(
+  x = c(0,0),
+  y = graph.data %>% filter(op == "~1") %>% pull(estimate), 
+  group = graph.data %>% filter(op == "~1") %>% pull(group),
+  ymin = graph.data %>% filter(op == "~1") %>% pull(estimate) - 
+    cutoff * graph.data %>% filter(op == "~1") %>% pull(std.error), 
+  ymax = graph.data %>% filter(op == "~1") %>% pull(estimate) + 
+    cutoff * graph.data %>% filter(op == "~1") %>% pull(std.error)
+  )
+  
+  # make the line data to draw on the slopes
+  linedata <- data.frame(
+  slope = graph.data %>% filter(op == "=~") %>% pull(estimate), 
+  intercept = graph.data %>% filter(op == "~1") %>% pull(estimate), 
+  group = graph.data %>% filter(op == "~1") %>% pull(group)
+  )
+  
+  # make the distributions for the residuals 
+  violindata <- data.frame(
+  y = c(rnorm(n = 1000, 
+            mean = graph.data %>% filter(op == "~~") %>% 
+              slice_head() %>% pull(estimate), 
+            sd = graph.data %>% filter(op == "~~") %>% 
+              slice_head() %>% pull(std.error)), 
+        rnorm(n = 1000, 
+            mean = graph.data %>% filter(op == "~~") %>% 
+              slice_tail() %>% pull(estimate), 
+            sd = graph.data %>% filter(op == "~~") %>% 
+              slice_tail() %>% pull(std.error))),
+  group = c(rep(graph.data %>% filter(op == "~~") %>% 
+              slice_head() %>% pull(group), 1000),
+            rep(graph.data %>% filter(op == "~~") %>% 
+              slice_tail() %>% pull(group), 1000)), 
+  x = 1
+  )
+  
+  # make the latent mean data for right panel
+  latent_predict <- predict(model_results)
+  latent_means <- data.frame(
+    c(latent_predict[[1]], latent_predict[[2]])
+    )
+  colnames(latent_means) <- colnames(latent_predict[[1]])
+  latent_means$group <- rep(names(latent_predict), 
+                  times = c(length(latent_predict[[1]]), 
+                           length(latent_predict[[2]])))
+  
+  latent_means$lv <- latent_means[ , lv_name]
+  
+  # make a plot of the variance
+  variance_plot <- 
+  ggplot(violindata, aes(x = 1, y = y, color = group, fill = group)) + 
+  geom_split_violin() + 
+  theme_void() + 
+  theme(legend.position = "none") + 
+  stat_summary(fun = "mean",
+               geom = "crossbar", 
+               width = 0.5,
+               colour = "black")
+  
+  # make the plot with intercepts and slopes
+  intercept_plot <- 
+  ggplot() + 
+  # basic set up
+  theme_classic() + 
+  xlab("Latent Variable") + 
+  ylab("Observed Variable") + 
+  coord_cartesian(xlim = x_limits, ylim = y_limits) + 
+  # plot the intercepts 
+  geom_point(data = pointdata, 
+             aes(x = x, y = y, color = group), 
+             inherit.aes = FALSE) + 
+  geom_errorbar(data = pointdata,
+                aes(x = x, ymin = ymin, ymax = ymax, color = group), 
+                inherit.aes = FALSE, width = .10) + 
+  # plot the slopes
+  geom_abline(data = linedata,
+              aes(slope = slope, intercept = intercept, color = group)) + 
+  geom_ribbon(data = ribbondata, 
+              aes(x = x, ymin = ymin, ymax = ymax, fill = group), 
+              inherit.aes = FALSE, alpha = .2) + 
+  scale_color_discrete(name = "Group") + 
+  scale_fill_discrete(name = "Group") + 
+  geom_vline(xintercept = 0) + 
+  theme(axis.line.y = element_blank())
+  
+  # make the latent means plot
+  mean_plot <- ggplot(latent_means, aes(x = lv, fill = group)) + 
+    geom_density(alpha = .2) + 
+    theme_classic() + 
+    xlab("Latent Variable") + 
+    ylab("Density") + 
+    geom_vline(data = latent_means %>% group_by(group) %>% summarize(mean = mean(lv)), 
+               aes(xintercept = mean, color = group)) + 
+    theme(legend.position = "none") 
+  
+  y_range = abs(y_limits[2] - y_limits[1])
+  
+  # line up the two plots 
+  prow <- plot_grid(
+    intercept_plot + 
+      theme(legend.position = "none") + 
+      annotation_custom(ggplotGrob(variance_plot), 
+                        xmin = .25, xmax = 1, 
+                        ymin = y_limits[1], ymax = y_limits[2]-y_range/1.8),
+    mean_plot + 
+      theme(legend.position = "none"),
+    align = 'vh',
+    hjust = -1,
+    nrow = 1
+  )
+  
+  # get the lengend
+  legend_b <- get_legend(
+    intercept_plot + 
+      guides(color = guide_legend(nrow = 1)) +
+      theme(legend.position = "bottom")
+  )
+  
+  # send out the plot 
+  plot_grid(prow, legend_b, ncol = 1, rel_heights = c(1, .1))
   
 }
 ```
@@ -111,242 +322,343 @@ Outline
 
 -   how can we visualize and interpret MGCFA to help us understand the impact of measurement differences
 
-Research Questions:
+By the end of this tutorial manuscript, readers will:
 
-By the end of this tutorial manuscript, readers will: 1. Be able to create visualizations for common steps to multi-group confirmatory factor analysis. 2. Be able to interpret the impact and size of potential non-invariance on measurement. 3. Understand the impact of measurement variability on replication and generalizability.
+1.  Be able to create visualizations for common steps to multi-group confirmatory factor analysis.
+2.  Be able to interpret the impact and size of potential non-invariance on measurement.
+3.  Understand the impact of measurement variability on replication and generalizability.
 
-# Methods
+# Method
 
-## Design
+## Design and Analysis
 
-Data will be simulated based on a multivariate normal distribution using R. The data will include two groups of individuals for multi-group confirmatory factor analysis (ns = 250; N = 500). The latent variables will be assumed to be continuous normal, and the measured items will be simulated using a traditional 1-7 Likert-type scale, matching many of the types of scales published in psychology and Assessment. Each item will be assumed to be related to the latent variable with loadings approximately equal to .60 to .80 (minus scenarios in which configural non-invariance is simulated).
+Data was simulated using the `simulateData` function in the *R* package `lavaan` [@rosseel2012] assuming multivariate normality using a $\mu$ of 0 and $\sigma$ of 1 for the data. This function allows you to write `lavaan` syntax for your model with estimated values to generate data for observed variables. The data included two groups of individuals ("Group 1", "Group 2") for a multi-group confirmatory factor analysis (\$n\_{group}\$ = 250, *N* = 500). The latent variables were assumed to be continuous normal. The model consisted of five observed items predicted by one latent variable (`lv =~ q1 + q2 + q3 + q4 + q5`); however, the demonstration in this manuscript extends to multiple latent variables and other combinations of observed variables. Each item was assumed to be related to the latent variable with loadings approximately equal to .40 to .80, except when cases of non-invariance on the loadings was assumed.
 
-## Variables
+The @brown2015 steps of testing measurement invariance are demonstrated in this manuscript for illustration purposes, but in line with @stark2006 suggestions, the visualizations show the impact of loadings and intercepts together. The configural model was analyzed nesting both groups into the same CFA model requiring that both groups show the same model structure, but all other parameters are free to vary between groups. The metric model constrained the factor loadings of each group to be equal within the model. The scalar model then constrained the item intercepts (i.e., item mean) to be equal across groups. Finally, the strict model constrained the item variances (i.e., error variances) to be equal for each item across groups. These models are normally tested sequentially, and a convenience function `mgcfa` is provided in the supplemental documents for this manuscript.
 
-- Number of factors: one and two latent variable models will be simulated with five measured items for each latent variable. 
-- Area of invariance: a model with non-invariance at each stage will be simulated including configural, metric, scalar, and strict non-invariance. One model with complete invariance will be used for comparison purposes. 
-- Size of invariance: the size of the invariance will be simulated at three levels.
+The data was then simulated to represent invariance across all model steps, small, medium, and large invariance using $d_{MACS}$ estimated sizes from @nye2019. While $d_{MACS}$ is used primarily for an effect size of the (non)-invariance for intercepts and loadings together, a similar approach was taken for the estimation of small, medium, and large effects on the residuals. The effect size is presented for all models, calculated from the *dmacs* package [@dueber2023, @nye2011]. Only one item in each model was manipulated from the invariant model to create the non-invariant models.
 
-none, small, medium, large 
-two models
-metric (loadings), scalar (intercepts), strict (residuals)
-
-4X2X3
-
-since these are normally tested sequentially, we will only do one at a time 
-
-
-https://stats.stackexchange.com/questions/593243/data-simulation-in-r-for-measurement-invariance
-
-```{r create-data}
-library(lavaan)
-
-# build invariant model one factor
-model.invariant.g1 <- "lv =~ .9*q1 + .4*q2 + .6*q3 + .3*q4 + .6*q5"
-model.invariant.g2 <- "lv =~ .87*q1 + .43*q2 + .54*q3 + .4*q4 + .61*q5"
+```{r create-models}
+# overall model
 model.overall <- "lv =~ q1 + q2 + q3 + q4 + q5"
 
-# simulate data
+# build invariant model one factor
+model.invariant.g1 <- "lv =~ .8*q1 + .4*q2 + .6*q3 + .3*q4 + .6*q5 
+q4 ~~ 1*q4
+q4 ~ 0*1"
+model.invariant.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .3*q4 + .61*q5
+q4 ~~ 1*q4
+q4 ~ 0*1"
+
+# loadings
+model.small.load.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .5*q4 + .61*q5"
+model.med.load.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .6*q4 + .61*q5"
+model.large.load.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + 1.1*q4 + .61*q5"
+
+# build invariance on intercepts .25, .50, and .75
+model.small.int.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
+q4 ~ .25*1"
+model.med.int.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
+q4 ~ .5*1"
+model.large.int.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
+q4 ~ .75*1"
+
+# build invariance on residuals .25, .50, and .75
+model.small.res.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
+q4 ~~ .75*q4"
+model.med.res.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
+q4 ~~ .5*q4"
+model.large.res.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
+q4 ~~ .25*q4"
+```
+
+```{r create-data}
+# simulate data invariant
 df.invariant <- bind_rows(
   simulateData(model.invariant.g1, sample.nobs = 250, 
-               meanstructure = T, model.type = "cfa") %>% 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
     mutate(group = "Group 1"), 
   simulateData(model.invariant.g2, sample.nobs = 250, 
-               meanstructure = T, model.type = "cfa") %>% 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
     mutate(group = "Group 2") 
 )
 
+# simulate data small load
+df.small.load <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.small.load.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data med load
+df.med.load <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.med.load.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data large load
+df.large.load <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.large.load.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data small int
+df.small.int <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.small.int.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data med int
+df.med.int <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.med.int.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data large int
+df.large.int <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.large.int.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data small res
+df.small.res <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.small.res.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data med res
+df.med.res <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.med.res.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data large res
+df.large.res <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.large.res.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
 ```
 
 ```{r run-cfa}
 # invariant CFA
 results.invariant <- mgcfa(df.invariant, "group", model.overall)
+d_invariant <- lavaan_dmacs(results.invariant$model.configural, RefGroup = "Group 1")
+
+# loadings
+results.small.load <- mgcfa(df.small.load, "group", model.overall)
+results.med.load <- mgcfa(df.med.load, "group", model.overall)
+results.large.load <- mgcfa(df.large.load, "group", model.overall)
+
+d_small_load <- lavaan_dmacs(results.small.load$model.configural, RefGroup = "Group 1")
+d_med_load <- lavaan_dmacs(results.med.load$model.configural, RefGroup = "Group 1")
+d_large_load <- lavaan_dmacs(results.large.load$model.configural, RefGroup = "Group 1")
+
+# intercepts
+results.small.int <- mgcfa(df.small.int, "group", model.overall)
+results.med.int <- mgcfa(df.med.int, "group", model.overall)
+results.large.int <- mgcfa(df.large.int, "group", model.overall)
+
+d_small_int <- lavaan_dmacs(results.small.int$model.configural, RefGroup = "Group 1")
+d_med_int <- lavaan_dmacs(results.med.int$model.configural, RefGroup = "Group 1")
+d_large_int <- lavaan_dmacs(results.large.int$model.configural, RefGroup = "Group 1")
+
+# residuals
+results.small.res <- mgcfa(df.small.res, "group", model.overall)
+results.med.res <- mgcfa(df.med.res, "group", model.overall)
+results.large.res <- mgcfa(df.large.res, "group", model.overall)
+
+d_small_res <- lavaan_dmacs(results.small.res$model.configural, RefGroup = "Group 1")
+d_med_res <- lavaan_dmacs(results.med.res$model.configural, RefGroup = "Group 1")
+d_large_res <- lavaan_dmacs(results.large.res$model.configural, RefGroup = "Group 1")
 ```
 
-```{r invariant-picture}
-graph.data <- results.invariant$model_coef %>% # put in tidy coefficients
-  filter(model == "configural") %>% # pick a model
-  filter(grepl("q4", term)) %>%  # pick a question
-  mutate(group = factor(group, levels = c(1,2), labels = c("Group 1", "Group 2"))) 
-
-graph.data$low <- graph.data$estimate - 2*graph.data$estimate
-graph.data$high <- graph.data$estimate + 2*graph.data$estimate
-
-# X = latent variable (so interpretation is z-score)
-# Y = observed variable
-# set x and y limits
-x_limits <- c(-1,1)
-y_limits <- c(min(df.invariant$q4), max(df.invariant$q4))
-
-# make ribbon data y = slope*x + intercept
-ribbondata <- bind_rows(
-  data.frame(
-  x = seq(from = x_limits[1] - 1,  
-          to = x_limits[2] + 1, 
-          by = .05), 
-  group = unique(graph.data$group)[1]
-) %>% 
-  mutate(ymin = (graph.data %>% filter(op == "=~") %>% 
-               slice_head() %>% pull(estimate) * x) - 
-           (2*graph.data %>% filter(op == "=~") %>% 
-                  slice_head() %>% pull(std.error)) +
-           graph.data %>% filter(op == "~1") %>% 
-               slice_head() %>% pull(estimate), 
-         ymax = (graph.data %>% filter(op == "=~") %>% 
-               slice_head() %>% pull(estimate) * x) + 
-           (2*graph.data %>% filter(op == "=~") %>% 
-                  slice_head() %>% pull(std.error)) +
-           graph.data %>% filter(op == "~1") %>% 
-               slice_head() %>% pull(estimate)), 
-  data.frame(
-    x = seq(from = x_limits[1] - 1,  
-            to = x_limits[2] + 1, 
-            by = .05), 
-    group = unique(graph.data$group)[2]
-  ) %>% 
-    mutate(ymin = (graph.data %>% filter(op == "=~") %>% 
-                 slice_tail() %>% pull(estimate) * x) - 
-             (2*graph.data %>% filter(op == "=~") %>% 
-                    slice_tail() %>% pull(std.error)) +
-             graph.data %>% filter(op == "~1") %>% 
-                 slice_tail() %>% pull(estimate), 
-           ymax = (graph.data %>% filter(op == "=~") %>% 
-                 slice_tail() %>% pull(estimate) * x) + 
-             (2*graph.data %>% filter(op == "=~") %>% 
-                    slice_tail() %>% pull(std.error)) +
-             graph.data %>% filter(op == "~1") %>% 
-                 slice_tail() %>% pull(estimate))
+```{r invariant-pic, include = T, fig.cap = "Invariant Model Visualization"}
+plot_mgcfa(
+  data_coef = results.invariant$model_coef, # output from model_coef
+  model_step = "configural", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.invariant$q4), max(df.invariant$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.invariant$model.configural, # what model results do you want 
+  lv_name = "lv"
 )
+```
 
-pointdata <- data.frame(
-  x = c(0,0),
-  y = graph.data %>% filter(op == "~1") %>% pull(estimate), 
-  group = graph.data %>% filter(op == "~1") %>% pull(group),
-  ymin = graph.data %>% filter(op == "~1") %>% pull(estimate) - 
-    2 * graph.data %>% filter(op == "~1") %>% pull(std.error), 
-  ymax = graph.data %>% filter(op == "~1") %>% pull(estimate) + 
-    2 * graph.data %>% filter(op == "~1") %>% pull(std.error)
+```{r small-load-pic, include = T, fig.cap = "Small Loadings Model Visualization"}
+plot_mgcfa(
+  data_coef = results.small.load$model_coef, # output from model_coef
+  model_step = "configural", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.small.load$q4), max(df.small.load$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.small.load$model.configural, # what model results do you want 
+  lv_name = "lv"
 )
+```
 
-linedata <- data.frame(
-  slope = graph.data %>% filter(op == "=~") %>% pull(estimate), 
-  intercept = graph.data %>% filter(op == "~1") %>% pull(estimate), 
-  group = graph.data %>% filter(op == "~1") %>% pull(group)
+```{r med-load-pic, include = T, fig.cap = "Medium Loadings Model Visualization"}
+plot_mgcfa(
+  data_coef = results.med.load$model_coef, # output from model_coef
+  model_step = "configural", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.med.load$q4), max(df.med.load$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.med.load$model.configural, # what model results do you want 
+  lv_name = "lv"
 )
+```
 
-violindata <- data.frame(
-  y = c(rnorm(n = 1000, 
-            mean = graph.data %>% filter(op == "~~") %>% 
-              slice_head() %>% pull(estimate), 
-            sd = graph.data %>% filter(op == "~~") %>% 
-              slice_head() %>% pull(std.error)), 
-        rnorm(n = 1000, 
-            mean = graph.data %>% filter(op == "~~") %>% 
-              slice_tail() %>% pull(estimate), 
-            sd = graph.data %>% filter(op == "~~") %>% 
-              slice_tail() %>% pull(std.error))),
-  group = c(rep(graph.data %>% filter(op == "~~") %>% 
-              slice_head() %>% pull(group), 100),
-            rep(graph.data %>% filter(op == "~~") %>% 
-              slice_tail() %>% pull(group), 100)), 
-  x = 1
+```{r large-load-pic, include = T, fig.cap = "Large Loadings Model Visualization"}
+plot_mgcfa(
+  data_coef = results.large.load$model_coef, # output from model_coef
+  model_step = "configural", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.large.load$q4), max(df.large.load$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.large.load$model.configural, # what model results do you want 
+  lv_name = "lv"
 )
-
-latent_means <- data.frame(
-  predict(model.overall.model), 
-  group = df.invariant$group
-)
-
-variance_plot <- 
-  ggplot(violindata, aes(x = 1, y = y, color = group, fill = group)) + 
-  geom_split_violin() + 
-  theme_void() + 
-  theme(legend.position = "none") + 
-  stat_summary(fun = "mean",
-               geom = "crossbar", 
-               width = 0.5,
-               colour = "black")
-
-intercept_plot <- 
-  ggplot() + 
-  # basic set up
-  theme_classic() + 
-  xlab("Latent Variable") + 
-  ylab("Observed Variable") + 
-  coord_cartesian(xlim = x_limits, ylim = y_limits) + 
-  # plot the intercepts 
-  geom_point(data = pointdata, 
-             aes(x = x, y = y, color = group), 
-             inherit.aes = FALSE) + 
-  geom_errorbar(data = pointdata,
-                aes(x = x, ymin = ymin, ymax = ymax, color = group), 
-                inherit.aes = FALSE, width = .10) + 
-  # plot the slopes
-  geom_abline(data = linedata,
-              aes(slope = slope, intercept = intercept, color = group)) + 
-  geom_ribbon(data = ribbondata, 
-              aes(x = x, ymin = ymin, ymax = ymax, fill = group), 
-              inherit.aes = FALSE, alpha = .2) + 
-  scale_color_discrete(name = "Group") + 
-  scale_fill_discrete(name = "Group") + 
-  geom_vline(xintercept = 0)
-  
-# latent means
-mean_plot <- ggplot(latent_means, aes(x = lv, fill = group)) + 
-  geom_density(alpha = .2) + 
-  theme_classic() + 
-  xlab("Latent Variable") + 
-  ylab("Density") + 
-  geom_vline(data = latent_means %>% group_by(group) %>% summarize(mean = mean(lv)), 
-             aes(xintercept = mean, color = group)) + 
-  theme(legend.position = "none") 
 ```
 
 
-
-```{r}
-
-
-model.2 <- "lv =~ q1 + q2 + q3 + q4 + q5
-lv2 =~ q6 + q7 + q8 + q9 + q10
-"
-
-# Packages
-library(lavaan)
-
-# specify population model for group 1 and group 2
-population_model_g1 <-'f1=~x1+.6*x2+.7*x3+0.5*x4'
-population_model_g2 <-'f1=~x1+.6*x2+.7*x3+0.4*x4'
-
-# Sumulate data
-set.seed(1234)
-model_data_g1<-lavaan::simulateData(population_model_g1,sample.nobs=500)
-model_data_g2<-lavaan::simulateData(population_model_g2,sample.nobs=500)
-
-# Add group label
-model_data_g1$group <- "Group1"
-model_data_g2$group <- "Group2"
-
-# put data into one data frame
-model_data_all <- cbind(model_data_g1,model_data_g2)
-
+```{r small-int-pic, include = T, fig.cap = "Small Intercepts Model Visualization"}
+plot_mgcfa(
+  data_coef = results.small.int$model_coef, # output from model_coef
+  model_step = "metric", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.small.int$q4), max(df.small.int$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.small.int$model.metric, # what model results do you want 
+  lv_name = "lv"
+)
 ```
 
-#### delete this 
-Across all studies, results indicated that the majority of the standardized factor loading differ-
-ences were below .10, and few were greater than .50. Given these results, small, medium, and large
-differences in factor loadings were operationalized as .10, .20, and .30, respectively. In other words,
-the factor loadings in the focal group were increased by .10, .20, or .30 to simulate MNE in various
-conditions. In contrast, intercept differences in the literature were larger than the factor loading
-differences, and the majority of these differences were below .20, but very few were above 1.00.
-Therefore, intercept differences across groups were operationalized as .25, .50, and .75. Figures A1
-and A2 in the online supplemental material show the distributions of differences between the
-standardized factor loadings and intercepts in the reference and focal groups.
+```{r med-int-pic, include = T, fig.cap = "Medium Intercepts Model Visualization"}
+plot_mgcfa(
+  data_coef = results.med.int$model_coef, # output from model_coef
+  model_step = "metric", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.med.int$q4), max(df.med.int$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.med.int$model.metric, # what model results do you want 
+  lv_name = "lv"
+)
+```
+
+```{r large-int-pic, include = T, fig.cap = "Large Intercepts Model Visualization"}
+plot_mgcfa(
+  data_coef = results.large.int$model_coef, # output from model_coef
+  model_step = "metric", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.large.int$q4), max(df.large.int$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.large.int$model.metric, # what model results do you want 
+  lv_name = "lv"
+)
+```
+
+```{r small-res-pic, include = T, fig.cap = "Small Residuals Model Visualization"}
+plot_mgcfa(
+  data_coef = results.small.res$model_coef, # output from model_coef
+  model_step = "scalar", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.small.res$q4), max(df.small.res$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.small.res$model.scalar, # what model results do you want 
+  lv_name = "lv"
+)
+```
+
+```{r med-res-pic, include = T, fig.cap = "Medium Residuals Model Visualization"}
+plot_mgcfa(
+  data_coef = results.med.res$model_coef, # output from model_coef
+  model_step = "scalar", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.med.res$q4), max(df.med.res$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.med.res$model.scalar, # what model results do you want 
+  lv_name = "lv"
+)
+```
+
+```{r large-res-pic, include = T, fig.cap = "Large Residuals Model Visualization"}
+plot_mgcfa(
+  data_coef = results.large.res$model_coef, # output from model_coef
+  model_step = "scalar", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.large.res$q4), max(df.large.res$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.large.res$model.scalar, # what model results do you want 
+  lv_name = "lv"
+)
+```
 
 
-## Data analysis
-
-Multi-group confirmatory factor analysis will be examined across the simulated two groups of individuals using lavaan (Rosseel, 2012) focusing on the most common procedure outlined in Brown (2015). Each stage of measurement invariance (i.e., configural, metric, scalar, and strict) will be examined in the simulated data demonstrating how to visualize results using common tools, such as ggplot2 (Wickham et al., 2021). These visualizations will be compared across differences in non-invariance size to illustrate how to interpret the size of the non-invariance. Last, these effects will be examined on total score measurement (i.e., latent means) to explore the potential impacts on replication. Finally, suggestions will be provided for framing registered reports using multi-group confirmatory factor analysis.
 
 # Results
 
@@ -363,107 +675,76 @@ Conclusions:
 ::: {#refs custom-style="Bibliography"}
 :::
 
+\newpage
 
-Visualizing Measurement Model Parameters for Tests of (Non)Invariance/DIF: 
-Purpose, Presentation, and a New R Package
+# Appendix
 
-Type: Tutorial 
+```{r}
+apa_table(results.invariant$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Invariant Model")
+```
 
-Authors: John K. Sakaluk, Brenton M. Wiernik, Flavio Azevedo, Alex J. Denison, and Erin M. Buchanan
+```{r}
+apa_table(results.small.load$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Small Differences in Loadings")
+```
 
-Email: jsakaluk@uwo.ca 
+```{r}
+apa_table(results.med.load$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Medium Differences in Loadings")
+```
 
-300 Word Summary: 
-Latent variable psychometric theory remains psychology’s most popular framework for conceptualizing and studying psychological entities across its many subdisciplines. Indeed, psychologists regularly use latent variable analysis frameworks to generate a “measurement model”: a statistical statement of the relations between a given set of observed variables and their construct(s) when attempting to describe and quantify the substance of the theoretical entities that they study. A core--and tacit--assumption, however of latent variables is that the measurement parameters are consistent between groups or across a given continuous covariate, as divergent measurement model parameters otherwise threaten the validity of the estimation, testing, and comparison of structural parameters. Psychologists therefore are often tasked with testing to establish “measurement invariance” (or equivalently, to rule out “differential item functioning”) for their latent variables of interest. But whereas the estimation, testing, and comparison of measurement model parameters is commonplace, the visualization of these parameters is virtually nonexistent, largely owing to a dearth of any standardized manner by which these parameters ought to be depicted. Without any compelling visualization techniques, the process of evaluating measurement (non)invariance seems likely to persist in facilitating relatively uninformative all-or-none omnibus testing, without any possibility of researchers identifying meaningful patterns. We therefore propose to describe, apply, and develop supporting analytic materials (e.g., R functions and tutorials) to visualize measurement modeling parameters. Our approach will be amenable to either multi-group comparisons or continuous covariate examinations of measurement modeling parameters and will enable emphasizing particular parameters and/or variables, while also providing visual information about the model as a whole. Finally, our approach will emphasize accessibility, in terms of: 1) creating easy-to-use functions for interested users to adopt in their own work, which will create 2) publication-ready greyscale figures and/or; 3) figures in a colorblind-friendly palette.  
-Prior Req’d Knowledge:
-R coding
-Regression
-Latent variable theory and measurement modeling 
+```{r}
+apa_table(results.large.load$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Large Differences in Loadings")
+```
 
+```{r}
+apa_table(results.small.int$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Small Differences in Intercepts")
+```
 
-What: 
-Rationale
-Easy-to-use functionality/package for visualizations of measurement modeling output for DIF/Noninvariance-Testing, including:
-Scale of measuremen-friendly for source of noninvariance
-Multi-Group
-Continuous-Covariate
-Multilevel(s) Targeting
-Measurement parameter (loading, intercept, residuals(?))
-Item level (e.g., noninvariance/DIF effect sizes?)
-Test level
-Application/didactic example
-Existing data sets? And/or?
-Simulated data sets?
+```{r}
+apa_table(results.med.int$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Medium Differences in Intercepts")
+```
 
-Guiding Programming Values
-Easy to use
-Should use df and fitted lavaan object and little else
-Easy to incorporate into pubs
-Should have a template option for APA-compliant figures (i.e., greyscale)
-Accessibility
-Should have a template(s) option for beautiful and colourblind-friendly palette(s)
-Modifiable
-Should return ggplot2::ggplot objects that the user can modify as desired; perhaps a “basic” template option that returns the geoms_ with little else?
+```{r}
+apa_table(results.large.int$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Large Differences in Intercepts")
+```
 
+```{r}
+apa_table(results.small.res$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Small Differences in Residuals")
+```
 
-March 24 Meeting
+```{r}
+apa_table(results.med.res$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Medium Differences in Residuals")
+```
 
-Introductions
-
-
-Rehash of project goals/features + Discussion
-Visualization of measurement model parameters for noninvariance/DIF testing
-Visualization types
-Response curves (latent score X, predicted item score on Y)
-IRT Sigmoidal curves
-CFA item “curves” 
-“Common” visualization style (simple intercepts/slopes) for MCCFA/RFA
-Error variance could be a band 
-Faceted by items
-Test level observed score and latent score distributions
-Densities with grouped observed + grouped latent scores
-Variance decomposition signal:noise (communality to uniqueness) “candybar plots”
-R Functions (take selection of items and group/covariate and/or MGCFA lavaan object)
-Return ggplot object
-Options for “canned” style (e.g., APA compliant) 
-Didactic example
-learnr tutorial(s) 
-
-
-Preferred workflow/systems
-lavaan:: focused
-Github repo for package
-Brenton with commit access on master branch
-Others suggest changes with pull requests
-Github issues for communication
-Use Brown terminology
-Configural
-Metric
-Scalar
-Strict
-
-
-Preferred roles
-Toy examples for dev (two group multiple groups, continuous mimic, categorical mimic, sparse groups at different levels)
-Erin’s examples 
-Install the package examples if you want: devtools::install_github(“doomlab/learnSEM”) (I have a few more too, I’ll dig them up)
-John: lavaan::HolzingerSwineford1939 and psych::bfi as preexisting/often used exemplar sets
-Plot design in ggplot
-Alex and Brenton and Flavio
-Function writing
-Alex and Brenton and John
-Package dev/maintenance
-Brenton
-learnr tutorial(s)
-Erin and John
-Writing
-John is happy to lead
-
-
-Prefered timeline
-
-
-Submission targets
-AMPPS
-BRM
-
+```{r}
+apa_table(results.large.res$model_fit %>% 
+            select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Large Differences in Residuals")
+```
