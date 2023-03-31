@@ -293,13 +293,19 @@ The data was then simulated to represent invariance across all model steps, smal
 
 The complete code for this manuscript can be found at \url{https://osf.io/wev5f/}, and the function code for the convenience function for multi-group models and plots is found in the appendix. First, we would create our model code in \texttt{lavaan} syntax. The \texttt{lv} latent variable predicts the five measured variables, which are present as columns in our \texttt{df.invariant} dataset. You would include the dataframe in the \texttt{data} argument of our function, the name of the grouping variable in quotes for \texttt{group}, and the \texttt{lavaan} model syntax in the \texttt{model} argument. The \texttt{mgcfa} function code runs an overall model with all data, regardless of group, each group separately on the model, then the steps described above: configural, metric, scalar, and strict invariance.
 
+\texttt{lavaan} automatically sets the mean (i.e., the intercept) for latent variables to zero. If we wish to visualize the impact of the changes in parameter estimates across groups on the latent means, we need to allow the latent mean estimation with \texttt{lv\ \textasciitilde{}\ 1}. However, adding this estimation into our model will create a non-identified model. To solve this problem, you can set one of the intercepts of another variable to a value to scale the model. Here we will set the scale of the model by using \texttt{q1\ \textasciitilde{}\ 0*1}, thus, scaling the expected means to zero. With simulation, this step is easy to know which variable to pick - we set the intercept on the variable we know did not show differences. In real data, you may wish to run the model steps \emph{without} setting this option, examine the results of a configural or separate models, and then add the option for the values most similar. Additionally, you could complete partial invariance steps to determine which value appears most consistent to fix.
+
 \small
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# create lavaan model}
-\NormalTok{model.overall }\OtherTok{\textless{}{-}} \StringTok{"lv =\textasciitilde{} q1 + q2 + q3 + q4 + q5}
+\NormalTok{model.overall }\OtherTok{\textless{}{-}} \StringTok{"}
+\StringTok{\# overall one{-}factor model}
+\StringTok{lv =\textasciitilde{} q1 + q2 + q3 + q4 + q5}
+\StringTok{\# set the intercept (mean) of q1 to zero}
 \StringTok{q1 \textasciitilde{} 0*1}
+\StringTok{\# allow the lv intercept to be freely estimated}
 \StringTok{lv \textasciitilde{} 1"}
 \CommentTok{\# look at the data}
 \FunctionTok{head}\NormalTok{(df.invariant)}
@@ -345,29 +351,33 @@ The results are saved as a list and include the following:
 \def\labelenumi{\arabic{enumi})}
 \tightlist
 \item
-  \texttt{model\_coef}: a tidy dataframe with \emph{all} model's coefficients saved from the \texttt{lavaan} outputs.
+  \texttt{model\_coef}: a tidy dataframe with \emph{all} model's coefficients saved from the \texttt{lavaan} outputs. Note that we can see that the intercept \texttt{\textasciitilde{}1} is set for question 1 but freely estimated for the latent variable.
 \end{enumerate}
 
 \small
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{head}\NormalTok{(results.invariant}\SpecialCharTok{$}\NormalTok{model\_coef)}
+\NormalTok{results.invariant}\SpecialCharTok{$}\NormalTok{model\_coef[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{ , ]}
 \end{Highlighting}
 \end{Shaded}
 
 \normalsize
 
 \begin{verbatim}
-## # A tibble: 6 x 13
-##   term       op    estimate std.error statistic   p.value std.lv std.all std.nox
-##   <chr>      <chr>    <dbl>     <dbl>     <dbl>     <dbl>  <dbl>   <dbl>   <dbl>
-## 1 "lv =~ q1" =~       1        0          NA    NA         0.780   0.598   0.598
-## 2 "lv =~ q2" =~       0.564    0.0864      6.52  6.99e-11  0.440   0.435   0.435
-## 3 "lv =~ q3" =~       0.748    0.105       7.12  1.09e-12  0.583   0.505   0.505
-## 4 "lv =~ q4" =~       0.338    0.0804      4.20  2.62e- 5  0.264   0.250   0.250
-## 5 "lv =~ q5" =~       0.904    0.120       7.52  5.48e-14  0.705   0.613   0.613
-## 6 "q1 ~1 "   ~1       0        0          NA    NA         0       0       0    
+## # A tibble: 10 x 13
+##    term     op    estimate std.error statistic   p.value  std.lv std.all std.nox
+##    <chr>    <chr>    <dbl>     <dbl>     <dbl>     <dbl>   <dbl>   <dbl>   <dbl>
+##  1 "lv =~ ~ =~      1         0         NA     NA         0.780   0.598   0.598 
+##  2 "lv =~ ~ =~      0.564     0.0864     6.52   6.99e-11  0.440   0.435   0.435 
+##  3 "lv =~ ~ =~      0.748     0.105      7.12   1.09e-12  0.583   0.505   0.505 
+##  4 "lv =~ ~ =~      0.338     0.0804     4.20   2.62e- 5  0.264   0.250   0.250 
+##  5 "lv =~ ~ =~      0.904     0.120      7.52   5.48e-14  0.705   0.613   0.613 
+##  6 "q1 ~1 " ~1      0         0         NA     NA         0       0       0     
+##  7 "lv ~1 " ~1     -0.0187    0.0584    -0.320  7.49e- 1 -0.0239 -0.0239 -0.0239
+##  8 "q1 ~~ ~ ~~      1.09      0.103     10.6    0         1.09    0.643   0.643 
+##  9 "q2 ~~ ~ ~~      0.828     0.0604    13.7    0         0.828   0.811   0.811 
+## 10 "q3 ~~ ~ ~~      0.997     0.0786    12.7    0         0.997   0.745   0.745 
 ## # i 4 more variables: model <chr>, block <int>, group <int>, label <chr>
 \end{verbatim}
 
@@ -422,7 +432,7 @@ The results from the \texttt{model\_coef} table can then be used directly in the
 \item
   \texttt{item\_name}: Which observed variable from your model syntax do you want to plot? Please list this variable name exactly how it appears in the model.
 \item
-  \texttt{x\_limits}: What do you want the x-axits limits to be for your invariance plot? The default option is to assume the latent variable is standardized, and therefore, -1 to 1 is recommended. Use only two numbers, a lower and upper limit.
+  \texttt{x\_limits}: What do you want the x-axits limits to be for your invariance plot? The default option is to assume the latent variable is standardized, and therefore, -1 to 1 is recommended. Use only two numbers, a lower and upper limit. This value also constrains the latent mean diagram to help zoom in on group differences because the scale of latent means is usually centered over zero. You can use this parameter to zoom out to a more traditional histogram using \texttt{c(-2,\ 2)}.
 \item
   \texttt{y\_limits}: What do you want the y-axits limits to be for your invariance plot? Given that the latent variable is used to predict the observed values in the data, you could use the minimum and maximum values found in the data. If that range is large, consider reducing this value to be able to visualize the results (i.e., otherwise it may be too zoomed out to judge group differences). Use only two numbers, a lower and upper limit.
 \item
@@ -439,7 +449,7 @@ The results from the \texttt{model\_coef} table can then be used directly in the
 \begin{Highlighting}[]
 \FunctionTok{plot\_mgcfa}\NormalTok{(}
   \AttributeTok{data\_coef =}\NormalTok{ results.invariant}\SpecialCharTok{$}\NormalTok{model\_coef, }\CommentTok{\# output from model\_coef}
-  \AttributeTok{model\_step =} \StringTok{"configural"}\NormalTok{, }\CommentTok{\# which model do you want to plot}
+  \AttributeTok{model\_step =} \StringTok{"Configural"}\NormalTok{, }\CommentTok{\# which model do you want to plot}
   \AttributeTok{item\_name =} \StringTok{"q4"}\NormalTok{, }\CommentTok{\# name of observed item}
   \AttributeTok{x\_limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\CommentTok{\# latent variable limits to graph}
   \AttributeTok{y\_limits =} \FunctionTok{c}\NormalTok{(}\FunctionTok{min}\NormalTok{(df.invariant}\SpecialCharTok{$}\NormalTok{q4), }\FunctionTok{max}\NormalTok{(df.invariant}\SpecialCharTok{$}\NormalTok{q4)), }\CommentTok{\# Y min and max in data }
@@ -475,7 +485,7 @@ Residuals are trickier to plot, as they are the left over error when predicting 
 \hypertarget{latent-means}{%
 \subsubsection{Latent Means}\label{latent-means}}
 
-The overall impact of differences on the latent means can be found in the right hand visualization. The latent means are calculated by using the \texttt{predict} function and then plotted as overlapping histograms. The vertical colored lines represent the mean for each group, and the spread of the distribution can be examined using the density coloring. Finally, group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the dataset or whichever group is the first that appears when using the \texttt{levels()} command.
+The overall impact of differences on the latent means can be found in the right hand visualization. The latent means are calculated by using the \texttt{lavPredict} function and then plotted as overlapping histograms. The vertical colored lines represent the mean for each group, and the spread of the distribution can be examined using the density coloring. Finally, group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the dataset or whichever group is the first that appears when using the \texttt{levels()} command.
 
 \begin{figure}
 \centering
@@ -486,7 +496,9 @@ The overall impact of differences on the latent means can be found in the right 
 \hypertarget{graphing-effect-size}{%
 \subsubsection{Graphing Effect Size}\label{graphing-effect-size}}
 
-The \(d_{MACS}\) value for item 4 in the invariant model was 0.06, representing a nil or unimportant difference in this manuscript. It is important to note that while Nye et al. (2019) suggests specific sizes for small, medium, and large, each researcher should determine for themselves what effects represent. Figure \ref{fig:small-load-pic} displays the results from the small (\(d_{MACS}\) = 0.12) difference in loadings, while Figure \ref{fig:med-load-pic} displays the results from the medium (\(d_{MACS}\) = 0.43) difference in loadings, and Figure \ref{fig:large-load-pic} shows the large (\(d_{MACS}\) = 0.63) differences. When investigating the slope values, we can clearly see the change in the loading for the second group (the only manipulated variable, although random dataset generation may also change intercepts and residuals slightly). At the medium effect size, we see that the confidence bands do not overlap (at the edges), and at the large effect size, we can see a clear separation of two lines. Note that the intercepts are still fixed so the loading representation will not literally separate, but the steepness of the lines is the indicator of the difference between the slopes. You can imagine these lines are interpreted like a simple slopes analysis for interactions in regression (Cohen, Cohen, West, \& Aiken, 2003). When simple slopes for interactions are plotted, if they are parallel, there is no interaction, and if they cross, then there is an interaction. Here, we can use this same logic. If they are parallel, there is likely invariance (they are the same), and the further from parallel they become, the larger the effect size for the differences between group loadings.
+The \(d_{MACS}\) value for item 4 in the invariant model was 0.06, representing a nil or unimportant difference in this manuscript. It is important to note that while Nye et al. (2019) suggests specific sizes for small, medium, and large, each researcher should determine for themselves what effects represent. Figure \ref{fig:small-load-pic} displays the results from the small (\(d_{MACS}\) = 0.12) difference in loadings, while Figure \ref{fig:med-load-pic} displays the results from the medium (\(d_{MACS}\) = 0.43) difference in loadings, and Figure \ref{fig:large-load-pic} shows the large (\(d_{MACS}\) = 0.63) differences. When investigating the slope values, we can clearly see the change in the loading for the second group (the only manipulated variable, although random dataset generation may also change intercepts and residuals slightly). At the medium effect size, we see that the confidence bands do not overlap (at the edges), and at the large effect size, we can see a clear separation of two lines. Note that the intercepts in this model are estimated as equal so the loading representation will not literally separate, but the steepness of the lines is the indicator of the difference between the slopes. You can imagine these lines are interpreted like a simple slopes analysis for interactions in regression (Cohen, Cohen, West, \& Aiken, 2003). When simple slopes for interactions are plotted, if they are parallel, there is no interaction, and if they cross, then there is an interaction. Here, we can use this same logic. If they are parallel, there is likely invariance (they are the same), and the further from parallel they become, the larger the effect size for the differences between group loadings.
+
+The latent means in Figure \ref{fig:large-load-pic} do appear to show differences, albeit visually small. The latent means diagram shows the impact of any group differences that aren't constrained, and this image shows the configural model (as the metric model would force them to be equal). In the simulated model, the \emph{only} manipulated parameter is question 4's loading. In real models, the differences may be larger due to other variation found in the parameter estimates. Therefore, once you discover items you believe would make a model ``partially'' invariant, you may wish to estimate that model and graph the item again using the partially invariant model to see only the effect of the non-invariant items. Additionally, consider that we set the scaling of the model to 0. The estimate for the lv mean in the large loading model was group 1: 0.00, and group 2: -0.04, which results in 0.04 difference in group means. The practical implications of this difference will depend on the research and interpretations of the researcher.
 
 \begin{figure}
 \centering
@@ -506,7 +518,7 @@ The \(d_{MACS}\) value for item 4 in the invariant model was 0.06, representing 
 \caption{\label{fig:large-load-pic}Large Loadings Model Visualization}
 \end{figure}
 
-For intercepts, the small (Figure \ref{fig:small-int-pic}), medium (Figure \ref{fig:med-int-pic}), and large (Figure \ref{fig:large-int-pic}) depictions represent \(d_{MACS}\) values of 0.29, 0.52, and 0.76, respectively. Intercept differences can be clearly seen represented by the spacing out of the intercept locations (and thus, the overall line as well). Note how little the intercept differences appear to influence the latent variable means and distributions.
+For intercepts, the small (Figure \ref{fig:small-int-pic}), medium (Figure \ref{fig:med-int-pic}), and large (Figure \ref{fig:large-int-pic}) depictions represent \(d_{MACS}\) values of 0.29, 0.52, and 0.76, respectively. Intercept differences can be clearly seen represented by the spacing out of the intercept locations (and thus, the overall line as well). While the changes in intercept do not appear to change the latent means, the cavaet to this simulation is that only item four was manipulated. An example is provided below that demonstrates large changes in latent means.
 
 \begin{figure}
 \centering
@@ -546,24 +558,771 @@ Last, the effect of the residuals is plotted in small (Figure \ref{fig:small-res
 \caption{\label{fig:large-res-pic}Large Residuals Model Visualization}
 \end{figure}
 
-\hypertarget{discussion}{%
-\section{Discussion}\label{discussion}}
+\hypertarget{an-example-analysis}{%
+\subsection{An Example Analysis}\label{an-example-analysis}}
+
+Aiena, Baczwaski, Schulenberg, and Buchanan (2014) examined the RS-14 (Wagnild, 2009) exploring the factor structure of the Resiliency Scale in a clinical sample receiving treatment services and a college student sample. Measurement invariance was calculated for differences separately for these samples for gender and race finding a partially invariant models with a few item intercepts or residuals that differed between groups. Aiena et al. (2014) did not compare the clinical to the student sample for measurement invariance, and it is reasonable to expect potential differences in these two populations. This example will demonstrate the procedure for researchers who wish to use partial invariance steps and how to interpret real, messy data.
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# load the data}
+\FunctionTok{load}\NormalTok{(}\StringTok{"RS14.Rdata"}\NormalTok{)}
+\CommentTok{\# build the one{-}factor model }
+\NormalTok{model.rs }\OtherTok{\textless{}{-}} \StringTok{"RS =\textasciitilde{} RS1+RS2+RS3+RS4+RS5+RS6+RS7+RS8+RS9+RS10+RS11+RS12+RS13+RS14"}
+\CommentTok{\# run the multi{-}group CFA}
+\NormalTok{results.rs }\OtherTok{\textless{}{-}} \FunctionTok{mgcfa}\NormalTok{(}\AttributeTok{data =}\NormalTok{ DF, }
+                    \AttributeTok{group =} \StringTok{"sample"}\NormalTok{, }
+                    \AttributeTok{model =}\NormalTok{ model.rs)}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# how to get results in table }
+\NormalTok{results.rs}\SpecialCharTok{$}\NormalTok{model\_fit }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{select}\NormalTok{(model, AIC, BIC, cfi, tli, rmsea, srmr)}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:rs-table}Model Fit for RS-14 Example}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 126,722.49 & 126,888.71 & 0.93 & 0.92 & 0.09 & 0.04\\
+Group 1 & 52,961.42 & 53,099.72 & 0.92 & 0.90 & 0.09 & 0.04\\
+Group 2 & 69,100.98 & 69,254.31 & 0.93 & 0.92 & 0.11 & 0.04\\
+Configural & 122,118.41 & 122,617.06 & 0.93 & 0.91 & 0.10 & 0.04\\
+Metric & 122,144.53 & 122,566.01 & 0.92 & 0.92 & 0.10 & 0.04\\
+Scalar & 122,544.11 & 122,888.42 & 0.91 & 0.91 & 0.10 & 0.05\\
+Strict & 126,466.24 & 126,727.44 & 0.78 & 0.79 & 0.16 & 0.09\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+Table \ref{fig:invariant-pic} indicates the results after running the one-factor model. There are several guidelines for assessing assessing a degradation in model fit (\textbf{cheung?})
+
+\#\#write out partial codes
+partial\_syntax \textless- paste(colnames(DF){[}1:14{]}, ``\textasciitilde1'') \#all columns again
+partial\_syntax
+
+CFI\_list \textless- 1:length(partial\_syntax)
+names(CFI\_list) \textless- partial\_syntax
+
+for (i in 1:length(partial\_syntax))\{
+
+temp \textless- cfa(model = model.rs,
+data = DF,
+meanstructure = TRUE,
+group = ``sample'',
+group.equal = c(``loadings'', ``intercepts''),
+group.partial = partial\_syntax{[}i{]})
+
+CFI\_list{[}i{]} \textless- fitmeasures(temp, ``cfi'')
+\}
+
+CFI\_list
+
+partial.rs \textless- cfa(model = model.rs,
+data = DF,
+meanstructure = TRUE,
+group = ``sample'',
+meanstructure = T,
+group.equal = c(``loadings'', ``intercepts''),
+group.partial = c(``RS7\textasciitilde1'')
+)
+
+tidy(partial.rs)
+glance(partial.rs)
+results.rs\$model\_fit
+
+partial.rs.2 \textless- cfa(model = model.rs,
+data = DF,
+meanstructure = TRUE,
+group = ``sample'',
+meanstructure = T,
+group.equal = c(``loadings'', ``intercepts''),
+group.partial = c(``RS7\textasciitilde1'', ``RS6\textasciitilde1'')
+)
+
+tidy(partial.rs.2)
+glance(partial.rs.2)
+
+partial.rs.2.strict \textless- cfa(model = model.rs,
+data = DF,
+meanstructure = TRUE,
+group = ``sample'',
+meanstructure = T,
+group.equal = c(``loadings'', ``intercepts'', ``residuals''),
+group.partial = c(``RS7\textasciitilde1'', ``RS6\textasciitilde1'')
+)
+
+tidy(partial.rs.2.strict)
+glance(partial.rs.2.strict)
+
+model.rs.picture \textless- ``RS =\textasciitilde{} RS1+RS2+RS3+RS4+RS5+RS6+RS7+RS8+RS9+RS10+RS11+RS12+RS13+RS14
+RS\textasciitilde1
+RS1\textasciitilde0*1''
+
+partial.rs.2.picture \textless- cfa(model = model.rs,
+data = DF,
+meanstructure = TRUE,
+group = ``sample'',
+meanstructure = T,
+group.equal = c(``loadings'', ``intercepts''),
+group.partial = c(``RS7\textasciitilde1'', ``RS6\textasciitilde1''))
+
+partial.coef \textless- tidy(partial.rs.2.picture) \%\textgreater\%
+mutate(model = ``intercepts'')
+
+plot\_mgcfa(
+data\_coef = partial.coef,
+model\_step = ``intercepts'',
+item\_name = ``RS6'',
+x\_limits = c(-2,2),
+y\_limits = c(min(DF\(RS7), max(DF\)RS7)),
+model\_results = partial.rs.2.picture,
+ci\_level = .95,
+lv\_name = ``RS''
+)
+
+plot\_mgcfa(
+data\_coef = partial.coef,
+model\_step = ``intercepts'',
+item\_name = ``RS7'',
+x\_limits = c(-2,2),
+y\_limits = c(min(DF\(RS7), max(DF\)RS7)),
+model\_results = partial.rs.2.picture,
+ci\_level = .95,
+lv\_name = ``RS''
+)
+
+SD \textless- tapply(DF\(RS6, DF\)sample, sd)
+M \textless- tapply(DF\(RS6, DF\)sample, mean)
+N \textless- tapply(DF\(RS6, DF\)sample, length)
+
+SD2 \textless- tapply(DF\(RS7, DF\)sample, sd)
+M2 \textless- tapply(DF\(RS7, DF\)sample, mean)
+N2 \textless- tapply(DF\(RS7, DF\)sample, length)
+
+library(MOTE)
+d.ind.t(M{[}1{]}, M{[}2{]}, SD{[}1{]}, SD{[}2{]}, N{[}1{]}, N{[}2{]})
+d.ind.t(M2{[}1{]}, M2{[}2{]}, SD2{[}1{]}, SD2{[}2{]}, N2{[}1{]}, N2{[}2{]})
+lavaan\_dmacs(partial.rs.2.picture, ``Clinical'')
+lavaan\_dmacs(results.rs\$model.configural, ``Clinical'')
+
+\begin{verbatim}
+
+6: Drive
+
+7: Perseverance
+
+I1tems for the RS–14 are described in the measure’s manual (Wagnild, 2009a)
+and can be viewed at www.resiliencecenter.com.
+
+
+
+# Discussion
 
 Conclusions:
 
-\begin{itemize}
-\tightlist
-\item
-  framework for submitted/interpreting reports
-\end{itemize}
+-   framework for submitted/interpreting reports
 
 \newpage
 
-\hypertarget{references}{%
-\section{References}\label{references}}
+# References
+
+::: {#refs custom-style="Bibliography"}
+:::
+
+\newpage
+
+# Appendix
+
+## Model Fit Statistics
+
+Model fit statistics are provided for each of the ten model combinations (invariant, three sizes for each ladings, intercepts, and residuals). These tables could be used to examine the traditional change in fit statistics cutoff rules of thumb [@cheung2002], such as $\Delta$ CFI or $\Delta$ RMSEA, to the visualizations presented in the manuscript.
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab1}Model Fit for Invariant Model}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,515.72 & 7,578.94 & 0.99 & 0.99 & 0.02 & 0.02\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,761.95 & 3,814.77 & 0.98 & 0.96 & 0.04 & 0.03\\
+Configural & 7,527.70 & 7,654.14 & 0.98 & 0.96 & 0.04 & 0.03\\
+Metric & 7,529.39 & 7,638.97 & 0.95 & 0.93 & 0.06 & 0.05\\
+Scalar & 7,522.90 & 7,615.62 & 0.96 & 0.96 & 0.04 & 0.05\\
+Strict & 7,519.51 & 7,591.16 & 0.96 & 0.96 & 0.04 & 0.06\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab2}Model Fit for Small Differences in Loadings}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,537.67 & 7,600.89 & 0.98 & 0.96 & 0.04 & 0.02\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,777.83 & 3,830.66 & 0.98 & 0.96 & 0.05 & 0.03\\
+Configural & 7,543.58 & 7,670.02 & 0.98 & 0.95 & 0.05 & 0.03\\
+Metric & 7,548.90 & 7,658.48 & 0.94 & 0.92 & 0.07 & 0.06\\
+Scalar & 7,541.81 & 7,634.53 & 0.95 & 0.95 & 0.05 & 0.06\\
+Strict & 7,541.66 & 7,613.31 & 0.93 & 0.94 & 0.05 & 0.07\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab3}Model Fit for Medium Differences in Loadings}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,554.55 & 7,617.77 & 0.97 & 0.94 & 0.05 & 0.03\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,784.92 & 3,837.74 & 1.00 & 1.00 & 0.02 & 0.02\\
+Configural & 7,550.67 & 7,677.11 & 0.99 & 0.98 & 0.04 & 0.03\\
+Metric & 7,562.71 & 7,672.29 & 0.93 & 0.89 & 0.07 & 0.06\\
+Scalar & 7,556.86 & 7,649.58 & 0.93 & 0.93 & 0.06 & 0.06\\
+Strict & 7,558.05 & 7,629.70 & 0.91 & 0.92 & 0.06 & 0.08\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab4}Model Fit for Large Differences in Loadings}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,662.99 & 7,726.21 & 0.98 & 0.97 & 0.04 & 0.02\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,857.21 & 3,910.03 & 0.97 & 0.94 & 0.08 & 0.03\\
+Configural & 7,622.96 & 7,749.40 & 0.97 & 0.94 & 0.06 & 0.03\\
+Metric & 7,659.19 & 7,768.77 & 0.85 & 0.79 & 0.12 & 0.08\\
+Scalar & 7,652.60 & 7,745.32 & 0.86 & 0.85 & 0.10 & 0.09\\
+Strict & 7,660.63 & 7,732.27 & 0.82 & 0.85 & 0.10 & 0.12\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab5}Model Fit for Small Differences in Intercepts}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,519.69 & 7,582.91 & 1.00 & 0.99 & 0.02 & 0.02\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,770.41 & 3,823.23 & 0.93 & 0.86 & 0.08 & 0.04\\
+Configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
+Metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
+Scalar & 7,531.34 & 7,624.06 & 0.94 & 0.93 & 0.06 & 0.05\\
+Strict & 7,523.54 & 7,595.18 & 0.95 & 0.96 & 0.04 & 0.05\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab6}Model Fit for Medium Differences in Intercepts}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,542.77 & 7,605.99 & 1.00 & 1.00 & 0.01 & 0.02\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,770.41 & 3,823.23 & 0.93 & 0.86 & 0.08 & 0.04\\
+Configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
+Metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
+Scalar & 7,554.20 & 7,646.92 & 0.85 & 0.83 & 0.09 & 0.07\\
+Strict & 7,546.38 & 7,618.03 & 0.86 & 0.88 & 0.08 & 0.07\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab7}Model Fit for Large Differences in Intercepts}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,579.17 & 7,642.39 & 1.00 & 1.00 & 0.00 & 0.02\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,770.41 & 3,823.23 & 0.93 & 0.86 & 0.08 & 0.04\\
+Configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
+Metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
+Scalar & 7,590.29 & 7,683.01 & 0.70 & 0.66 & 0.13 & 0.10\\
+Strict & 7,582.47 & 7,654.12 & 0.71 & 0.75 & 0.11 & 0.10\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab8}Model Fit for Small Differences in Residuals}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,449.49 & 7,512.71 & 1.00 & 1.01 & 0.00 & 0.01\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,693.32 & 3,746.14 & 1.00 & 1.01 & 0.00 & 0.02\\
+Configural & 7,459.07 & 7,585.51 & 0.99 & 0.98 & 0.03 & 0.03\\
+Metric & 7,461.41 & 7,570.99 & 0.97 & 0.95 & 0.05 & 0.05\\
+Scalar & 7,455.85 & 7,548.58 & 0.97 & 0.97 & 0.04 & 0.05\\
+Strict & 7,453.48 & 7,525.12 & 0.96 & 0.97 & 0.04 & 0.05\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab9}Model Fit for Medium Differences in Residuals}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,378.57 & 7,441.79 & 1.00 & 1.00 & 0.00 & 0.02\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,597.77 & 3,650.60 & 1.00 & 1.03 & 0.00 & 0.02\\
+Configural & 7,363.52 & 7,489.96 & 1.00 & 0.99 & 0.02 & 0.02\\
+Metric & 7,366.63 & 7,476.21 & 0.97 & 0.96 & 0.05 & 0.05\\
+Scalar & 7,360.15 & 7,452.87 & 0.98 & 0.98 & 0.03 & 0.05\\
+Strict & 7,382.53 & 7,454.18 & 0.88 & 0.90 & 0.08 & 0.07\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:tab10}Model Fit for Large Differences in Residuals}
+
+\begin{tabular}{lllllll}
+\toprule
+Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
+\midrule
+Overall & 7,294.21 & 7,357.43 & 1.00 & 1.01 & 0.00 & 0.01\\
+Group 1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+Group 2 & 3,453.47 & 3,506.29 & 0.95 & 0.90 & 0.07 & 0.03\\
+Configural & 7,219.22 & 7,345.66 & 0.96 & 0.92 & 0.06 & 0.03\\
+Metric & 7,216.38 & 7,325.96 & 0.96 & 0.94 & 0.05 & 0.04\\
+Scalar & 7,210.65 & 7,303.37 & 0.96 & 0.96 & 0.04 & 0.05\\
+Strict & 7,297.89 & 7,369.54 & 0.59 & 0.65 & 0.13 & 0.18\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+## MGCFA Convenience Function
+
+Please note that any partial invariance is not automatically included in this function. This function returns a list with all model summaries, the model coefficients in a tidy dataframe, and the model fit statistics in a tidy dataframe. You will need the libraries listed below for this function to work properly.
+
+\small
+
+```r
+library(lavaan)
+library(dplyr)
+library(broom)
+# CFA function
+mgcfa <- function(data, group, model){
+  
+  group_names <- unique(data[ , group])
+  data$group <- data[ , group]
+  
+  model.overall <- cfa(model = model, data = data)
+  model.group1 <- cfa(model = model, 
+                      data = subset(data, group == group_names[1]))
+  model.group2 <- cfa(model = model, 
+                      data = subset(data, group == group_names[2]))
+  model.configural <- cfa(model = model, data = data, 
+                          group = group, meanstructure = T)
+  model.metric <- cfa(model = model, data = data, 
+                      group = group, meanstructure = T,
+                      group.equal = "loadings")
+  model.scalar <- cfa(model = model, data = data, 
+                      group = group, meanstructure = T, 
+                      group.equal = c("loadings", "intercepts"))
+  model.strict <- cfa(model = model, data = data, 
+                      group = group, meanstructure = T, 
+                      group.equal =  c("loadings", "intercepts", "residuals"))
+  
+  model_coef <- bind_rows(
+    tidy(model.overall, conf.level = .95) %>% 
+      mutate(model = "Overall"), 
+    tidy(model.group1, conf.level = .95) %>% 
+      mutate(model = "Group 1"), 
+    tidy(model.group2, conf.level = .95) %>% 
+      mutate(model = "Group 2"), 
+    tidy(model.configural, conf.level = .95) %>% 
+      mutate(model = "Configural"), 
+    tidy(model.metric, conf.level = .95) %>% 
+      mutate(model = "Metric"), 
+    tidy(model.scalar, conf.level = .95) %>% 
+      mutate(model = "Scalar"), 
+    tidy(model.strict, conf.level = .95) %>% 
+      mutate(model = "Strict")
+  )
+    
+  model_fit <- bind_rows(
+    glance(model.overall) %>% mutate(model = "Overall"), 
+    glance(model.group1) %>% mutate(model = "Group 1"), 
+    glance(model.group2) %>% mutate(model = "Group 2"), 
+    glance(model.configural) %>% mutate(model = "Configural"), 
+    glance(model.metric) %>% mutate(model = "Metric"), 
+    glance(model.scalar) %>% mutate(model = "Scalar"), 
+    glance(model.strict) %>% mutate(model = "Strict")
+    )
+  
+  return(list(
+    "model_coef" = model_coef,
+    "model_fit" = model_fit,
+    "model.overall" = model.overall,
+    "model.group1" = model.group1,
+    "model.group2" = model.group2,
+    "model.configural" = model.configural,
+    "model.metric" = model.metric,
+    "model.scalar" = model.scalar,
+    "model.strict" = model.strict
+  ))
+  
+}
+\end{verbatim}
+
+\normalsize
+
+\hypertarget{measurement-invariance-plot-function}{%
+\subsection{Measurement Invariance Plot Function}\label{measurement-invariance-plot-function}}
+
+This function creates the plots shown in the manuscript. You will need the libraries listed for this function to work. Plots may be modified to rearrange for those who are familiar with \texttt{ggplot2}. Please note that the function assumes you will use the outputs from the previous \texttt{mgcfa} function or a tidy dataframe that includes the coefficients from the model with a column \texttt{model} that indicates which step of the MGCFA you are wanting to plot. If you have more than two groups, you should first filter the dataframe model coefficient outputs to only include to the two groups you want to compare. This code does not plot more than two groups (although, it could be modified for this, but the assumption here is that you only have two, as this is how you would normally proceed in a MGCFA using pairwise comparisons to find where the invariance occurs).
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(cowplot)}
+\FunctionTok{library}\NormalTok{(lavaan)}
+\CommentTok{\# devtools::install\_github("psyteachr/introdataviz")}
+\FunctionTok{library}\NormalTok{(introdataviz)}
+\CommentTok{\# Plot MI MGCFA}
+\NormalTok{plot\_mgcfa }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(data\_coef, }\CommentTok{\# output from model\_coef}
+\NormalTok{                       model\_step, }\CommentTok{\# which model}
+\NormalTok{                       item\_name, }\CommentTok{\# name of observed item}
+                       \AttributeTok{x\_limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\CommentTok{\# LV limits to graph}
+\NormalTok{                       y\_limits, }\CommentTok{\# Y min and max in data }
+\NormalTok{                       ci\_level, }\CommentTok{\# what ci do you want}
+\NormalTok{                       model\_results, }\CommentTok{\# what model results do you want }
+\NormalTok{                       lv\_name }\CommentTok{\# which latent is the observed variable on}
+\NormalTok{                       )\{}
+  
+  \CommentTok{\# calculate cutoff}
+\NormalTok{  cutoff }\OtherTok{\textless{}{-}} \FunctionTok{qt}\NormalTok{(}\AttributeTok{p =}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{ci\_level)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, }
+               \AttributeTok{df =} \FunctionTok{sum}\NormalTok{(}\FunctionTok{unlist}\NormalTok{(model\_results}\SpecialCharTok{@}\NormalTok{Data}\SpecialCharTok{@}\NormalTok{nobs)), }
+               \AttributeTok{lower.tail =}\NormalTok{ F)}
+  
+  \CommentTok{\# get group variable}
+\NormalTok{  group\_var }\OtherTok{\textless{}{-}}\NormalTok{ model\_results}\SpecialCharTok{@}\NormalTok{Data}\SpecialCharTok{@}\NormalTok{group}
+\NormalTok{  group\_labels }\OtherTok{\textless{}{-}}\NormalTok{ model\_results}\SpecialCharTok{@}\NormalTok{Data}\SpecialCharTok{@}\NormalTok{group.label}
+  
+  \CommentTok{\# first get the data}
+\NormalTok{  graph.data }\OtherTok{\textless{}{-}}\NormalTok{ data\_coef }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# put in tidy coefficients}
+  \FunctionTok{filter}\NormalTok{(model }\SpecialCharTok{==}\NormalTok{ model\_step) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# pick a model}
+  \FunctionTok{filter}\NormalTok{(}\FunctionTok{grepl}\NormalTok{(item\_name, term)) }\SpecialCharTok{\%\textgreater{}\%}  \CommentTok{\# pick a question}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{group =} \FunctionTok{factor}\NormalTok{(group, }\AttributeTok{levels =} \FunctionTok{names}\NormalTok{(}\FunctionTok{table}\NormalTok{(data\_coef}\SpecialCharTok{$}\NormalTok{group)), }\AttributeTok{labels =}\NormalTok{ group\_labels)) }
+  
+  \CommentTok{\# make ribbon data y = slope*x + intercept for ci for slopes }
+\NormalTok{  ribbondata }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}
+    \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{x =} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from =}\NormalTok{ x\_limits[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,  }
+            \AttributeTok{to =}\NormalTok{ x\_limits[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{+} \DecValTok{1}\NormalTok{, }
+            \AttributeTok{by =}\NormalTok{ .}\DecValTok{05}\NormalTok{), }
+    \AttributeTok{group =} \FunctionTok{unique}\NormalTok{(graph.data}\SpecialCharTok{$}\NormalTok{group)[}\DecValTok{1}\NormalTok{]}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ymin =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{{-}} 
+\NormalTok{             (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                    \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
+\NormalTok{             graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+           \AttributeTok{ymax =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{+} 
+\NormalTok{             (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                    \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
+\NormalTok{             graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate)), }
+    \FunctionTok{data.frame}\NormalTok{(}
+      \AttributeTok{x =} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from =}\NormalTok{ x\_limits[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,  }
+              \AttributeTok{to =}\NormalTok{ x\_limits[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{+} \DecValTok{1}\NormalTok{, }
+              \AttributeTok{by =}\NormalTok{ .}\DecValTok{05}\NormalTok{), }
+      \AttributeTok{group =} \FunctionTok{unique}\NormalTok{(graph.data}\SpecialCharTok{$}\NormalTok{group)[}\DecValTok{2}\NormalTok{]}
+\NormalTok{    ) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ymin =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{{-}} 
+\NormalTok{               (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                      \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
+\NormalTok{               graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+             \AttributeTok{ymax =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{+} 
+\NormalTok{               (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                      \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
+\NormalTok{               graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate))}
+\NormalTok{  )}
+  
+  \CommentTok{\# make point data to draw on the intercepts }
+\NormalTok{  pointdata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{x =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{),}
+  \AttributeTok{y =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+  \AttributeTok{group =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group),}
+  \AttributeTok{ymin =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{{-}} 
+\NormalTok{    cutoff }\SpecialCharTok{*}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error), }
+  \AttributeTok{ymax =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{+} 
+\NormalTok{    cutoff }\SpecialCharTok{*}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)}
+\NormalTok{  )}
+  
+  \CommentTok{\# make the line data to draw on the slopes}
+\NormalTok{  linedata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{slope =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+  \AttributeTok{intercept =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+  \AttributeTok{group =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group)}
+\NormalTok{  )}
+  
+  \CommentTok{\# make the distributions for the residuals }
+\NormalTok{  violindata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{y =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rnorm}\NormalTok{(}\AttributeTok{n =} \DecValTok{1000}\NormalTok{, }
+            \AttributeTok{mean =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+            \AttributeTok{sd =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)), }
+        \FunctionTok{rnorm}\NormalTok{(}\AttributeTok{n =} \DecValTok{1000}\NormalTok{, }
+            \AttributeTok{mean =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+            \AttributeTok{sd =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error))),}
+  \AttributeTok{group =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group), }\DecValTok{1000}\NormalTok{),}
+            \FunctionTok{rep}\NormalTok{(graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group), }\DecValTok{1000}\NormalTok{)), }
+  \AttributeTok{x =} \DecValTok{1}
+\NormalTok{  )}
+  
+  \CommentTok{\# make the latent mean data for right panel}
+\NormalTok{  latent\_means }\OtherTok{\textless{}{-}} \FunctionTok{lavPredict}\NormalTok{(model\_results, }
+                               \AttributeTok{type =} \StringTok{"lv"}\NormalTok{, }
+                               \AttributeTok{label =} \ConstantTok{TRUE}\NormalTok{,}
+                               \AttributeTok{assemble =} \ConstantTok{TRUE}\NormalTok{, }
+                               \AttributeTok{append.data =} \ConstantTok{TRUE}\NormalTok{)}
+  
+\NormalTok{  latent\_means}\SpecialCharTok{$}\NormalTok{lv }\OtherTok{\textless{}{-}}\NormalTok{ latent\_means[ , lv\_name]}
+\NormalTok{  latent\_means}\SpecialCharTok{$}\NormalTok{group }\OtherTok{\textless{}{-}}\NormalTok{ latent\_means[ , group\_var]}
+  
+  \CommentTok{\# make a plot of the variance}
+\NormalTok{  variance\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(violindata, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \DecValTok{1}\NormalTok{, }\AttributeTok{y =}\NormalTok{ y, }\AttributeTok{color =}\NormalTok{ group, }\AttributeTok{fill =}\NormalTok{ group)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_split\_violin}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{theme\_void}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{stat\_summary}\NormalTok{(}\AttributeTok{fun =} \StringTok{"mean"}\NormalTok{,}
+               \AttributeTok{geom =} \StringTok{"crossbar"}\NormalTok{, }
+               \AttributeTok{width =} \FloatTok{0.5}\NormalTok{,}
+               \AttributeTok{colour =} \StringTok{"black"}\NormalTok{)}
+  
+  \CommentTok{\# make the plot with intercepts and slopes}
+\NormalTok{  intercept\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+} 
+  \CommentTok{\# basic set up}
+  \FunctionTok{theme\_classic}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Latent Variable"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Observed Variable"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{coord\_cartesian}\NormalTok{(}\AttributeTok{xlim =}\NormalTok{ x\_limits, }\AttributeTok{ylim =}\NormalTok{ y\_limits) }\SpecialCharTok{+} 
+  \CommentTok{\# plot the intercepts }
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data =}\NormalTok{ pointdata, }
+             \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{y =}\NormalTok{ y, }\AttributeTok{color =}\NormalTok{ group), }
+             \AttributeTok{inherit.aes =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_errorbar}\NormalTok{(}\AttributeTok{data =}\NormalTok{ pointdata,}
+                \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{ymin =}\NormalTok{ ymin, }\AttributeTok{ymax =}\NormalTok{ ymax, }\AttributeTok{color =}\NormalTok{ group), }
+                \AttributeTok{inherit.aes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{width =}\NormalTok{ .}\DecValTok{10}\NormalTok{) }\SpecialCharTok{+} 
+  \CommentTok{\# plot the slopes}
+  \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{data =}\NormalTok{ linedata,}
+              \FunctionTok{aes}\NormalTok{(}\AttributeTok{slope =}\NormalTok{ slope, }\AttributeTok{intercept =}\NormalTok{ intercept, }\AttributeTok{color =}\NormalTok{ group)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data =}\NormalTok{ ribbondata, }
+              \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{ymin =}\NormalTok{ ymin, }\AttributeTok{ymax =}\NormalTok{ ymax, }\AttributeTok{fill =}\NormalTok{ group), }
+              \AttributeTok{inherit.aes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_color\_discrete}\NormalTok{(}\AttributeTok{name =} \StringTok{"Group"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_fill\_discrete}\NormalTok{(}\AttributeTok{name =} \StringTok{"Group"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \DecValTok{0}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.line.y =} \FunctionTok{element\_blank}\NormalTok{())}
+  
+  \CommentTok{\# make the latent means plot}
+\NormalTok{  mean\_plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(latent\_means, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ lv, }\AttributeTok{fill =}\NormalTok{ group)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_density}\NormalTok{(}\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{theme\_classic}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Latent Variable"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Density"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{data =}\NormalTok{ latent\_means }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{group\_by}\NormalTok{(group) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{summarize}\NormalTok{(}\AttributeTok{mean =} \FunctionTok{mean}\NormalTok{(lv)), }
+               \FunctionTok{aes}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ mean, }\AttributeTok{color =}\NormalTok{ group)) }\SpecialCharTok{+} 
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{coord\_cartesian}\NormalTok{(}\AttributeTok{xlim =}\NormalTok{ x\_limits)}
+  
+\NormalTok{  y\_range }\OtherTok{=} \FunctionTok{abs}\NormalTok{(y\_limits[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{{-}}\NormalTok{ y\_limits[}\DecValTok{1}\NormalTok{])}
+  
+  \CommentTok{\# line up the two plots }
+\NormalTok{  prow }\OtherTok{\textless{}{-}} \FunctionTok{plot\_grid}\NormalTok{(}
+\NormalTok{    intercept\_plot }\SpecialCharTok{+} 
+      \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Item Invariance"}\NormalTok{) }\SpecialCharTok{+} 
+      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+} 
+      \FunctionTok{annotation\_custom}\NormalTok{(}\FunctionTok{ggplotGrob}\NormalTok{(variance\_plot), }
+                        \AttributeTok{xmin =}\NormalTok{ .}\DecValTok{25}\NormalTok{, }\AttributeTok{xmax =} \DecValTok{1}\NormalTok{, }
+                        \AttributeTok{ymin =}\NormalTok{ y\_limits[}\DecValTok{1}\NormalTok{], }\AttributeTok{ymax =}\NormalTok{ y\_limits[}\DecValTok{2}\NormalTok{]}\SpecialCharTok{{-}}\NormalTok{y\_range}\SpecialCharTok{/}\FloatTok{1.8}\NormalTok{),}
+\NormalTok{    mean\_plot }\SpecialCharTok{+} 
+      \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Latent Mean Distribution"}\NormalTok{) }\SpecialCharTok{+} 
+      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{),}
+    \AttributeTok{align =} \StringTok{\textquotesingle{}vh\textquotesingle{}}\NormalTok{,}
+    \AttributeTok{hjust =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}
+    \AttributeTok{nrow =} \DecValTok{1}
+\NormalTok{  )}
+  
+  \CommentTok{\# get the lengend}
+\NormalTok{  legend\_b }\OtherTok{\textless{}{-}} \FunctionTok{get\_legend}\NormalTok{(}
+\NormalTok{    intercept\_plot }\SpecialCharTok{+} 
+      \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{1}\NormalTok{)) }\SpecialCharTok{+}
+      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)}
+\NormalTok{  )}
+  
+  \CommentTok{\# send out the plot }
+  \FunctionTok{plot\_grid}\NormalTok{(prow, legend\_b, }\AttributeTok{ncol =} \DecValTok{1}\NormalTok{, }\AttributeTok{rel\_heights =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, .}\DecValTok{1}\NormalTok{))}
+  
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-aiena2014}{}}%
+Aiena, B. J., Baczwaski, B. J., Schulenberg, S. E., \& Buchanan, E. M. (2014). Measuring Resilience With the RS{\textendash}14: A Tale of Two Samples. \emph{Journal of Personality Assessment}, \emph{97}(3), 291--300. \url{https://doi.org/10.1080/00223891.2014.951445}
+
 \leavevmode\vadjust pre{\hypertarget{ref-akaike1998}{}}%
 Akaike, H. (1998). \emph{Information theory and an extension of the maximum likelihood principle} (E. Parzen, K. Tanabe, \& G. Kitagawa, Eds.). New York, NY: Springer New York. Retrieved from \url{http://link.springer.com/10.1007/978-1-4612-1694-0_15}
 
@@ -687,6 +1446,9 @@ Van De Schoot, R., Schmidt, P., De Beuckelaer, A., Lek, K., \& Zondervan-Zwijnen
 \leavevmode\vadjust pre{\hypertarget{ref-vazire2022}{}}%
 Vazire, S., Schiavone, S. R., \& Bottesini, J. G. (2022). Credibility Beyond Replicability: Improving the Four Validities in Psychological Science. \emph{Current Directions in Psychological Science}, \emph{31}(2), 162--168. \url{https://doi.org/10.1177/09637214211067779}
 
+\leavevmode\vadjust pre{\hypertarget{ref-wagnild2009}{}}%
+Wagnild, G. (2009). A review of the resilience scale. \emph{Journal of Nursing Measurement}, \emph{17}(2), 105--113. \url{https://doi.org/10.1891/1061-3749.17.2.105}
+
 \leavevmode\vadjust pre{\hypertarget{ref-weidman2017}{}}%
 Weidman, A. C., Steckler, C. M., \& Tracy, J. L. (2017). The jingle and jangle of emotion assessment: Imprecise measurement, casual scale usage, and conceptual fuzziness in emotion research. \emph{Emotion}, \emph{17}(2), 267--295. \url{https://doi.org/10.1037/emo0000226}
 
@@ -694,564 +1456,6 @@ Weidman, A. C., Steckler, C. M., \& Tracy, J. L. (2017). The jingle and jangle o
 Zwaan, R. A., Etz, A., Lucas, R. E., \& Donnellan, M. B. (2018). Making replication mainstream. \emph{Behavioral and Brain Sciences}, \emph{41}, e120. \url{https://doi.org/10.1017/S0140525X17001972}
 
 \end{CSLReferences}
-
-\newpage
-
-\hypertarget{appendix}{%
-\section{Appendix}\label{appendix}}
-
-\hypertarget{model-fit-statistics}{%
-\subsection{Model Fit Statistics}\label{model-fit-statistics}}
-
-Model fit statistics are provided for each of the ten model combinations (invariant, three sizes for each ladings, intercepts, and residuals). These tables could be used to examine the traditional change in fit statistics cutoff rules of thumb (Cheung \& Rensvold, 2002), such as \(\Delta\) CFI or \(\Delta\) RMSEA, to the visualizations presented in the manuscript.
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab1}Model Fit for Invariant Model}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,515.72 & 7,578.94 & 0.99 & 0.99 & 0.02 & 0.02\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,761.95 & 3,814.77 & 0.98 & 0.96 & 0.04 & 0.03\\
-configural & 7,527.70 & 7,654.14 & 0.98 & 0.96 & 0.04 & 0.03\\
-metric & 7,529.39 & 7,638.97 & 0.95 & 0.93 & 0.06 & 0.05\\
-scalar & 7,522.90 & 7,615.62 & 0.96 & 0.96 & 0.04 & 0.05\\
-strict & 7,519.51 & 7,591.16 & 0.96 & 0.96 & 0.04 & 0.06\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab2}Model Fit for Small Differences in Loadings}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,537.67 & 7,600.89 & 0.98 & 0.96 & 0.04 & 0.02\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,777.83 & 3,830.66 & 0.98 & 0.96 & 0.05 & 0.03\\
-configural & 7,543.58 & 7,670.02 & 0.98 & 0.95 & 0.05 & 0.03\\
-metric & 7,548.90 & 7,658.48 & 0.94 & 0.92 & 0.07 & 0.06\\
-scalar & 7,541.81 & 7,634.53 & 0.95 & 0.95 & 0.05 & 0.06\\
-strict & 7,541.66 & 7,613.31 & 0.93 & 0.94 & 0.05 & 0.07\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab3}Model Fit for Medium Differences in Loadings}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,554.55 & 7,617.77 & 0.97 & 0.94 & 0.05 & 0.03\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,784.92 & 3,837.74 & 1.00 & 1.00 & 0.02 & 0.02\\
-configural & 7,550.67 & 7,677.11 & 0.99 & 0.98 & 0.04 & 0.03\\
-metric & 7,562.71 & 7,672.29 & 0.93 & 0.89 & 0.07 & 0.06\\
-scalar & 7,556.86 & 7,649.58 & 0.93 & 0.93 & 0.06 & 0.06\\
-strict & 7,558.05 & 7,629.70 & 0.91 & 0.92 & 0.06 & 0.08\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab4}Model Fit for Large Differences in Loadings}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,662.99 & 7,726.21 & 0.98 & 0.97 & 0.04 & 0.02\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,857.21 & 3,910.03 & 0.97 & 0.94 & 0.08 & 0.03\\
-configural & 7,622.96 & 7,749.40 & 0.97 & 0.94 & 0.06 & 0.03\\
-metric & 7,659.19 & 7,768.77 & 0.85 & 0.79 & 0.12 & 0.08\\
-scalar & 7,652.60 & 7,745.32 & 0.86 & 0.85 & 0.10 & 0.09\\
-strict & 7,660.63 & 7,732.27 & 0.82 & 0.85 & 0.10 & 0.12\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab5}Model Fit for Small Differences in Intercepts}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,519.69 & 7,582.91 & 1.00 & 0.99 & 0.02 & 0.02\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,770.41 & 3,823.23 & 0.93 & 0.86 & 0.08 & 0.04\\
-configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
-metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
-scalar & 7,531.34 & 7,624.06 & 0.94 & 0.93 & 0.06 & 0.05\\
-strict & 7,523.54 & 7,595.18 & 0.95 & 0.96 & 0.04 & 0.05\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab6}Model Fit for Medium Differences in Intercepts}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,542.77 & 7,605.99 & 1.00 & 1.00 & 0.01 & 0.02\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,770.41 & 3,823.23 & 0.93 & 0.86 & 0.08 & 0.04\\
-configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
-metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
-scalar & 7,554.20 & 7,646.92 & 0.85 & 0.83 & 0.09 & 0.07\\
-strict & 7,546.38 & 7,618.03 & 0.86 & 0.88 & 0.08 & 0.07\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab7}Model Fit for Large Differences in Intercepts}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,579.17 & 7,642.39 & 1.00 & 1.00 & 0.00 & 0.02\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,770.41 & 3,823.23 & 0.93 & 0.86 & 0.08 & 0.04\\
-configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
-metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
-scalar & 7,590.29 & 7,683.01 & 0.70 & 0.66 & 0.13 & 0.10\\
-strict & 7,582.47 & 7,654.12 & 0.71 & 0.75 & 0.11 & 0.10\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab8}Model Fit for Small Differences in Residuals}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,449.49 & 7,512.71 & 1.00 & 1.01 & 0.00 & 0.01\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,693.32 & 3,746.14 & 1.00 & 1.01 & 0.00 & 0.02\\
-configural & 7,459.07 & 7,585.51 & 0.99 & 0.98 & 0.03 & 0.03\\
-metric & 7,461.41 & 7,570.99 & 0.97 & 0.95 & 0.05 & 0.05\\
-scalar & 7,455.85 & 7,548.58 & 0.97 & 0.97 & 0.04 & 0.05\\
-strict & 7,453.48 & 7,525.12 & 0.96 & 0.97 & 0.04 & 0.05\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab9}Model Fit for Medium Differences in Residuals}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,378.57 & 7,441.79 & 1.00 & 1.00 & 0.00 & 0.02\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,597.77 & 3,650.60 & 1.00 & 1.03 & 0.00 & 0.02\\
-configural & 7,363.52 & 7,489.96 & 1.00 & 0.99 & 0.02 & 0.02\\
-metric & 7,366.63 & 7,476.21 & 0.97 & 0.96 & 0.05 & 0.05\\
-scalar & 7,360.15 & 7,452.87 & 0.98 & 0.98 & 0.03 & 0.05\\
-strict & 7,382.53 & 7,454.18 & 0.88 & 0.90 & 0.08 & 0.07\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\begin{table}[tbp]
-
-\begin{center}
-\begin{threeparttable}
-
-\caption{\label{tab:tab10}Model Fit for Large Differences in Residuals}
-
-\begin{tabular}{lllllll}
-\toprule
-Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
-\midrule
-overall & 7,294.21 & 7,357.43 & 1.00 & 1.01 & 0.00 & 0.01\\
-group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
-group2 & 3,453.47 & 3,506.29 & 0.95 & 0.90 & 0.07 & 0.03\\
-configural & 7,219.22 & 7,345.66 & 0.96 & 0.92 & 0.06 & 0.03\\
-metric & 7,216.38 & 7,325.96 & 0.96 & 0.94 & 0.05 & 0.04\\
-scalar & 7,210.65 & 7,303.37 & 0.96 & 0.96 & 0.04 & 0.05\\
-strict & 7,297.89 & 7,369.54 & 0.59 & 0.65 & 0.13 & 0.18\\
-\bottomrule
-\end{tabular}
-
-\end{threeparttable}
-\end{center}
-
-\end{table}
-
-\hypertarget{mgcfa-convenience-function}{%
-\subsection{MGCFA Convenience Function}\label{mgcfa-convenience-function}}
-
-Please note that any partial invariance is not automatically included in this function. This function returns a list with all model summaries, the model coefficients in a tidy dataframe, and the model fit statistics in a tidy dataframe. You will need the libraries listed below for this function to work properly.
-
-\small
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(lavaan)}
-\FunctionTok{library}\NormalTok{(dplyr)}
-\FunctionTok{library}\NormalTok{(broom)}
-\CommentTok{\# CFA function}
-\NormalTok{mgcfa }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(data, group, model)\{}
-  
-\NormalTok{  group\_names }\OtherTok{\textless{}{-}} \FunctionTok{unique}\NormalTok{(data[ , group])}
-  
-\NormalTok{  model.overall }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data)}
-\NormalTok{  model.group1 }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }
-                      \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(data, group }\SpecialCharTok{==}\NormalTok{ group\_names[}\DecValTok{1}\NormalTok{]))}
-\NormalTok{  model.group2 }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }
-                      \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(data, group }\SpecialCharTok{==}\NormalTok{ group\_names[}\DecValTok{2}\NormalTok{]))}
-\NormalTok{  model.configural }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data, }
-                          \AttributeTok{group =}\NormalTok{ group, }\AttributeTok{meanstructure =}\NormalTok{ T)}
-\NormalTok{  model.metric }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data, }
-                      \AttributeTok{group =}\NormalTok{ group, }\AttributeTok{meanstructure =}\NormalTok{ T,}
-                      \AttributeTok{group.equal =} \StringTok{"loadings"}\NormalTok{)}
-\NormalTok{  model.scalar }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data, }
-                      \AttributeTok{group =}\NormalTok{ group, }\AttributeTok{meanstructure =}\NormalTok{ T, }
-                      \AttributeTok{group.equal =} \FunctionTok{c}\NormalTok{(}\StringTok{"loadings"}\NormalTok{, }\StringTok{"intercepts"}\NormalTok{))}
-\NormalTok{  model.strict }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data, }
-                      \AttributeTok{group =}\NormalTok{ group, }\AttributeTok{meanstructure =}\NormalTok{ T, }
-                      \AttributeTok{group.equal =}  \FunctionTok{c}\NormalTok{(}\StringTok{"loadings"}\NormalTok{, }\StringTok{"intercepts"}\NormalTok{, }\StringTok{"residuals"}\NormalTok{))}
-  
-\NormalTok{  model\_coef }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}
-    \FunctionTok{tidy}\NormalTok{(model.overall, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"overall"}\NormalTok{), }
-    \FunctionTok{tidy}\NormalTok{(model.group1, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"group1"}\NormalTok{), }
-    \FunctionTok{tidy}\NormalTok{(model.group2, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"group2"}\NormalTok{), }
-    \FunctionTok{tidy}\NormalTok{(model.configural, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"configural"}\NormalTok{), }
-    \FunctionTok{tidy}\NormalTok{(model.metric, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"metric"}\NormalTok{), }
-    \FunctionTok{tidy}\NormalTok{(model.scalar, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"scalar"}\NormalTok{), }
-    \FunctionTok{tidy}\NormalTok{(model.strict, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"strict"}\NormalTok{)}
-\NormalTok{  )}
-    
-\NormalTok{  model\_fit }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}
-    \FunctionTok{glance}\NormalTok{(model.overall) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"overall"}\NormalTok{), }
-    \FunctionTok{glance}\NormalTok{(model.group1) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"group1"}\NormalTok{), }
-    \FunctionTok{glance}\NormalTok{(model.group2) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"group2"}\NormalTok{), }
-    \FunctionTok{glance}\NormalTok{(model.configural) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"configural"}\NormalTok{), }
-    \FunctionTok{glance}\NormalTok{(model.metric) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"metric"}\NormalTok{), }
-    \FunctionTok{glance}\NormalTok{(model.scalar) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"scalar"}\NormalTok{), }
-    \FunctionTok{glance}\NormalTok{(model.strict) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"strict"}\NormalTok{)}
-\NormalTok{    )}
-  
-  \FunctionTok{return}\NormalTok{(}\FunctionTok{list}\NormalTok{(}
-    \StringTok{"model\_coef"} \OtherTok{=}\NormalTok{ model\_coef,}
-    \StringTok{"model\_fit"} \OtherTok{=}\NormalTok{ model\_fit,}
-    \StringTok{"model.overall"} \OtherTok{=}\NormalTok{ model.overall,}
-    \StringTok{"model.group1"} \OtherTok{=}\NormalTok{ model.group1,}
-    \StringTok{"model.group2"} \OtherTok{=}\NormalTok{ model.group2,}
-    \StringTok{"model.configural"} \OtherTok{=}\NormalTok{ model.configural,}
-    \StringTok{"model.metric"} \OtherTok{=}\NormalTok{ model.metric,}
-    \StringTok{"model.scalar"} \OtherTok{=}\NormalTok{ model.scalar,}
-    \StringTok{"model.strict"} \OtherTok{=}\NormalTok{ model.strict}
-\NormalTok{  ))}
-  
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-\normalsize
-
-\hypertarget{measurement-invariance-plot-function}{%
-\subsection{Measurement Invariance Plot Function}\label{measurement-invariance-plot-function}}
-
-This function creates the plots shown in the manuscript. You will need the libraries listed for this function to work. Plots may be modified to rearrange for those who are familiar with \texttt{ggplot2}. Please note that the function assumes you will use the outputs from the previous \texttt{mgcfa} function or a tidy dataframe that includes the coefficients from the model with a column \texttt{model} that indicates which step of the MGCFA you are wanting to plot. If you have more than two groups, you should first filter the dataframe model coefficient outputs to only include to the two groups you want to compare. This code does not plot more than two groups (although, it could be modified for this, but the assumption here is that you only have two, as this is how you would normally proceed in a MGCFA using pairwise comparisons to find where the invariance occurs).
-
-\small
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(dplyr)}
-\FunctionTok{library}\NormalTok{(ggplot2)}
-\FunctionTok{library}\NormalTok{(cowplot)}
-\FunctionTok{library}\NormalTok{(lavaan)}
-\CommentTok{\# devtools::install\_github("psyteachr/introdataviz")}
-\FunctionTok{library}\NormalTok{(introdataviz)}
-\CommentTok{\# Plot MI MGCFA}
-\NormalTok{plot\_mgcfa }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(data\_coef, }\CommentTok{\# output from model\_coef}
-\NormalTok{                       model\_step, }\CommentTok{\# which model}
-\NormalTok{                       item\_name, }\CommentTok{\# name of observed item}
-                       \AttributeTok{x\_limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\CommentTok{\# LV limits to graph}
-\NormalTok{                       y\_limits, }\CommentTok{\# Y min and max in data }
-\NormalTok{                       ci\_level, }\CommentTok{\# what ci do you want}
-\NormalTok{                       model\_results, }\CommentTok{\# what model results do you want }
-\NormalTok{                       lv\_name }\CommentTok{\# which latent is the observed variable on}
-\NormalTok{                       )\{}
-  
-  \CommentTok{\# calculate cutoff}
-\NormalTok{  cutoff }\OtherTok{\textless{}{-}} \FunctionTok{qt}\NormalTok{(}\AttributeTok{p =}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{ci\_level)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, }
-               \AttributeTok{df =} \FunctionTok{sum}\NormalTok{(}\FunctionTok{unlist}\NormalTok{(model\_results}\SpecialCharTok{@}\NormalTok{Data}\SpecialCharTok{@}\NormalTok{nobs)), }
-               \AttributeTok{lower.tail =}\NormalTok{ F)}
-  
-  \CommentTok{\# first get the data}
-\NormalTok{  graph.data }\OtherTok{\textless{}{-}}\NormalTok{ data\_coef }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# put in tidy coefficients}
-  \FunctionTok{filter}\NormalTok{(model }\SpecialCharTok{==}\NormalTok{ model\_step) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# pick a model}
-  \FunctionTok{filter}\NormalTok{(}\FunctionTok{grepl}\NormalTok{(item\_name, term)) }\SpecialCharTok{\%\textgreater{}\%}  \CommentTok{\# pick a question}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{group =} \FunctionTok{factor}\NormalTok{(group, }\AttributeTok{levels =} \FunctionTok{names}\NormalTok{(}\FunctionTok{table}\NormalTok{(data\_coef}\SpecialCharTok{$}\NormalTok{group)), }
-                        \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Group 1"}\NormalTok{, }\StringTok{"Group 2"}\NormalTok{))) }
-  
-  \CommentTok{\# make ribbon data y = slope*x + intercept for ci for slopes }
-\NormalTok{  ribbondata }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}
-    \FunctionTok{data.frame}\NormalTok{(}
-    \AttributeTok{x =} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from =}\NormalTok{ x\_limits[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,  }
-            \AttributeTok{to =}\NormalTok{ x\_limits[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{+} \DecValTok{1}\NormalTok{, }
-            \AttributeTok{by =}\NormalTok{ .}\DecValTok{05}\NormalTok{), }
-    \AttributeTok{group =} \FunctionTok{unique}\NormalTok{(graph.data}\SpecialCharTok{$}\NormalTok{group)[}\DecValTok{1}\NormalTok{]}
-\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%} 
-    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ymin =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{{-}} 
-\NormalTok{             (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                    \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
-\NormalTok{             graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
-           \AttributeTok{ymax =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{+} 
-\NormalTok{             (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                    \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
-\NormalTok{             graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate)), }
-    \FunctionTok{data.frame}\NormalTok{(}
-      \AttributeTok{x =} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from =}\NormalTok{ x\_limits[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,  }
-              \AttributeTok{to =}\NormalTok{ x\_limits[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{+} \DecValTok{1}\NormalTok{, }
-              \AttributeTok{by =}\NormalTok{ .}\DecValTok{05}\NormalTok{), }
-      \AttributeTok{group =} \FunctionTok{unique}\NormalTok{(graph.data}\SpecialCharTok{$}\NormalTok{group)[}\DecValTok{2}\NormalTok{]}
-\NormalTok{    ) }\SpecialCharTok{\%\textgreater{}\%} 
-      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ymin =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{{-}} 
-\NormalTok{               (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                      \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
-\NormalTok{               graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
-             \AttributeTok{ymax =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{+} 
-\NormalTok{               (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                      \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
-\NormalTok{               graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate))}
-\NormalTok{  )}
-  
-  \CommentTok{\# make point data to draw on the intercepts }
-\NormalTok{  pointdata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
-  \AttributeTok{x =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{),}
-  \AttributeTok{y =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
-  \AttributeTok{group =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group),}
-  \AttributeTok{ymin =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{{-}} 
-\NormalTok{    cutoff }\SpecialCharTok{*}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error), }
-  \AttributeTok{ymax =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{+} 
-\NormalTok{    cutoff }\SpecialCharTok{*}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)}
-\NormalTok{  )}
-  
-  \CommentTok{\# make the line data to draw on the slopes}
-\NormalTok{  linedata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
-  \AttributeTok{slope =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
-  \AttributeTok{intercept =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
-  \AttributeTok{group =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group)}
-\NormalTok{  )}
-  
-  \CommentTok{\# make the distributions for the residuals }
-\NormalTok{  violindata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
-  \AttributeTok{y =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rnorm}\NormalTok{(}\AttributeTok{n =} \DecValTok{1000}\NormalTok{, }
-            \AttributeTok{mean =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-              \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
-            \AttributeTok{sd =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-              \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)), }
-        \FunctionTok{rnorm}\NormalTok{(}\AttributeTok{n =} \DecValTok{1000}\NormalTok{, }
-            \AttributeTok{mean =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-              \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
-            \AttributeTok{sd =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-              \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error))),}
-  \AttributeTok{group =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-              \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group), }\DecValTok{1000}\NormalTok{),}
-            \FunctionTok{rep}\NormalTok{(graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
-              \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group), }\DecValTok{1000}\NormalTok{)), }
-  \AttributeTok{x =} \DecValTok{1}
-\NormalTok{  )}
-  
-  \CommentTok{\# make the latent mean data for right panel}
-\NormalTok{  latent\_means }\OtherTok{\textless{}{-}} \FunctionTok{lavPredict}\NormalTok{(model\_results, }
-                               \AttributeTok{type =} \StringTok{"lv"}\NormalTok{, }
-                               \AttributeTok{label =} \ConstantTok{TRUE}\NormalTok{,}
-                               \AttributeTok{assemble =} \ConstantTok{TRUE}\NormalTok{, }
-                               \AttributeTok{append.data =} \ConstantTok{TRUE}\NormalTok{)}
-  
-\NormalTok{  latent\_means}\SpecialCharTok{$}\NormalTok{lv }\OtherTok{\textless{}{-}}\NormalTok{ latent\_means[ , lv\_name]}
-  
-  \CommentTok{\# make a plot of the variance}
-\NormalTok{  variance\_plot }\OtherTok{\textless{}{-}} 
-  \FunctionTok{ggplot}\NormalTok{(violindata, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \DecValTok{1}\NormalTok{, }\AttributeTok{y =}\NormalTok{ y, }\AttributeTok{color =}\NormalTok{ group, }\AttributeTok{fill =}\NormalTok{ group)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_split\_violin}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{theme\_void}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{stat\_summary}\NormalTok{(}\AttributeTok{fun =} \StringTok{"mean"}\NormalTok{,}
-               \AttributeTok{geom =} \StringTok{"crossbar"}\NormalTok{, }
-               \AttributeTok{width =} \FloatTok{0.5}\NormalTok{,}
-               \AttributeTok{colour =} \StringTok{"black"}\NormalTok{)}
-  
-  \CommentTok{\# make the plot with intercepts and slopes}
-\NormalTok{  intercept\_plot }\OtherTok{\textless{}{-}} 
-  \FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+} 
-  \CommentTok{\# basic set up}
-  \FunctionTok{theme\_classic}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Latent Variable"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Observed Variable"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{coord\_cartesian}\NormalTok{(}\AttributeTok{xlim =}\NormalTok{ x\_limits, }\AttributeTok{ylim =}\NormalTok{ y\_limits) }\SpecialCharTok{+} 
-  \CommentTok{\# plot the intercepts }
-  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data =}\NormalTok{ pointdata, }
-             \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{y =}\NormalTok{ y, }\AttributeTok{color =}\NormalTok{ group), }
-             \AttributeTok{inherit.aes =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_errorbar}\NormalTok{(}\AttributeTok{data =}\NormalTok{ pointdata,}
-                \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{ymin =}\NormalTok{ ymin, }\AttributeTok{ymax =}\NormalTok{ ymax, }\AttributeTok{color =}\NormalTok{ group), }
-                \AttributeTok{inherit.aes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{width =}\NormalTok{ .}\DecValTok{10}\NormalTok{) }\SpecialCharTok{+} 
-  \CommentTok{\# plot the slopes}
-  \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{data =}\NormalTok{ linedata,}
-              \FunctionTok{aes}\NormalTok{(}\AttributeTok{slope =}\NormalTok{ slope, }\AttributeTok{intercept =}\NormalTok{ intercept, }\AttributeTok{color =}\NormalTok{ group)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data =}\NormalTok{ ribbondata, }
-              \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{ymin =}\NormalTok{ ymin, }\AttributeTok{ymax =}\NormalTok{ ymax, }\AttributeTok{fill =}\NormalTok{ group), }
-              \AttributeTok{inherit.aes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{scale\_color\_discrete}\NormalTok{(}\AttributeTok{name =} \StringTok{"Group"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{scale\_fill\_discrete}\NormalTok{(}\AttributeTok{name =} \StringTok{"Group"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \DecValTok{0}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.line.y =} \FunctionTok{element\_blank}\NormalTok{())}
-  
-  \CommentTok{\# make the latent means plot}
-\NormalTok{  mean\_plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(latent\_means, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ lv, }\AttributeTok{fill =}\NormalTok{ group)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_density}\NormalTok{(}\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{theme\_classic}\NormalTok{() }\SpecialCharTok{+} 
-    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Latent Variable"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Density"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{data =}\NormalTok{ latent\_means }\SpecialCharTok{\%\textgreater{}\%}
-                 \FunctionTok{group\_by}\NormalTok{(group) }\SpecialCharTok{\%\textgreater{}\%} 
-                 \FunctionTok{summarize}\NormalTok{(}\AttributeTok{mean =} \FunctionTok{mean}\NormalTok{(lv)), }
-               \FunctionTok{aes}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ mean, }\AttributeTok{color =}\NormalTok{ group)) }\SpecialCharTok{+} 
-    \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{coord\_cartesian}\NormalTok{(}\AttributeTok{xlim =}\NormalTok{ x\_limits)}
-  
-\NormalTok{  y\_range }\OtherTok{=} \FunctionTok{abs}\NormalTok{(y\_limits[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{{-}}\NormalTok{ y\_limits[}\DecValTok{1}\NormalTok{])}
-  
-  \CommentTok{\# line up the two plots }
-\NormalTok{  prow }\OtherTok{\textless{}{-}} \FunctionTok{plot\_grid}\NormalTok{(}
-\NormalTok{    intercept\_plot }\SpecialCharTok{+} 
-      \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Item Invariance"}\NormalTok{) }\SpecialCharTok{+} 
-      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+} 
-      \FunctionTok{annotation\_custom}\NormalTok{(}\FunctionTok{ggplotGrob}\NormalTok{(variance\_plot), }
-                        \AttributeTok{xmin =}\NormalTok{ .}\DecValTok{25}\NormalTok{, }\AttributeTok{xmax =} \DecValTok{1}\NormalTok{, }
-                        \AttributeTok{ymin =}\NormalTok{ y\_limits[}\DecValTok{1}\NormalTok{], }
-                        \AttributeTok{ymax =}\NormalTok{ y\_limits[}\DecValTok{2}\NormalTok{]}\SpecialCharTok{{-}}\NormalTok{y\_range}\SpecialCharTok{/}\FloatTok{1.8}\NormalTok{),}
-\NormalTok{    mean\_plot }\SpecialCharTok{+} 
-      \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Latent Mean Distribution"}\NormalTok{) }\SpecialCharTok{+} 
-      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{),}
-    \AttributeTok{align =} \StringTok{\textquotesingle{}vh\textquotesingle{}}\NormalTok{,}
-    \AttributeTok{hjust =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}
-    \AttributeTok{nrow =} \DecValTok{1}
-\NormalTok{  )}
-  
-  \CommentTok{\# get the lengend}
-\NormalTok{  legend\_b }\OtherTok{\textless{}{-}} \FunctionTok{get\_legend}\NormalTok{(}
-\NormalTok{    intercept\_plot }\SpecialCharTok{+} 
-      \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{1}\NormalTok{)) }\SpecialCharTok{+}
-      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)}
-\NormalTok{  )}
-  
-  \CommentTok{\# send out the plot }
-  \FunctionTok{plot\_grid}\NormalTok{(prow, legend\_b, }\AttributeTok{ncol =} \DecValTok{1}\NormalTok{, }\AttributeTok{rel\_heights =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, .}\DecValTok{1}\NormalTok{))}
-  
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-\normalsize
 
 
 \end{document}

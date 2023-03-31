@@ -66,6 +66,7 @@ knitr::knit_hooks$set(source = function(x, options) {
 mgcfa <- function(data, group, model){
   
   group_names <- unique(data[ , group])
+  data$group <- data[ , group]
   
   model.overall <- cfa(model = model, data = data)
   model.group1 <- cfa(model = model, data = subset(data, group == group_names[1]))
@@ -82,23 +83,23 @@ mgcfa <- function(data, group, model){
                       group.equal =  c("loadings", "intercepts", "residuals"))
   
   model_coef <- bind_rows(
-    tidy(model.overall, conf.level = .95) %>% mutate(model = "overall"), 
-    tidy(model.group1, conf.level = .95) %>% mutate(model = "group1"), 
-    tidy(model.group2, conf.level = .95) %>% mutate(model = "group2"), 
-    tidy(model.configural, conf.level = .95) %>% mutate(model = "configural"), 
-    tidy(model.metric, conf.level = .95) %>% mutate(model = "metric"), 
-    tidy(model.scalar, conf.level = .95) %>% mutate(model = "scalar"), 
-    tidy(model.strict, conf.level = .95) %>% mutate(model = "strict")
+    tidy(model.overall, conf.level = .95) %>% mutate(model = "Overall"), 
+    tidy(model.group1, conf.level = .95) %>% mutate(model = "Group 1"), 
+    tidy(model.group2, conf.level = .95) %>% mutate(model = "Group 2"), 
+    tidy(model.configural, conf.level = .95) %>% mutate(model = "Configural"), 
+    tidy(model.metric, conf.level = .95) %>% mutate(model = "Metric"), 
+    tidy(model.scalar, conf.level = .95) %>% mutate(model = "Scalar"), 
+    tidy(model.strict, conf.level = .95) %>% mutate(model = "Strict")
   )
     
   model_fit <- bind_rows(
-    glance(model.overall) %>% mutate(model = "overall"), 
-    glance(model.group1) %>% mutate(model = "group1"), 
-    glance(model.group2) %>% mutate(model = "group2"), 
-    glance(model.configural) %>% mutate(model = "configural"), 
-    glance(model.metric) %>% mutate(model = "metric"), 
-    glance(model.scalar) %>% mutate(model = "scalar"), 
-    glance(model.strict) %>% mutate(model = "strict")
+    glance(model.overall) %>% mutate(model = "Overall"), 
+    glance(model.group1) %>% mutate(model = "Group 1"), 
+    glance(model.group2) %>% mutate(model = "Group 2"), 
+    glance(model.configural) %>% mutate(model = "Configural"), 
+    glance(model.metric) %>% mutate(model = "Metric"), 
+    glance(model.scalar) %>% mutate(model = "Scalar"), 
+    glance(model.strict) %>% mutate(model = "Strict")
     )
   
   return(list(
@@ -119,7 +120,7 @@ mgcfa <- function(data, group, model){
 ```{r test-function, eval = F, include = F}
 # temp test
 data_coef = results.large.res$model_coef
-model_step = "configural" 
+model_step = "Configural" 
 item_name = "q4"
 x_limits = c(-1,1)
 y_limits = c(min(df.large.res$q4), max(df.large.res$q4))
@@ -640,7 +641,7 @@ The results from the `model_coef` table can then be used directly in the suggest
 ```{r eval = F, echo = T, include = T, size = "small"}
 plot_mgcfa(
   data_coef = results.invariant$model_coef, # output from model_coef
-  model_step = "configural", # which model do you want to plot
+  model_step = "Configural", # which model do you want to plot
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # latent variable limits to graph
   y_limits = c(min(df.invariant$q4), max(df.invariant$q4)), # Y min and max in data 
@@ -656,15 +657,15 @@ The output from this model can be found in Figure \@ref(fig:invariant-pic). On t
 
 ### Loadings
 
-Factor loadings represent the slope of the regression equation for the latent variable predicting the scores on the observed variable ($\hat{Y} \sim b_0 + b_1X + \epsilon$). Therefore, the latent variable is shown on the x-axis using standardized values (i.e., *z*-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The y-axis indicates the observed variable scores, and here, the plot includes the entire range of the scale of the data for item four. The coefficient ($b_1$) for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_tail() %>% pull(estimate))`. The ribbon bands around the plotted slopes indicate the confidence interval for that estimate. In this plot, while the coefficients for each group are not literally equal, the overlapping and parallel slope bands indicate they are not different practically.
+Factor loadings represent the slope of the regression equation for the latent variable predicting the scores on the observed variable ($\hat{Y} \sim b_0 + b_1X + \epsilon$). Therefore, the latent variable is shown on the x-axis using standardized values (i.e., *z*-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The y-axis indicates the observed variable scores, and here, the plot includes the entire range of the scale of the data for item four. The coefficient ($b_1$) for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_tail() %>% pull(estimate))`. The ribbon bands around the plotted slopes indicate the confidence interval for that estimate. In this plot, while the coefficients for each group are not literally equal, the overlapping and parallel slope bands indicate they are not different practically.
 
 ### Intercepts
 
-The item intercepts ($b_0$) are plotted on the middle line where they would cross the y-axis at a latent variable score of zero. These are represented by a dot with a set of confidence error bars around the point. The intercept for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))`. In this invariant depiction, the overlap in the intercepts is clear, indicating they are not different. You can use `y_limits` to zoom in on the graph if these are too small to be distinguishable.
+The item intercepts ($b_0$) are plotted on the middle line where they would cross the y-axis at a latent variable score of zero. These are represented by a dot with a set of confidence error bars around the point. The intercept for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))`. In this invariant depiction, the overlap in the intercepts is clear, indicating they are not different. You can use `y_limits` to zoom in on the graph if these are too small to be distinguishable.
 
 ### Residuals
 
-Residuals are trickier to plot, as they are the left over error when predicting the observed variables $\epsilon$. It is tempting to plot this value as the confidence band around the slope, however, that defeats the purpose of understanding that the slopes are estimated separately from the residuals, and both have an associated variability around their parameter estimate. Therefore, residuals are represented in the inset picture at the bottom right of the item invariance plot. The black bars represent the estimated residual for each group (group 1: `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_head() %>% pull(estimate))`, group 2: `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_tail() %>% pull(estimate))`). The distributions are plotted to represent the normal spread of values using the standard error of the residuals. The violin plot allows for direct comparison of those residuals and their potential distributions. Note that the placement has nothing to do with the x or y-axis and is designed to always show in the same location, regardless of size/value.
+Residuals are trickier to plot, as they are the left over error when predicting the observed variables $\epsilon$. It is tempting to plot this value as the confidence band around the slope, however, that defeats the purpose of understanding that the slopes are estimated separately from the residuals, and both have an associated variability around their parameter estimate. Therefore, residuals are represented in the inset picture at the bottom right of the item invariance plot. The black bars represent the estimated residual for each group (group 1: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_head() %>% pull(estimate))`, group 2: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_tail() %>% pull(estimate))`). The distributions are plotted to represent the normal spread of values using the standard error of the residuals. The violin plot allows for direct comparison of those residuals and their potential distributions. Note that the placement has nothing to do with the x or y-axis and is designed to always show in the same location, regardless of size/value.
 
 ### Latent Means
 
@@ -673,7 +674,7 @@ The overall impact of differences on the latent means can be found in the right 
 ```{r invariant-pic, include = T, fig.cap = "Invariant Model Visualization"}
 plot_mgcfa(
   data_coef = results.invariant$model_coef, # output from model_coef
-  model_step = "configural", # which model
+  model_step = "Configural", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.invariant$q4), max(df.invariant$q4)), # Y min and max in data 
@@ -687,12 +688,12 @@ plot_mgcfa(
 
 The $d_{MACS}$ value for item 4 in the invariant model was `r apa_num(d_invariant)$DMACS[4]`, representing a nil or unimportant difference in this manuscript. It is important to note that while @nye2019 suggests specific sizes for small, medium, and large, each researcher should determine for themselves what effects represent. Figure \@ref(fig:small-load-pic) displays the results from the small ($d_{MACS}$ = `r apa_num(d_small_load)$DMACS[4]`) difference in loadings, while Figure \@ref(fig:med-load-pic) displays the results from the medium ($d_{MACS}$ = `r apa_num(d_med_load)$DMACS[4]`) difference in loadings, and Figure \@ref(fig:large-load-pic) shows the large ($d_{MACS}$ = `r apa_num(d_large_load)$DMACS[4]`) differences. When investigating the slope values, we can clearly see the change in the loading for the second group (the only manipulated variable, although random dataset generation may also change intercepts and residuals slightly). At the medium effect size, we see that the confidence bands do not overlap (at the edges), and at the large effect size, we can see a clear separation of two lines. Note that the intercepts in this model are estimated as equal so the loading representation will not literally separate, but the steepness of the lines is the indicator of the difference between the slopes. You can imagine these lines are interpreted like a simple slopes analysis for interactions in regression [@cohen2003]. When simple slopes for interactions are plotted, if they are parallel, there is no interaction, and if they cross, then there is an interaction. Here, we can use this same logic. If they are parallel, there is likely invariance (they are the same), and the further from parallel they become, the larger the effect size for the differences between group loadings.
 
-The latent means in Figure \@ref(fig:large-load-pic) do appear to show differences, albeit visually small. The latent means diagram shows the impact of any group differences that aren't constrained, and this image shows the configural model (as the metric model would force them to be equal). In the simulated model, the *only* manipulated parameter is question 4's loading. In real models, the differences may be larger due to other variation found in the parameter estimates. Therefore, once you discover items you believe would make a model "partially" invariant, you may wish to estimate that model and graph the item again using the partially invariant model to see only the effect of the non-invariant items. Additionally, consider that we set the scaling of the model to 0. The estimate for the lv mean in the large loading model was group 1: `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate))`, and group 2: `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))`, which results in `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate) - results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))` difference in group means. The practical implications of this difference will depend on the research and interpretations of the researcher.
+The latent means in Figure \@ref(fig:large-load-pic) do appear to show differences, albeit visually small. The latent means diagram shows the impact of any group differences that aren't constrained, and this image shows the configural model (as the metric model would force them to be equal). In the simulated model, the *only* manipulated parameter is question 4's loading. In real models, the differences may be larger due to other variation found in the parameter estimates. Therefore, once you discover items you believe would make a model "partially" invariant, you may wish to estimate that model and graph the item again using the partially invariant model to see only the effect of the non-invariant items. Additionally, consider that we set the scaling of the model to 0. The estimate for the lv mean in the large loading model was group 1: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate))`, and group 2: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))`, which results in `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate) - results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))` difference in group means. The practical implications of this difference will depend on the research and interpretations of the researcher.
 
 ```{r small-load-pic, include = T, fig.cap = "Small Loadings Model Visualization"}
 plot_mgcfa(
   data_coef = results.small.load$model_coef, # output from model_coef
-  model_step = "configural", # which model
+  model_step = "Configural", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.small.load$q4), max(df.small.load$q4)), # Y min and max in data 
@@ -705,7 +706,7 @@ plot_mgcfa(
 ```{r med-load-pic, include = T, fig.cap = "Medium Loadings Model Visualization"}
 plot_mgcfa(
   data_coef = results.med.load$model_coef, # output from model_coef
-  model_step = "configural", # which model
+  model_step = "Configural", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.med.load$q4), max(df.med.load$q4)), # Y min and max in data 
@@ -718,7 +719,7 @@ plot_mgcfa(
 ```{r large-load-pic, include = T, fig.cap = "Large Loadings Model Visualization"}
 plot_mgcfa(
   data_coef = results.large.load$model_coef, # output from model_coef
-  model_step = "configural", # which model
+  model_step = "Configural", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.large.load$q4), max(df.large.load$q4)), # Y min and max in data 
@@ -728,12 +729,12 @@ plot_mgcfa(
 )
 ```
 
-For intercepts, the small (Figure \@ref(fig:small-int-pic)), medium (Figure \@ref(fig:med-int-pic)), and large (Figure \@ref(fig:large-int-pic)) depictions represent $d_{MACS}$ values of `r apa_num(d_small_int)$DMACS[4]`, `r apa_num(d_med_int)$DMACS[4]`, and `r apa_num(d_large_int)$DMACS[4]`, respectively. Intercept differences can be clearly seen represented by the spacing out of the intercept locations (and thus, the overall line as well). Note how little the intercept differences appear to influence the latent variable means and distributions.
+For intercepts, the small (Figure \@ref(fig:small-int-pic)), medium (Figure \@ref(fig:med-int-pic)), and large (Figure \@ref(fig:large-int-pic)) depictions represent $d_{MACS}$ values of `r apa_num(d_small_int)$DMACS[4]`, `r apa_num(d_med_int)$DMACS[4]`, and `r apa_num(d_large_int)$DMACS[4]`, respectively. Intercept differences can be clearly seen represented by the spacing out of the intercept locations (and thus, the overall line as well). While the changes in intercept do not appear to change the latent means, the cavaet to this simulation is that only item four was manipulated. An example is provided below that demonstrates large changes in latent means. 
 
 ```{r small-int-pic, include = T, fig.cap = "Small Intercepts Model Visualization"}
 plot_mgcfa(
   data_coef = results.small.int$model_coef, # output from model_coef
-  model_step = "metric", # which model
+  model_step = "Metric", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.small.int$q4), max(df.small.int$q4)), # Y min and max in data 
@@ -746,7 +747,7 @@ plot_mgcfa(
 ```{r med-int-pic, include = T, fig.cap = "Medium Intercepts Model Visualization"}
 plot_mgcfa(
   data_coef = results.med.int$model_coef, # output from model_coef
-  model_step = "metric", # which model
+  model_step = "Metric", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.med.int$q4), max(df.med.int$q4)), # Y min and max in data 
@@ -759,7 +760,7 @@ plot_mgcfa(
 ```{r large-int-pic, include = T, fig.cap = "Large Intercepts Model Visualization"}
 plot_mgcfa(
   data_coef = results.large.int$model_coef, # output from model_coef
-  model_step = "metric", # which model
+  model_step = "Metric", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.large.int$q4), max(df.large.int$q4)), # Y min and max in data 
@@ -774,7 +775,7 @@ Last, the effect of the residuals is plotted in small (Figure \@ref(fig:small-re
 ```{r small-res-pic, include = T, fig.cap = "Small Residuals Model Visualization"}
 plot_mgcfa(
   data_coef = results.small.res$model_coef, # output from model_coef
-  model_step = "scalar", # which model
+  model_step = "Scalar", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.small.res$q4), max(df.small.res$q4)), # Y min and max in data 
@@ -787,7 +788,7 @@ plot_mgcfa(
 ```{r med-res-pic, include = T, fig.cap = "Medium Residuals Model Visualization"}
 plot_mgcfa(
   data_coef = results.med.res$model_coef, # output from model_coef
-  model_step = "scalar", # which model
+  model_step = "Scalar", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.med.res$q4), max(df.med.res$q4)), # Y min and max in data 
@@ -800,7 +801,7 @@ plot_mgcfa(
 ```{r large-res-pic, include = T, fig.cap = "Large Residuals Model Visualization"}
 plot_mgcfa(
   data_coef = results.large.res$model_coef, # output from model_coef
-  model_step = "scalar", # which model
+  model_step = "Scalar", # which model
   item_name = "q4", # name of observed item
   x_limits = c(-1,1), # LV limits to graph
   y_limits = c(min(df.large.res$q4), max(df.large.res$q4)), # Y min and max in data 
@@ -829,17 +830,36 @@ DF <- bind_rows(
 save(DF, file = "RS14.Rdata")
 ```
 
-@aiena2014 examined the RS-14 [@wagnild2009] exploring the factor structure of the Resiliency Scale in a clinical sample receiving treatment services and a college student sample. Measurement invariance was calculated for differences separately for these samples for gender and race finding a partially invariant models with a few item intercepts or residuals that differed between groups. @aiena2014 did not compare the clinical to the student sample for measurement invariance, and it is reasonable to expect potential differences in these two populations. 
+@aiena2014 examined the RS-14 [@wagnild2009] exploring the factor structure of the Resiliency Scale in a clinical sample receiving treatment services and a college student sample. Measurement invariance was calculated for differences separately for these samples for gender and race finding a partially invariant models with a few item intercepts or residuals that differed between groups. @aiena2014 did not compare the clinical to the student sample for measurement invariance, and it is reasonable to expect potential differences in these two populations. This example will demonstrate the procedure for researchers who wish to use partial invariance steps and how to interpret real, messy data. 
 
 ```{r echo = T, include = T, size = "small"}
+# load the data
 load("RS14.Rdata")
+# build the one-factor model 
 model.rs <- "RS =~ RS1+RS2+RS3+RS4+RS5+RS6+RS7+RS8+RS9+RS10+RS11+RS12+RS13+RS14"
+# run the multi-group CFA
 results.rs <- mgcfa(data = DF, 
                     group = "sample", 
                     model = model.rs)
+```
 
-results.rs$model_fit %>% select(model, AIC, BIC, cfi, tli, rmsea, srmr)
+```{r eval = F, echo = T, include = T, size = "small"}
+# how to get results in table 
+results.rs$model_fit %>% 
+        select(model, AIC, BIC, cfi, tli, rmsea, srmr)
+```
 
+```{r rs-table, results = 'asis'}
+apa_table(results.rs$model_fit %>% 
+        select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+        col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for RS-14 Example")
+```
+
+Table \@ref(fig:invariant-pic) indicates the results after running the one-factor model. There are several guidelines for assessing assessing a degradation in model fit [@cheung]
+
+
+```{r}
 ##write out partial codes
 partial_syntax <- paste(colnames(DF)[1:14], "~1") #all columns again 
 partial_syntax
@@ -917,14 +937,45 @@ plot_mgcfa(
   data_coef = partial.coef,
   model_step = "intercepts", 
   item_name = "RS6",
-  x_limits = c(-1,1),
+  x_limits = c(-2,2),
   y_limits = c(min(DF$RS7), max(DF$RS7)),
   model_results = partial.rs.2.picture, 
   ci_level = .95,
   lv_name = "RS"
 )
 
+plot_mgcfa(
+  data_coef = partial.coef,
+  model_step = "intercepts", 
+  item_name = "RS7",
+  x_limits = c(-2,2),
+  y_limits = c(min(DF$RS7), max(DF$RS7)),
+  model_results = partial.rs.2.picture, 
+  ci_level = .95,
+  lv_name = "RS"
+)
+
+SD <- tapply(DF$RS6, DF$sample, sd)
+M <- tapply(DF$RS6, DF$sample, mean)
+N <- tapply(DF$RS6, DF$sample, length)
+
+SD2 <- tapply(DF$RS7, DF$sample, sd)
+M2 <- tapply(DF$RS7, DF$sample, mean)
+N2 <- tapply(DF$RS7, DF$sample, length)
+
+library(MOTE)
+d.ind.t(M[1], M[2], SD[1], SD[2], N[1], N[2])
+d.ind.t(M2[1], M2[2], SD2[1], SD2[2], N2[1], N2[2])
+lavaan_dmacs(partial.rs.2.picture, "Clinical")
+lavaan_dmacs(results.rs$model.configural, "Clinical")
 ```
+
+6: Drive
+
+7: Perseverance
+
+I1tems for the RS–14 are described in the measure’s manual (Wagnild, 2009a)
+and can be viewed at www.resiliencecenter.com.
 
 ```{r echo = T, include = T, size = "small"}
 
@@ -1033,6 +1084,7 @@ library(broom)
 mgcfa <- function(data, group, model){
   
   group_names <- unique(data[ , group])
+  data$group <- data[ , group]
   
   model.overall <- cfa(model = model, data = data)
   model.group1 <- cfa(model = model, 
@@ -1053,29 +1105,29 @@ mgcfa <- function(data, group, model){
   
   model_coef <- bind_rows(
     tidy(model.overall, conf.level = .95) %>% 
-      mutate(model = "overall"), 
+      mutate(model = "Overall"), 
     tidy(model.group1, conf.level = .95) %>% 
-      mutate(model = "group1"), 
+      mutate(model = "Group 1"), 
     tidy(model.group2, conf.level = .95) %>% 
-      mutate(model = "group2"), 
+      mutate(model = "Group 2"), 
     tidy(model.configural, conf.level = .95) %>% 
-      mutate(model = "configural"), 
+      mutate(model = "Configural"), 
     tidy(model.metric, conf.level = .95) %>% 
-      mutate(model = "metric"), 
+      mutate(model = "Metric"), 
     tidy(model.scalar, conf.level = .95) %>% 
-      mutate(model = "scalar"), 
+      mutate(model = "Scalar"), 
     tidy(model.strict, conf.level = .95) %>% 
-      mutate(model = "strict")
+      mutate(model = "Strict")
   )
     
   model_fit <- bind_rows(
-    glance(model.overall) %>% mutate(model = "overall"), 
-    glance(model.group1) %>% mutate(model = "group1"), 
-    glance(model.group2) %>% mutate(model = "group2"), 
-    glance(model.configural) %>% mutate(model = "configural"), 
-    glance(model.metric) %>% mutate(model = "metric"), 
-    glance(model.scalar) %>% mutate(model = "scalar"), 
-    glance(model.strict) %>% mutate(model = "strict")
+    glance(model.overall) %>% mutate(model = "Overall"), 
+    glance(model.group1) %>% mutate(model = "Group 1"), 
+    glance(model.group2) %>% mutate(model = "Group 2"), 
+    glance(model.configural) %>% mutate(model = "Configural"), 
+    glance(model.metric) %>% mutate(model = "Metric"), 
+    glance(model.scalar) %>% mutate(model = "Scalar"), 
+    glance(model.strict) %>% mutate(model = "Strict")
     )
   
   return(list(
