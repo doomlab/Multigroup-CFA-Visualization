@@ -33,6 +33,46 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -189,9 +229,7 @@
 
 \authornote{
 
-Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
-
-Enter author note here.
+Thank you to K.D. Valentine and Chelsea Parlett-Pelleriti for feedback on some ugly graphs.
 
 The authors made the following contributions. Erin M. Buchanan: Conceptualization, Writing - Original Draft Preparation, Writing - Review \& Editing.
 
@@ -210,24 +248,19 @@ Latent variable modeling as a lens for psychometric theory is a popular tool for
 \begin{document}
 \maketitle
 
-Outline
+Psychological assessments play a critical role in our ability to measure and analyze constructs to support theories and experimental hypotheses. Defining and creating assessments to validly and reliability measure constructs is often difficult because phenomenon, such as anxiety, are often not directly observable. Instead, we use surveys and questionnaires to indirectly assess the underlying construct (DeVellis \& Thorpe, 2022). Latent variable modeling (i.e., structural equation modeling) is a popular tool for the validation of developed survey instruments to verify scale dimensionalality, structure, and model fit. A simple search for scale development reveals thousands of articles in psychology that examine new and previously published work, thus, illustrating the interest in both measurement and the use of validation techniques. Unfortunately, except in specialty journals, much of the validity evidence and/or development for measures used in empirical studies is not reported within the journal article Weidman, Steckler, \& Tracy (2017). Without this information, it is difficult to interpret individual study conclusions, as validity information allows for judgment of usefulness of the measured values (Flake \& Fried, 2020). Further, the current focus on replication Zwaan, Etz, Lucas, \& Donnellan (2018), reproducibility (Nelson et al., 2018), and the credibility of our results (Vazire, Schiavone, \& Bottesini, 2022) has demonstrated questionable measurement practices - decisions that researchers make like survey selection and scoring that impact the results of the study (Flake \& Fried, 2020). Transparent reporting of the use and creation of scales can improve both interpretation and reproducibility when using surveys developed to measure latent constructs (Shadish, Cook, \& Campbell, 2001).
 
-\begin{itemize}
-\item
-  talk about LVM
-\item
-  talk about cfa
-\item
-  talk about mgcfa
-\item
-  how are measurement and replication/crisis related
-\item
-  why it is a bad idea to say that replication/crisis are \emph{because} bad measurement
-\item
-  how can we visualize and interpret MGCFA to help us understand the impact of measurement differences
-\end{itemize}
+A secondary concern for developed measures is the potential for differential responding and assessment within target populations. For example, Trent et al. (2013) examined for potential variability in the Revised Child Anxiety and Depression Scale in White and Black youths (Chorpita, Yim, Moffitt, Umemoto, \& Francis, 2000). They found that the scale mostly functioned the same for both White and Black individuals but differences in averages on individual items could potentially affect the scoring and interpretation of the scale results. This comparison of sub-populations is the test of measurement invariance (Meredith, 1993). Invariance or equivalence implies that the scale operates in the same fashion for each sub-group, and thus, differences in the final latent variable scores can interpretated as differences in populations. Non-invariance suggests that individuals respond or interpret items differently, and thus, differences in scores may represent different scores on the latent variable in the population or differences in measurement. Non-invariant measurement may lead to misleading results when making group comparisons, and assessing invariance has become a popular technique in scale development (Van De Schoot, Schmidt, De Beuckelaer, Lek, \& Zondervan-Zwijnenburg, 2015).
 
-By the end of this tutorial manuscript, readers will:
+Measurement invariance is typically analyzed using confirmatory factor analysis, specifically, multi-group confirmatory factor analysis (MGCFA) or less often, with item response theory Tay, Meade, \& Cao (2015). First, the model is examined with the factor structure proposed for the latent and observed variables, and then often these models are assessed for each group separately. The two models are then combined together into one nested CFA in order to determine configural invariance Kline (2016). Configural invariance tests if the proposed factor structure is the same between groups. In this model, all other estimated parameters are allowed to vary between groups. The general approach is to use this model as a baseline for starting a sequential analysis of further restrictions between group parameters (i.e., more restrictive with each step). However, models without configural invariance can occur and often point to misspecification for the observed and latent variables within one group (i.e., cross loadings of items onto other latent variables or correlated error terms for one group only).
+
+Next, the estimated parameter between each observed variable and its latent variable are constrained to be equal between groups for metric invariance. For example, item 1's factor loading must be equal to item 1's factor loading for each group. This test examines if the items represent the same relationship to the latent variable, or if specific items have weaker or stronger relationships in specific groups. Finding non-invariance at this stage generally points to items that have different functioning or interpretation for one group. At the third model, the item intercepts (i.e., item averages) are restricted across groups for scalar invariance. Scalar non-invariance would indicate that items have the same strength of relationship with their latent variable, just one group has a higher overall average on that item. Last (although sometimes not used), we may consider constraining error variances for each observed variable to be equal across groups for strict invariance. Strict non-invariance can occur when one group has a higher range of values on the observed variable, thus showing a larger variance. For example, if using a Likert scale, one group may use the full 1 to 7 range (creating a flatter distribution and larger variance), while the other group shows a ceiling effect of only using 5 to 7.
+
+These concepts have been explored and implemented for the last fifty years Sörbom (1978) and implemented in the most popular structural equation modeling programs Boker et al. (2011). Byrne, Shavelson, and Muthén (1989) extended the ideas of multi-group testing by suggesting partial invariance (followed by Meredith, 1993). Partial invariance occurs when non-invariance is found but can be attributed to only a few parameter estimate differences between groups (i.e., items 1 and 2 have different factor loadings but all others are the same). This testing provided an advantage to understand where the potential non-invariance may occur for further study and interpretation guidelines. To determine when non-invariance and partial invariance occurred, each model is sequentially compared to the previous model using some form of a difference test. Traditionally, since models were nested, a chi-square difference test was used Cheung \& Rensvold (2002); however, given the known issues with chi-square (Thompson \& Daniel, 1996), people have favored empirical cutoffs for differences in fit indices. As the field pushes back against favoring cutoff criteria and rules of thumb Putnick \& Bornstein (2016), an effect size measure for translating ``how much'' non-invariance was developed \(d_{MACS}\) (Nye \& Drasgow, 2011). This effect size examines the differences in observed variables between the two groups for both the factor loading and the item intercept; thus, any differences in either or both will increase the effect size for non-invariance (Stark et al., 2006).
+
+With \(d_{MACS}\) and measurement invariance testing, researchers can begin to quantify how and where their construct measurement may vary between groups. However, given the large number of studies that show non-invariance, it is clear that equivalence can be hard to meet. It is difficult to know if non-invariance occurs because of random sampling error, true population differences, or differences in replication and reproducibility of the construct in a new sample. Further, it is important to remember that the parameter estimates that we are testing are just that - estimates. All the parameter estimates have measures of standard error to indicate that they are more than likely variable with a new sample or population. Given that this information is generally ignored during the examination of measurement invariance, it may be that we are claiming that many scales are non-invariant, when in reality, the differences between loadings or item intercepts are small and unimportant. \(d_{MACS}\) provides the opportunity to begin to think about the smallest effect size of interest or the smallest meaningful effect size Anvari \& Lakens (2021). As mentioned, \(d_{MACS}\) has only really been explored for a combined intercept and loadings, and while useful, does not necessarily allow a researcher to pinpoint specific issues within an observed variable. The purpose of this manuscript is provide readers with a framework for visualization of differences in loadings, intercepts, and variances for each item, and the impact of those differences on the distribution of the latent mean. No known visualization techniques have been proposed for measurement invariance. By creating panel visualizations, we can supplement a researchers ability to judge the strength of the non-invariance differences and effect size for each item. Coupled with other indicators (i.e., fit indice differences, \(d_{MACS}\)), we can move toward a better understanding of how much measurement non-invariance is meaningful.
+
+By the end of this manuscript, readers will:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -248,15 +281,212 @@ By the end of this tutorial manuscript, readers will:
 
 Data was simulated using the \texttt{simulateData} function in the \emph{R} package \texttt{lavaan} (Rosseel, 2012) assuming multivariate normality using a \(\mu\) of 0 and \(\sigma\) of 1 for the data. This function allows you to write \texttt{lavaan} syntax for your model with estimated values to generate data for observed variables. The data included two groups of individuals (``Group 1'', ``Group 2'') for a multi-group confirmatory factor analysis (\$n\_\{group\}\$ = 250, \emph{N} = 500). The latent variables were assumed to be continuous normal. The model consisted of five observed items predicted by one latent variable (\texttt{lv\ =\textasciitilde{}\ q1\ +\ q2\ +\ q3\ +\ q4\ +\ q5}); however, the demonstration in this manuscript extends to multiple latent variables and other combinations of observed variables. Each item was assumed to be related to the latent variable with loadings approximately equal to .40 to .80, except when cases of non-invariance on the loadings was assumed.
 
-The Brown (2015) steps of testing measurement invariance are demonstrated in this manuscript for illustration purposes, but in line with Stark, Chernyshenko, and Drasgow (2006) suggestions, the visualizations show the impact of loadings and intercepts together. The configural model was analyzed nesting both groups into the same CFA model requiring that both groups show the same model structure, but all other parameters are free to vary between groups. The metric model constrained the factor loadings of each group to be equal within the model. The scalar model then constrained the item intercepts (i.e., item mean) to be equal across groups. Finally, the strict model constrained the item variances (i.e., error variances) to be equal for each item across groups. These models are normally tested sequentially, and a convenience function \texttt{mgcfa} is provided in the supplemental documents for this manuscript.
+The Brown (2015) steps of testing measurement invariance are demonstrated in this manuscript for illustration purposes, but in line with Stark et al. (2006) suggestions, the visualizations show the impact of loadings and intercepts together. The configural model was analyzed nesting both groups into the same CFA model requiring that both groups show the same model structure, but all other parameters are free to vary between groups. The metric model constrained the factor loadings of each group to be equal within the model. The scalar model then constrained the item intercepts (i.e., item mean) to be equal across groups. Finally, the strict model constrained the item variances (i.e., error variances) to be equal for each item across groups. These models are normally tested sequentially, and a convenience function \texttt{mgcfa} is provided in the supplemental documents for this manuscript. Fit indices for the steps for multi-group models are presented in the appendix for comparison of cutoff rules of thumb (Cheung \& Rensvold, 2002) to effect sizes and visualizations presented in this manuscript. Fit indices include Akaike Information Criterion (AIC, Akaike, 1998), Bayesian Information Criterion (BIC, Schwarz, 1978), Comparative Fit Index (CFI, Bentler, 1990), Tucker Lewis Index (TLI, Tucker \& Lewis, 1973), root mean squared error of approximation RMSEA (Steiger, 1990), and standardized root mean squar residual (SRMR, Bentler, 1995).
 
 The data was then simulated to represent invariance across all model steps, small, medium, and large invariance using \(d_{MACS}\) estimated sizes from Nye, Bradburn, Olenick, Bialko, and Drasgow (2019). While \(d_{MACS}\) is used primarily for an effect size of the (non)-invariance for intercepts and loadings together, a similar approach was taken for the estimation of small, medium, and large effects on the residuals. The effect size is presented for all models, calculated from the \emph{dmacs} package Nye \& Drasgow (2011). Only one item in each model was manipulated from the invariant model to create the non-invariant models.
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\hypertarget{code-examples}{%
+\subsection{Code Examples}\label{code-examples}}
+
+The complete code for this manuscript can be found at \url{https://osf.io/wev5f/}, and the function code for the convenience function for multi-group models and plots is found in the appendix. First, we would create our model code in \texttt{lavaan} syntax. The \texttt{lv} latent variable predicts the five measured variables, which are present as columns in our \texttt{df.invariant} dataset. You would include the dataframe in the \texttt{data} argument of our function, the name of the grouping variable in quotes for \texttt{group}, and the \texttt{lavaan} model syntax in the \texttt{model} argument. The \texttt{mgcfa} function code runs an overall model with all data, regardless of group, each group separately on the model, then the steps described above: configural, metric, scalar, and strict invariance.
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# create lavaan model}
+\NormalTok{model.overall }\OtherTok{\textless{}{-}} \StringTok{"lv =\textasciitilde{} q1 + q2 + q3 + q4 + q5}
+\StringTok{q1 \textasciitilde{} 0*1}
+\StringTok{lv \textasciitilde{} 1"}
+\CommentTok{\# look at the data}
+\FunctionTok{head}\NormalTok{(df.invariant)}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+\begin{verbatim}
+##           q1          q2          q3         q4         q5   group
+## 1 -0.8903542 -0.81707530  0.06137292 -1.3236407 -1.7916418 Group 1
+## 2  1.1054521 -0.03540948 -0.81299606  1.0028340 -0.1909127 Group 1
+## 3  1.4555852  1.54083484  1.59084213 -0.3345967 -0.6865496 Group 1
+## 4 -1.8745187 -1.27880245 -2.53565792 -1.0024193 -1.6253249 Group 1
+## 5 -0.4449517 -0.17782974  1.05507079 -1.2615705  1.7536428 Group 1
+## 6  0.2278813  0.71348845  1.63251893  0.6449847 -1.0055700 Group 1
+\end{verbatim}
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# run our mgcfa function to run all models}
+\NormalTok{results.invariant }\OtherTok{\textless{}{-}} \FunctionTok{mgcfa}\NormalTok{(}\AttributeTok{data =}\NormalTok{ df.invariant, }\CommentTok{\#dataframe}
+                           \AttributeTok{group =} \StringTok{"group"}\NormalTok{, }
+                           \AttributeTok{model =}\NormalTok{ model.overall)}
+\CommentTok{\# what is saved for you}
+\FunctionTok{names}\NormalTok{(results.invariant)}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+\begin{verbatim}
+## [1] "model_coef"       "model_fit"        "model.overall"    "model.group1"    
+## [5] "model.group2"     "model.configural" "model.metric"     "model.scalar"    
+## [9] "model.strict"
+\end{verbatim}
+
+The results are saved as a list and include the following:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\tightlist
+\item
+  \texttt{model\_coef}: a tidy dataframe with \emph{all} model's coefficients saved from the \texttt{lavaan} outputs.
+\end{enumerate}
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(results.invariant}\SpecialCharTok{$}\NormalTok{model\_coef)}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+\begin{verbatim}
+## # A tibble: 6 x 13
+##   term       op    estimate std.error statistic   p.value std.lv std.all std.nox
+##   <chr>      <chr>    <dbl>     <dbl>     <dbl>     <dbl>  <dbl>   <dbl>   <dbl>
+## 1 "lv =~ q1" =~       1        0          NA    NA         0.780   0.598   0.598
+## 2 "lv =~ q2" =~       0.564    0.0864      6.52  6.99e-11  0.440   0.435   0.435
+## 3 "lv =~ q3" =~       0.748    0.105       7.12  1.09e-12  0.583   0.505   0.505
+## 4 "lv =~ q4" =~       0.338    0.0804      4.20  2.62e- 5  0.264   0.250   0.250
+## 5 "lv =~ q5" =~       0.904    0.120       7.52  5.48e-14  0.705   0.613   0.613
+## 6 "q1 ~1 "   ~1       0        0          NA    NA         0       0       0    
+## # i 4 more variables: model <chr>, block <int>, group <int>, label <chr>
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  \texttt{model\_fit}: a tidy dataframe with \emph{all} model's fit indices saved from the \texttt{lavaan} outputs.
+\end{enumerate}
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(results.invariant}\SpecialCharTok{$}\NormalTok{model\_fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+\begin{verbatim}
+## # A tibble: 6 x 18
+##    agfi   AIC   BIC   cfi chisq  npar  rmsea rmsea.conf.high   srmr   tli
+##   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl>           <dbl>  <dbl> <dbl>
+## 1 0.979 7516. 7579. 0.994  6.37    15 0.0234          0.0697 0.0211 0.988
+## 2 0.948 3766. 3819. 0.976  7.79    15 0.0473          0.108  0.0312 0.953
+## 3 0.952 3762. 3815. 0.980  7.25    15 0.0424          0.104  0.0322 0.960
+## 4 0.950 7528. 7654. 0.978 15.0     30 0.0449          0.0886 0.0317 0.956
+## 5 0.942 7529. 7639. 0.954 24.7     26 0.0554          0.0905 0.0476 0.934
+## 6 0.952 7523. 7616. 0.964 26.2     22 0.0428          0.0760 0.0488 0.960
+## # i 8 more variables: converged <lgl>, estimator <chr>, ngroups <int>,
+## #   missing_method <chr>, nobs <int>, norig <int>, nexcluded <int>, model <chr>
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Saved \texttt{lavaan} fitted objects that you can use the \texttt{summary()}, \texttt{parameterEstimates()}, \texttt{fitIndices()}, etc. on. Overall model indicates the model without grouping variables testing all data on the proposed model structure. This model is then tested separately for each group (\texttt{model.group1}, \texttt{model.group2}). The final models follow the Brown (2015) naming convention for sequential steps for testing MGCFA for measurement invariance (\texttt{model.configural}, \texttt{model.metric}, \texttt{model.scalar}, \texttt{model.strict}).
+\end{enumerate}
+
+The results from the \texttt{model\_coef} table can then be used directly in the suggested plotting function. The plot outputs will be described below. First, here are the arguments for the function:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  \texttt{data\_coef}: A tidy dataframe of the parameter estimates from the models. This function assumes you have used \texttt{broom::tidy()} on the saved model from \texttt{lavaan} and added a column called ``model'' with the name of the model step. This function will only run for models that have used the grouping function (i.e., configural, metric, scalar, and strict or other combinations/steps you wish to examine).
+\item
+  \texttt{model\_step}: Which model do you want to plot? You should match this name to the one you want to extract from your model column in the \texttt{data\_coef}.
+\item
+  \texttt{item\_name}: Which observed variable from your model syntax do you want to plot? Please list this variable name exactly how it appears in the model.
+\item
+  \texttt{x\_limits}: What do you want the x-axits limits to be for your invariance plot? The default option is to assume the latent variable is standardized, and therefore, -1 to 1 is recommended. Use only two numbers, a lower and upper limit.
+\item
+  \texttt{y\_limits}: What do you want the y-axits limits to be for your invariance plot? Given that the latent variable is used to predict the observed values in the data, you could use the minimum and maximum values found in the data. If that range is large, consider reducing this value to be able to visualize the results (i.e., otherwise it may be too zoomed out to judge group differences). Use only two numbers, a lower and upper limit.
+\item
+  \texttt{ci\_level}: What confidence limit do you want to plot? Use 1 - \(\alpha\).
+\item
+  \texttt{model\_results}: In this argument, include the saved \texttt{lavaan} output for the model listed in the \texttt{model\_step} argument.
+\item
+  \texttt{lv\_name}: Include the name of the latent variable, exactly how it is listed in your \texttt{lavaan} syntax. You should plot the latent variable that the \texttt{item\_name} is linked to. If you have items that load onto multiple latent variables, you will need to make multiple plots.
+\end{enumerate}
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot\_mgcfa}\NormalTok{(}
+  \AttributeTok{data\_coef =}\NormalTok{ results.invariant}\SpecialCharTok{$}\NormalTok{model\_coef, }\CommentTok{\# output from model\_coef}
+  \AttributeTok{model\_step =} \StringTok{"configural"}\NormalTok{, }\CommentTok{\# which model do you want to plot}
+  \AttributeTok{item\_name =} \StringTok{"q4"}\NormalTok{, }\CommentTok{\# name of observed item}
+  \AttributeTok{x\_limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\CommentTok{\# latent variable limits to graph}
+  \AttributeTok{y\_limits =} \FunctionTok{c}\NormalTok{(}\FunctionTok{min}\NormalTok{(df.invariant}\SpecialCharTok{$}\NormalTok{q4), }\FunctionTok{max}\NormalTok{(df.invariant}\SpecialCharTok{$}\NormalTok{q4)), }\CommentTok{\# Y min and max in data }
+  \AttributeTok{ci\_level =}\NormalTok{ .}\DecValTok{95}\NormalTok{, }\CommentTok{\# what ci do you want}
+  \AttributeTok{model\_results =}\NormalTok{ results.invariant}\SpecialCharTok{$}\NormalTok{model.configural, }\CommentTok{\# what model results do you want }
+  \AttributeTok{lv\_name =} \StringTok{"lv"} \CommentTok{\# which latent variable do you want }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+\hypertarget{visualization-of-invariance}{%
+\subsection{Visualization of Invariance}\label{visualization-of-invariance}}
+
+The output from this model can be found in Figure \ref{fig:invariant-pic}. On the left hand side, the item invariance is plotted, and on the right hand side, the latent mean distributions for the two groups are plotted. In the item invariance sub-plot, the visualization includes all three components traditionally seen in MGCFA testing steps: loadings, intercepts, and residuals. Each visualization element was designed to match the traditional visualization for that type of output. All parameter estimates are plotted on the unstandardized estimates and their confidence interval based on the standard error of the estimate.
+
+\hypertarget{loadings}{%
+\subsubsection{Loadings}\label{loadings}}
+
+Factor loadings represent the slope of the regression equation for the latent variable predicting the scores on the observed variable (\(\hat{Y} \sim b_0 + b_1X + \epsilon\)). Therefore, the latent variable is shown on the x-axis using standardized values (i.e., \emph{z}-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The y-axis indicates the observed variable scores, and here, the plot includes the entire range of the scale of the data for item four. The coefficient (\(b_1\)) for group 1 was 0.40, while the coefficient for group 2 was 0.34. The ribbon bands around the plotted slopes indicate the confidence interval for that estimate. In this plot, while the coefficients for each group are not literally equal, the overlapping and parallel slope bands indicate they are not different practically.
+
+\hypertarget{intercepts}{%
+\subsubsection{Intercepts}\label{intercepts}}
+
+The item intercepts (\(b_0\)) are plotted on the middle line where they would cross the y-axis at a latent variable score of zero. These are represented by a dot with a set of confidence error bars around the point. The intercept for group 1 was 0.07, while the coefficient for group 2 was 0.03. In this invariant depiction, the overlap in the intercepts is clear, indicating they are not different. You can use \texttt{y\_limits} to zoom in on the graph if these are too small to be distinguishable.
+
+\hypertarget{residuals}{%
+\subsubsection{Residuals}\label{residuals}}
+
+Residuals are trickier to plot, as they are the left over error when predicting the observed variables \(\epsilon\). It is tempting to plot this value as the confidence band around the slope, however, that defeats the purpose of understanding that the slopes are estimated separately from the residuals, and both have an associated variability around their parameter estimate. Therefore, residuals are represented in the inset picture at the bottom right of the item invariance plot. The black bars represent the estimated residual for each group (group 1: 0.91, group 2: 1.16). The distributions are plotted to represent the normal spread of values using the standard error of the residuals. The violin plot allows for direct comparison of those residuals and their potential distributions. Note that the placement has nothing to do with the x or y-axis and is designed to always show in the same location, regardless of size/value.
+
+\hypertarget{latent-means}{%
+\subsubsection{Latent Means}\label{latent-means}}
+
+The overall impact of differences on the latent means can be found in the right hand visualization. The latent means are calculated by using the \texttt{predict} function and then plotted as overlapping histograms. The vertical colored lines represent the mean for each group, and the spread of the distribution can be examined using the density coloring. Finally, group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the dataset or whichever group is the first that appears when using the \texttt{levels()} command.
 
 \begin{figure}
 \centering
 \includegraphics{manuscript_files/figure-latex/invariant-pic-1.pdf}
 \caption{\label{fig:invariant-pic}Invariant Model Visualization}
 \end{figure}
+
+\hypertarget{graphing-effect-size}{%
+\subsubsection{Graphing Effect Size}\label{graphing-effect-size}}
+
+The \(d_{MACS}\) value for item 4 in the invariant model was 0.06, representing a nil or unimportant difference in this manuscript. It is important to note that while Nye et al. (2019) suggests specific sizes for small, medium, and large, each researcher should determine for themselves what effects represent. Figure \ref{fig:small-load-pic} displays the results from the small (\(d_{MACS}\) = 0.12) difference in loadings, while Figure \ref{fig:med-load-pic} displays the results from the medium (\(d_{MACS}\) = 0.43) difference in loadings, and Figure \ref{fig:large-load-pic} shows the large (\(d_{MACS}\) = 0.63) differences. When investigating the slope values, we can clearly see the change in the loading for the second group (the only manipulated variable, although random dataset generation may also change intercepts and residuals slightly). At the medium effect size, we see that the confidence bands do not overlap (at the edges), and at the large effect size, we can see a clear separation of two lines. Note that the intercepts are still fixed so the loading representation will not literally separate, but the steepness of the lines is the indicator of the difference between the slopes. You can imagine these lines are interpreted like a simple slopes analysis for interactions in regression (Cohen, Cohen, West, \& Aiken, 2003). When simple slopes for interactions are plotted, if they are parallel, there is no interaction, and if they cross, then there is an interaction. Here, we can use this same logic. If they are parallel, there is likely invariance (they are the same), and the further from parallel they become, the larger the effect size for the differences between group loadings.
 
 \begin{figure}
 \centering
@@ -276,6 +506,8 @@ The data was then simulated to represent invariance across all model steps, smal
 \caption{\label{fig:large-load-pic}Large Loadings Model Visualization}
 \end{figure}
 
+For intercepts, the small (Figure \ref{fig:small-int-pic}), medium (Figure \ref{fig:med-int-pic}), and large (Figure \ref{fig:large-int-pic}) depictions represent \(d_{MACS}\) values of 0.29, 0.52, and 0.76, respectively. Intercept differences can be clearly seen represented by the spacing out of the intercept locations (and thus, the overall line as well). Note how little the intercept differences appear to influence the latent variable means and distributions.
+
 \begin{figure}
 \centering
 \includegraphics{manuscript_files/figure-latex/small-int-pic-1.pdf}
@@ -293,6 +525,8 @@ The data was then simulated to represent invariance across all model steps, smal
 \includegraphics{manuscript_files/figure-latex/large-int-pic-1.pdf}
 \caption{\label{fig:large-int-pic}Large Intercepts Model Visualization}
 \end{figure}
+
+Last, the effect of the residuals is plotted in small (Figure \ref{fig:small-res-pic}), medium (Figure \ref{fig:med-res-pic}), and large (Figure \ref{fig:large-res-pic}) formats. While \(d_{MACS}\) values are not technically avaliable for the residuals, our models showed 0.20, 0.14, and 0.11, respectively. These differences in values are variable due to the random generation of datasets for each measurement invariance manipulation. At first glance, the differences in the small chart may seem large, because the black lines are not touching, but notice that the distributions overlap, indicating a likely small difference. The medium and large differences better illustrate differences in residuals across groups. Further, the impact of the residuals on the shape of the latent mean distribution can also been seen (and unintentionally, in the first figures as well due to random variation). The impact is due to the standard error of the residuals, as smaller standard errors represent lepokurtic distributions (taller), and larger standard errors represent platykurtic distributions (flatter). The effect size difference of the residuals does not appear to change the effects in the latent means.
 
 \begin{figure}
 \centering
@@ -312,9 +546,6 @@ The data was then simulated to represent invariance across all model steps, smal
 \caption{\label{fig:large-res-pic}Large Residuals Model Visualization}
 \end{figure}
 
-\hypertarget{results}{%
-\section{Results}\label{results}}
-
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
 
@@ -333,14 +564,80 @@ Conclusions:
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-akaike1998}{}}%
+Akaike, H. (1998). \emph{Information theory and an extension of the maximum likelihood principle} (E. Parzen, K. Tanabe, \& G. Kitagawa, Eds.). New York, NY: Springer New York. Retrieved from \url{http://link.springer.com/10.1007/978-1-4612-1694-0_15}
+
+\leavevmode\vadjust pre{\hypertarget{ref-anvari2021}{}}%
+Anvari, F., \& Lakens, D. (2021). Using anchor-based methods to determine the smallest effect size of interest. \emph{Journal of Experimental Social Psychology}, \emph{96}, 104159. \url{https://doi.org/10.1016/j.jesp.2021.104159}
+
+\leavevmode\vadjust pre{\hypertarget{ref-barry2014}{}}%
+Barry, A. E., Chaney, B., Piazza-Gardner, A. K., \& Chavarria, E. A. (2014). Validity and Reliability Reporting Practices in the Field of Health Education and Behavior: A Review of Seven Journals. \emph{Health Education \& Behavior}, \emph{41}(1), 12--18. \url{https://doi.org/10.1177/1090198113483139}
+
 \leavevmode\vadjust pre{\hypertarget{ref-beaujean2014}{}}%
 Beaujean, A. A. (2014). \emph{Latent variable modeling using r: A step by step guide}. New York: Routledge/Taylor \& Francis Group.
+
+\leavevmode\vadjust pre{\hypertarget{ref-bentler1990}{}}%
+Bentler, P. M. (1990). Comparative fit indexes in structural models. \emph{Psychological Bulletin}, \emph{107}(2), 238--246. \url{https://doi.org/10.1037/0033-2909.107.2.238}
+
+\leavevmode\vadjust pre{\hypertarget{ref-bentler1995}{}}%
+Bentler, P. M. (1995). \emph{EQS structural equations program manual}. Encino, CA.
+
+\leavevmode\vadjust pre{\hypertarget{ref-boker2011}{}}%
+Boker, S., Neale, M., Maes, H., Wilde, M., Spiegel, M., Brick, T., \ldots{} Fox, J. (2011). OpenMx: An Open Source Extended Structural Equation Modeling Framework. \emph{Psychometrika}, \emph{76}(2), 306--317. \url{https://doi.org/10.1007/s11336-010-9200-6}
 
 \leavevmode\vadjust pre{\hypertarget{ref-brown2015}{}}%
 Brown, T. A. (2015). \emph{Confirmatory factor analysis for applied research} (Second edition). New York ; London: The Guilford Press.
 
+\leavevmode\vadjust pre{\hypertarget{ref-byrne2001}{}}%
+Byrne, B. M. (2001). Structural Equation Modeling With AMOS, EQS, and LISREL: Comparative Approaches to Testing for the Factorial Validity of a Measuring Instrument. \emph{International Journal of Testing}, \emph{1}(1), 55--86. \url{https://doi.org/10.1207/S15327574IJT0101_4}
+
+\leavevmode\vadjust pre{\hypertarget{ref-byrne1989}{}}%
+Byrne, B. M., Shavelson, R. J., \& Muthén, B. (1989). Testing for the equivalence of factor covariance and mean structures: The issue of partial measurement invariance. \emph{Psychological Bulletin}, \emph{105}(3), 456--466. \url{https://doi.org/10.1037/0033-2909.105.3.456}
+
+\leavevmode\vadjust pre{\hypertarget{ref-cheung2002}{}}%
+Cheung, G. W., \& Rensvold, R. B. (2002). Evaluating Goodness-of-Fit Indexes for Testing Measurement Invariance. \emph{Structural Equation Modeling: A Multidisciplinary Journal}, \emph{9}(2), 233--255. \url{https://doi.org/10.1207/s15328007sem0902_5}
+
+\leavevmode\vadjust pre{\hypertarget{ref-chorpita2000}{}}%
+Chorpita, B. F., Yim, L., Moffitt, C., Umemoto, L. A., \& Francis, S. E. (2000). Assessment of symptoms of DSM-IV anxiety and depression in children: a revised child anxiety and depression scale. \emph{Behaviour Research and Therapy}, \emph{38}(8), 835--855. \url{https://doi.org/10.1016/S0005-7967(99)00130-8}
+
+\leavevmode\vadjust pre{\hypertarget{ref-cohen2003}{}}%
+Cohen, J., Cohen, P., West, S. G., \& Aiken, L. (2003). \emph{Applied multiple regression / correlation analysis for the behavioral sciences} (3rd ed.). Lawrence Erlbaum Associates.
+
+\leavevmode\vadjust pre{\hypertarget{ref-devellis2022}{}}%
+DeVellis, R. F., \& Thorpe, C. T. (2022). \emph{Scale development: Theory and applications} (Fifth edition). Thousand Oaks, California: SAGE Publications, Inc.
+
 \leavevmode\vadjust pre{\hypertarget{ref-dueber2023}{}}%
 Dueber, D. (2023). \emph{Dmacs}. Retrieved from \url{https://github.com/ddueber/dmacs}
+
+\leavevmode\vadjust pre{\hypertarget{ref-flake2020}{}}%
+Flake, J. K., \& Fried, E. I. (2020). Measurement Schmeasurement: Questionable Measurement Practices and How to Avoid Them. \emph{Advances in Methods and Practices in Psychological Science}, \emph{3}(4), 456--465. \url{https://doi.org/10.1177/2515245920952393}
+
+\leavevmode\vadjust pre{\hypertarget{ref-juxf6reskog1971}{}}%
+Jöreskog, K. G. (1971). Simultaneous factor analysis in several populations. \emph{Psychometrika}, \emph{36}(4), 409--426. \url{https://doi.org/10.1007/BF02291366}
+
+\leavevmode\vadjust pre{\hypertarget{ref-juxf6reskog2001}{}}%
+Jöreskog, Karl G., \& Sörbom, D. (2001). \emph{LISREL 8: user's reference guide} (2. ed., updated to LISREL 8). Lincolnwood, Ill: SSI Scientific Software Internat.
+
+\leavevmode\vadjust pre{\hypertarget{ref-kline2016}{}}%
+Kline, R. B. (2016). \emph{Principles and practice of structural equation modeling} (Fourth edition). New York: The Guilford Press.
+
+\leavevmode\vadjust pre{\hypertarget{ref-lakens2017}{}}%
+Lakens, D. (2017). Equivalence Tests. \emph{Social Psychological and Personality Science}, \emph{8}(4), 355--362. \url{https://doi.org/10.1177/1948550617697177}
+
+\leavevmode\vadjust pre{\hypertarget{ref-makel2014}{}}%
+Makel, M. C., \& Plucker, J. A. (2014). Facts Are More Important Than Novelty: Replication in the Education Sciences. \emph{Educational Researcher}, \emph{43}(6), 304--316. \url{https://doi.org/10.3102/0013189X14545513}
+
+\leavevmode\vadjust pre{\hypertarget{ref-makel2012}{}}%
+Makel, M. C., Plucker, J. A., \& Hegarty, B. (2012). Replications in Psychology Research: How Often Do They Really Occur? \emph{Perspectives on Psychological Science}, \emph{7}(6), 537--542. \url{https://doi.org/10.1177/1745691612460688}
+
+\leavevmode\vadjust pre{\hypertarget{ref-marsh2004}{}}%
+Marsh, H. W., Hau, K.-T., \& Wen, Z. (2004). In search of golden rules: Comment on hypothesis-testing approaches to setting cutoff values for fit indexes and dangers in overgeneralizing hu and bentler's (1999) findings. \emph{Structural Equation Modeling: A Multidisciplinary Journal}, \emph{11}(3), 320--341. \url{https://doi.org/10.1207/s15328007sem1103_2}
+
+\leavevmode\vadjust pre{\hypertarget{ref-meade2008}{}}%
+Meade, A. W., Johnson, E. C., \& Braddy, P. W. (2008). Power and sensitivity of alternative fit indices in tests of measurement invariance. \emph{Journal of Applied Psychology}, \emph{93}(3), 568--592. \url{https://doi.org/10.1037/0021-9010.93.3.568}
+
+\leavevmode\vadjust pre{\hypertarget{ref-meredith1993}{}}%
+Meredith, W. (1993). Measurement invariance, factor analysis and factorial invariance. \emph{Psychometrika}, \emph{58}(4), 525--543. \url{https://doi.org/10.1007/BF02294825}
 
 \leavevmode\vadjust pre{\hypertarget{ref-nelson2018}{}}%
 Nelson, L. D., Simmons, J., \& Simonsohn, U. (2018). Psychology's renaissance. \emph{Annual Review of Psychology}, \emph{69}(1), 511--534. \url{https://doi.org/10.1146/annurev-psych-122216-011836}
@@ -351,11 +648,50 @@ Nye, C. D., Bradburn, J., Olenick, J., Bialko, C., \& Drasgow, F. (2019). How Bi
 \leavevmode\vadjust pre{\hypertarget{ref-nye2011}{}}%
 Nye, C. D., \& Drasgow, F. (2011). Effect size indices for analyses of measurement equivalence: Understanding the practical importance of differences between groups. \emph{Journal of Applied Psychology}, \emph{96}(5), 966--980. \url{https://doi.org/10.1037/a0022955}
 
+\leavevmode\vadjust pre{\hypertarget{ref-putnick2016}{}}%
+Putnick, D. L., \& Bornstein, M. H. (2016). Measurement invariance conventions and reporting: The state of the art and future directions for psychological research. \emph{Developmental Review}, \emph{41}, 71--90. \url{https://doi.org/10.1016/j.dr.2016.06.004}
+
 \leavevmode\vadjust pre{\hypertarget{ref-rosseel2012}{}}%
 Rosseel, Y. (2012). Lavaan: An r package for structural equation modeling. \emph{Journal of Statistical Software}, \emph{48}(1), 1--36. \url{https://doi.org/10.18637/jss.v048.i02}
 
+\leavevmode\vadjust pre{\hypertarget{ref-schwarz1978}{}}%
+Schwarz, G. (1978). Estimating the dimension of a model. \emph{The Annals of Statistics}, \emph{6}(2), 461--464. Retrieved from \url{https://www.jstor.org/stable/2958889}
+
+\leavevmode\vadjust pre{\hypertarget{ref-shadish2001}{}}%
+Shadish, W. R., Cook, T. D., \& Campbell, D. T. (2001). \emph{Experimental and quasi-experimental designs for generalized causal inference}. Boston: Houghton Mifflin.
+
+\leavevmode\vadjust pre{\hypertarget{ref-suxf6rbom1978}{}}%
+Sörbom, D. (1978). An alternative to the methodology for analysis of covariance. \emph{Psychometrika}, \emph{43}(3), 381--396. \url{https://doi.org/10.1007/BF02293647}
+
 \leavevmode\vadjust pre{\hypertarget{ref-stark2006}{}}%
 Stark, S., Chernyshenko, O. S., \& Drasgow, F. (2006). Detecting differential item functioning with confirmatory factor analysis and item response theory: Toward a unified strategy. \emph{Journal of Applied Psychology}, \emph{91}(6), 1292--1306. \url{https://doi.org/10.1037/0021-9010.91.6.1292}
+
+\leavevmode\vadjust pre{\hypertarget{ref-steiger1990}{}}%
+Steiger, J. H. (1990). Structural model evaluation and modification: An interval estimation approach. \emph{Multivariate Behavioral Research}, \emph{25}(2), 173--180. \url{https://doi.org/10.1207/s15327906mbr2502_4}
+
+\leavevmode\vadjust pre{\hypertarget{ref-tay2015}{}}%
+Tay, L., Meade, A. W., \& Cao, M. (2015). An Overview and Practical Guide to IRT Measurement Equivalence Analysis. \emph{Organizational Research Methods}, \emph{18}(1), 3--46. \url{https://doi.org/10.1177/1094428114553062}
+
+\leavevmode\vadjust pre{\hypertarget{ref-thompson1996}{}}%
+Thompson, B., \& Daniel, L. G. (1996). Factor Analytic Evidence for the Construct Validity of Scores: A Historical Overview and Some Guidelines. \emph{Educational and Psychological Measurement}, \emph{56}(2), 197--208. \url{https://doi.org/10.1177/0013164496056002001}
+
+\leavevmode\vadjust pre{\hypertarget{ref-trent2013}{}}%
+Trent, L. R., Buchanan, E., Ebesutani, C., Ale, C. M., Heiden, L., Hight, T. L., \ldots{} Young, J. (2013). A measurement invariance examination of the revised child anxiety and depression scale in a southern sample: Differential item functioning between african american and caucasian youth. \emph{Assessment}, \emph{20}(2), 175--187. \url{https://doi.org/10.1177/1073191112450907}
+
+\leavevmode\vadjust pre{\hypertarget{ref-tucker1973}{}}%
+Tucker, L. R., \& Lewis, C. (1973). A reliability coefficient for maximum likelihood factor analysis. \emph{Psychometrika}, \emph{38}(1), 1--10. \url{https://doi.org/10.1007/BF02291170}
+
+\leavevmode\vadjust pre{\hypertarget{ref-vandeschoot2015}{}}%
+Van De Schoot, R., Schmidt, P., De Beuckelaer, A., Lek, K., \& Zondervan-Zwijnenburg, M. (2015). Editorial: Measurement invariance. \emph{Frontiers in Psychology}, \emph{6}. Retrieved from \url{https://www.frontiersin.org/articles/10.3389/fpsyg.2015.01064}
+
+\leavevmode\vadjust pre{\hypertarget{ref-vazire2022}{}}%
+Vazire, S., Schiavone, S. R., \& Bottesini, J. G. (2022). Credibility Beyond Replicability: Improving the Four Validities in Psychological Science. \emph{Current Directions in Psychological Science}, \emph{31}(2), 162--168. \url{https://doi.org/10.1177/09637214211067779}
+
+\leavevmode\vadjust pre{\hypertarget{ref-weidman2017}{}}%
+Weidman, A. C., Steckler, C. M., \& Tracy, J. L. (2017). The jingle and jangle of emotion assessment: Imprecise measurement, casual scale usage, and conceptual fuzziness in emotion research. \emph{Emotion}, \emph{17}(2), 267--295. \url{https://doi.org/10.1037/emo0000226}
+
+\leavevmode\vadjust pre{\hypertarget{ref-zwaan2018}{}}%
+Zwaan, R. A., Etz, A., Lucas, R. E., \& Donnellan, M. B. (2018). Making replication mainstream. \emph{Behavioral and Brain Sciences}, \emph{41}, e120. \url{https://doi.org/10.1017/S0140525X17001972}
 
 \end{CSLReferences}
 
@@ -364,20 +700,25 @@ Stark, S., Chernyshenko, O. S., \& Drasgow, F. (2006). Detecting differential it
 \hypertarget{appendix}{%
 \section{Appendix}\label{appendix}}
 
+\hypertarget{model-fit-statistics}{%
+\subsection{Model Fit Statistics}\label{model-fit-statistics}}
+
+Model fit statistics are provided for each of the ten model combinations (invariant, three sizes for each ladings, intercepts, and residuals). These tables could be used to examine the traditional change in fit statistics cutoff rules of thumb (Cheung \& Rensvold, 2002), such as \(\Delta\) CFI or \(\Delta\) RMSEA, to the visualizations presented in the manuscript.
+
 \begin{table}[tbp]
 
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-1}Model Fit for Invariant Model}
+\caption{\label{tab:tab1}Model Fit for Invariant Model}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,505.72 & 7,547.87 & 0.99 & 0.99 & 0.02 & 0.02\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,751.95 & 3,787.17 & 0.98 & 0.96 & 0.04 & 0.04\\
+overall & 7,515.72 & 7,578.94 & 0.99 & 0.99 & 0.02 & 0.02\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,761.95 & 3,814.77 & 0.98 & 0.96 & 0.04 & 0.03\\
 configural & 7,527.70 & 7,654.14 & 0.98 & 0.96 & 0.04 & 0.03\\
 metric & 7,529.39 & 7,638.97 & 0.95 & 0.93 & 0.06 & 0.05\\
 scalar & 7,522.90 & 7,615.62 & 0.96 & 0.96 & 0.04 & 0.05\\
@@ -395,15 +736,15 @@ strict & 7,519.51 & 7,591.16 & 0.96 & 0.96 & 0.04 & 0.06\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-2}Model Fit for Small Differences in Loadings}
+\caption{\label{tab:tab2}Model Fit for Small Differences in Loadings}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,527.67 & 7,569.81 & 0.98 & 0.96 & 0.04 & 0.03\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,767.83 & 3,803.05 & 0.98 & 0.96 & 0.05 & 0.04\\
+overall & 7,537.67 & 7,600.89 & 0.98 & 0.96 & 0.04 & 0.02\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,777.83 & 3,830.66 & 0.98 & 0.96 & 0.05 & 0.03\\
 configural & 7,543.58 & 7,670.02 & 0.98 & 0.95 & 0.05 & 0.03\\
 metric & 7,548.90 & 7,658.48 & 0.94 & 0.92 & 0.07 & 0.06\\
 scalar & 7,541.81 & 7,634.53 & 0.95 & 0.95 & 0.05 & 0.06\\
@@ -421,15 +762,15 @@ strict & 7,541.66 & 7,613.31 & 0.93 & 0.94 & 0.05 & 0.07\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-3}Model Fit for Medium Differences in Loadings}
+\caption{\label{tab:tab3}Model Fit for Medium Differences in Loadings}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,544.55 & 7,586.70 & 0.97 & 0.94 & 0.05 & 0.03\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,774.92 & 3,810.14 & 1.00 & 1.00 & 0.02 & 0.03\\
+overall & 7,554.55 & 7,617.77 & 0.97 & 0.94 & 0.05 & 0.03\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,784.92 & 3,837.74 & 1.00 & 1.00 & 0.02 & 0.02\\
 configural & 7,550.67 & 7,677.11 & 0.99 & 0.98 & 0.04 & 0.03\\
 metric & 7,562.71 & 7,672.29 & 0.93 & 0.89 & 0.07 & 0.06\\
 scalar & 7,556.86 & 7,649.58 & 0.93 & 0.93 & 0.06 & 0.06\\
@@ -447,15 +788,15 @@ strict & 7,558.05 & 7,629.70 & 0.91 & 0.92 & 0.06 & 0.08\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-4}Model Fit for Large Differences in Loadings}
+\caption{\label{tab:tab4}Model Fit for Large Differences in Loadings}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,652.99 & 7,695.14 & 0.98 & 0.97 & 0.04 & 0.03\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,847.21 & 3,882.42 & 0.97 & 0.94 & 0.08 & 0.04\\
+overall & 7,662.99 & 7,726.21 & 0.98 & 0.97 & 0.04 & 0.02\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,857.21 & 3,910.03 & 0.97 & 0.94 & 0.08 & 0.03\\
 configural & 7,622.96 & 7,749.40 & 0.97 & 0.94 & 0.06 & 0.03\\
 metric & 7,659.19 & 7,768.77 & 0.85 & 0.79 & 0.12 & 0.08\\
 scalar & 7,652.60 & 7,745.32 & 0.86 & 0.85 & 0.10 & 0.09\\
@@ -473,15 +814,15 @@ strict & 7,660.63 & 7,732.27 & 0.82 & 0.85 & 0.10 & 0.12\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-5}Model Fit for Small Differences in Intercepts}
+\caption{\label{tab:tab5}Model Fit for Small Differences in Intercepts}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,509.69 & 7,551.83 & 1.00 & 0.99 & 0.02 & 0.02\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,760.41 & 3,795.63 & 0.93 & 0.86 & 0.08 & 0.05\\
+overall & 7,519.69 & 7,582.91 & 1.00 & 0.99 & 0.02 & 0.02\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,770.41 & 3,823.23 & 0.93 & 0.86 & 0.08 & 0.04\\
 configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
 metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
 scalar & 7,531.34 & 7,624.06 & 0.94 & 0.93 & 0.06 & 0.05\\
@@ -499,15 +840,15 @@ strict & 7,523.54 & 7,595.18 & 0.95 & 0.96 & 0.04 & 0.05\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-6}Model Fit for Medium Differences in Intercepts}
+\caption{\label{tab:tab6}Model Fit for Medium Differences in Intercepts}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,532.77 & 7,574.92 & 1.00 & 1.00 & 0.01 & 0.02\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,760.41 & 3,795.63 & 0.93 & 0.86 & 0.08 & 0.05\\
+overall & 7,542.77 & 7,605.99 & 1.00 & 1.00 & 0.01 & 0.02\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,770.41 & 3,823.23 & 0.93 & 0.86 & 0.08 & 0.04\\
 configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
 metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
 scalar & 7,554.20 & 7,646.92 & 0.85 & 0.83 & 0.09 & 0.07\\
@@ -525,15 +866,15 @@ strict & 7,546.38 & 7,618.03 & 0.86 & 0.88 & 0.08 & 0.07\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-7}Model Fit for Large Differences in Intercepts}
+\caption{\label{tab:tab7}Model Fit for Large Differences in Intercepts}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,569.17 & 7,611.31 & 1.00 & 1.00 & 0.00 & 0.02\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,760.41 & 3,795.63 & 0.93 & 0.86 & 0.08 & 0.05\\
+overall & 7,579.17 & 7,642.39 & 1.00 & 1.00 & 0.00 & 0.02\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,770.41 & 3,823.23 & 0.93 & 0.86 & 0.08 & 0.04\\
 configural & 7,536.16 & 7,662.60 & 0.95 & 0.91 & 0.07 & 0.04\\
 metric & 7,531.36 & 7,640.94 & 0.96 & 0.94 & 0.05 & 0.04\\
 scalar & 7,590.29 & 7,683.01 & 0.70 & 0.66 & 0.13 & 0.10\\
@@ -551,15 +892,15 @@ strict & 7,582.47 & 7,654.12 & 0.71 & 0.75 & 0.11 & 0.10\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-8}Model Fit for Small Differences in Residuals}
+\caption{\label{tab:tab8}Model Fit for Small Differences in Residuals}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,439.49 & 7,481.64 & 1.00 & 1.01 & 0.00 & 0.02\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,683.32 & 3,718.53 & 1.00 & 1.01 & 0.00 & 0.02\\
+overall & 7,449.49 & 7,512.71 & 1.00 & 1.01 & 0.00 & 0.01\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,693.32 & 3,746.14 & 1.00 & 1.01 & 0.00 & 0.02\\
 configural & 7,459.07 & 7,585.51 & 0.99 & 0.98 & 0.03 & 0.03\\
 metric & 7,461.41 & 7,570.99 & 0.97 & 0.95 & 0.05 & 0.05\\
 scalar & 7,455.85 & 7,548.58 & 0.97 & 0.97 & 0.04 & 0.05\\
@@ -577,15 +918,15 @@ strict & 7,453.48 & 7,525.12 & 0.96 & 0.97 & 0.04 & 0.05\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-9}Model Fit for Medium Differences in Residuals}
+\caption{\label{tab:tab9}Model Fit for Medium Differences in Residuals}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,368.57 & 7,410.71 & 1.00 & 1.00 & 0.00 & 0.02\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,587.77 & 3,622.99 & 1.00 & 1.03 & 0.00 & 0.02\\
+overall & 7,378.57 & 7,441.79 & 1.00 & 1.00 & 0.00 & 0.02\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,597.77 & 3,650.60 & 1.00 & 1.03 & 0.00 & 0.02\\
 configural & 7,363.52 & 7,489.96 & 1.00 & 0.99 & 0.02 & 0.02\\
 metric & 7,366.63 & 7,476.21 & 0.97 & 0.96 & 0.05 & 0.05\\
 scalar & 7,360.15 & 7,452.87 & 0.98 & 0.98 & 0.03 & 0.05\\
@@ -603,15 +944,15 @@ strict & 7,382.53 & 7,454.18 & 0.88 & 0.90 & 0.08 & 0.07\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:unnamed-chunk-10}Model Fit for Large Differences in Residuals}
+\caption{\label{tab:tab10}Model Fit for Large Differences in Residuals}
 
 \begin{tabular}{lllllll}
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-overall & 7,284.21 & 7,326.36 & 1.00 & 1.01 & 0.00 & 0.02\\
-group1 & 3,755.75 & 3,790.96 & 0.98 & 0.95 & 0.05 & 0.04\\
-group2 & 3,443.47 & 3,478.69 & 0.95 & 0.90 & 0.07 & 0.04\\
+overall & 7,294.21 & 7,357.43 & 1.00 & 1.01 & 0.00 & 0.01\\
+group1 & 3,765.75 & 3,818.57 & 0.98 & 0.95 & 0.05 & 0.03\\
+group2 & 3,453.47 & 3,506.29 & 0.95 & 0.90 & 0.07 & 0.03\\
 configural & 7,219.22 & 7,345.66 & 0.96 & 0.92 & 0.06 & 0.03\\
 metric & 7,216.38 & 7,325.96 & 0.96 & 0.94 & 0.05 & 0.04\\
 scalar & 7,210.65 & 7,303.37 & 0.96 & 0.96 & 0.04 & 0.05\\
@@ -623,6 +964,294 @@ strict & 7,297.89 & 7,369.54 & 0.59 & 0.65 & 0.13 & 0.18\\
 \end{center}
 
 \end{table}
+
+\hypertarget{mgcfa-convenience-function}{%
+\subsection{MGCFA Convenience Function}\label{mgcfa-convenience-function}}
+
+Please note that any partial invariance is not automatically included in this function. This function returns a list with all model summaries, the model coefficients in a tidy dataframe, and the model fit statistics in a tidy dataframe. You will need the libraries listed below for this function to work properly.
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(lavaan)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(broom)}
+\CommentTok{\# CFA function}
+\NormalTok{mgcfa }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(data, group, model)\{}
+  
+\NormalTok{  group\_names }\OtherTok{\textless{}{-}} \FunctionTok{unique}\NormalTok{(data[ , group])}
+  
+\NormalTok{  model.overall }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data)}
+\NormalTok{  model.group1 }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }
+                      \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(data, group }\SpecialCharTok{==}\NormalTok{ group\_names[}\DecValTok{1}\NormalTok{]))}
+\NormalTok{  model.group2 }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }
+                      \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(data, group }\SpecialCharTok{==}\NormalTok{ group\_names[}\DecValTok{2}\NormalTok{]))}
+\NormalTok{  model.configural }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data, }
+                          \AttributeTok{group =}\NormalTok{ group, }\AttributeTok{meanstructure =}\NormalTok{ T)}
+\NormalTok{  model.metric }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data, }
+                      \AttributeTok{group =}\NormalTok{ group, }\AttributeTok{meanstructure =}\NormalTok{ T,}
+                      \AttributeTok{group.equal =} \StringTok{"loadings"}\NormalTok{)}
+\NormalTok{  model.scalar }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data, }
+                      \AttributeTok{group =}\NormalTok{ group, }\AttributeTok{meanstructure =}\NormalTok{ T, }
+                      \AttributeTok{group.equal =} \FunctionTok{c}\NormalTok{(}\StringTok{"loadings"}\NormalTok{, }\StringTok{"intercepts"}\NormalTok{))}
+\NormalTok{  model.strict }\OtherTok{\textless{}{-}} \FunctionTok{cfa}\NormalTok{(}\AttributeTok{model =}\NormalTok{ model, }\AttributeTok{data =}\NormalTok{ data, }
+                      \AttributeTok{group =}\NormalTok{ group, }\AttributeTok{meanstructure =}\NormalTok{ T, }
+                      \AttributeTok{group.equal =}  \FunctionTok{c}\NormalTok{(}\StringTok{"loadings"}\NormalTok{, }\StringTok{"intercepts"}\NormalTok{, }\StringTok{"residuals"}\NormalTok{))}
+  
+\NormalTok{  model\_coef }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}
+    \FunctionTok{tidy}\NormalTok{(model.overall, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"overall"}\NormalTok{), }
+    \FunctionTok{tidy}\NormalTok{(model.group1, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"group1"}\NormalTok{), }
+    \FunctionTok{tidy}\NormalTok{(model.group2, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"group2"}\NormalTok{), }
+    \FunctionTok{tidy}\NormalTok{(model.configural, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"configural"}\NormalTok{), }
+    \FunctionTok{tidy}\NormalTok{(model.metric, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"metric"}\NormalTok{), }
+    \FunctionTok{tidy}\NormalTok{(model.scalar, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"scalar"}\NormalTok{), }
+    \FunctionTok{tidy}\NormalTok{(model.strict, }\AttributeTok{conf.level =}\NormalTok{ .}\DecValTok{95}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"strict"}\NormalTok{)}
+\NormalTok{  )}
+    
+\NormalTok{  model\_fit }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}
+    \FunctionTok{glance}\NormalTok{(model.overall) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"overall"}\NormalTok{), }
+    \FunctionTok{glance}\NormalTok{(model.group1) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"group1"}\NormalTok{), }
+    \FunctionTok{glance}\NormalTok{(model.group2) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"group2"}\NormalTok{), }
+    \FunctionTok{glance}\NormalTok{(model.configural) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"configural"}\NormalTok{), }
+    \FunctionTok{glance}\NormalTok{(model.metric) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"metric"}\NormalTok{), }
+    \FunctionTok{glance}\NormalTok{(model.scalar) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"scalar"}\NormalTok{), }
+    \FunctionTok{glance}\NormalTok{(model.strict) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \StringTok{"strict"}\NormalTok{)}
+\NormalTok{    )}
+  
+  \FunctionTok{return}\NormalTok{(}\FunctionTok{list}\NormalTok{(}
+    \StringTok{"model\_coef"} \OtherTok{=}\NormalTok{ model\_coef,}
+    \StringTok{"model\_fit"} \OtherTok{=}\NormalTok{ model\_fit,}
+    \StringTok{"model.overall"} \OtherTok{=}\NormalTok{ model.overall,}
+    \StringTok{"model.group1"} \OtherTok{=}\NormalTok{ model.group1,}
+    \StringTok{"model.group2"} \OtherTok{=}\NormalTok{ model.group2,}
+    \StringTok{"model.configural"} \OtherTok{=}\NormalTok{ model.configural,}
+    \StringTok{"model.metric"} \OtherTok{=}\NormalTok{ model.metric,}
+    \StringTok{"model.scalar"} \OtherTok{=}\NormalTok{ model.scalar,}
+    \StringTok{"model.strict"} \OtherTok{=}\NormalTok{ model.strict}
+\NormalTok{  ))}
+  
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+\hypertarget{measurement-invariance-plot-function}{%
+\subsection{Measurement Invariance Plot Function}\label{measurement-invariance-plot-function}}
+
+This function creates the plots shown in the manuscript. You will need the libraries listed for this function to work. Plots may be modified to rearrange for those who are familiar with \texttt{ggplot2}. Please note that the function assumes you will use the outputs from the previous \texttt{mgcfa} function or a tidy dataframe that includes the coefficients from the model with a column \texttt{model} that indicates which step of the MGCFA you are wanting to plot. If you have more than two groups, you should first filter the dataframe model coefficient outputs to only include to the two groups you want to compare. This code does not plot more than two groups (although, it could be modified for this, but the assumption here is that you only have two, as this is how you would normally proceed in a MGCFA using pairwise comparisons to find where the invariance occurs).
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(cowplot)}
+\FunctionTok{library}\NormalTok{(lavaan)}
+\CommentTok{\# devtools::install\_github("psyteachr/introdataviz")}
+\FunctionTok{library}\NormalTok{(introdataviz)}
+\CommentTok{\# Plot MI MGCFA}
+\NormalTok{plot\_mgcfa }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(data\_coef, }\CommentTok{\# output from model\_coef}
+\NormalTok{                       model\_step, }\CommentTok{\# which model}
+\NormalTok{                       item\_name, }\CommentTok{\# name of observed item}
+                       \AttributeTok{x\_limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\CommentTok{\# LV limits to graph}
+\NormalTok{                       y\_limits, }\CommentTok{\# Y min and max in data }
+\NormalTok{                       ci\_level, }\CommentTok{\# what ci do you want}
+\NormalTok{                       model\_results, }\CommentTok{\# what model results do you want }
+\NormalTok{                       lv\_name }\CommentTok{\# which latent is the observed variable on}
+\NormalTok{                       )\{}
+  
+  \CommentTok{\# calculate cutoff}
+\NormalTok{  cutoff }\OtherTok{\textless{}{-}} \FunctionTok{qt}\NormalTok{(}\AttributeTok{p =}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{ci\_level)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, }
+               \AttributeTok{df =} \FunctionTok{sum}\NormalTok{(}\FunctionTok{unlist}\NormalTok{(model\_results}\SpecialCharTok{@}\NormalTok{Data}\SpecialCharTok{@}\NormalTok{nobs)), }
+               \AttributeTok{lower.tail =}\NormalTok{ F)}
+  
+  \CommentTok{\# first get the data}
+\NormalTok{  graph.data }\OtherTok{\textless{}{-}}\NormalTok{ data\_coef }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# put in tidy coefficients}
+  \FunctionTok{filter}\NormalTok{(model }\SpecialCharTok{==}\NormalTok{ model\_step) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# pick a model}
+  \FunctionTok{filter}\NormalTok{(}\FunctionTok{grepl}\NormalTok{(item\_name, term)) }\SpecialCharTok{\%\textgreater{}\%}  \CommentTok{\# pick a question}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{group =} \FunctionTok{factor}\NormalTok{(group, }\AttributeTok{levels =} \FunctionTok{names}\NormalTok{(}\FunctionTok{table}\NormalTok{(data\_coef}\SpecialCharTok{$}\NormalTok{group)), }
+                        \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Group 1"}\NormalTok{, }\StringTok{"Group 2"}\NormalTok{))) }
+  
+  \CommentTok{\# make ribbon data y = slope*x + intercept for ci for slopes }
+\NormalTok{  ribbondata }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}
+    \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{x =} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from =}\NormalTok{ x\_limits[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,  }
+            \AttributeTok{to =}\NormalTok{ x\_limits[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{+} \DecValTok{1}\NormalTok{, }
+            \AttributeTok{by =}\NormalTok{ .}\DecValTok{05}\NormalTok{), }
+    \AttributeTok{group =} \FunctionTok{unique}\NormalTok{(graph.data}\SpecialCharTok{$}\NormalTok{group)[}\DecValTok{1}\NormalTok{]}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ymin =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{{-}} 
+\NormalTok{             (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                    \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
+\NormalTok{             graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+           \AttributeTok{ymax =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{+} 
+\NormalTok{             (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                    \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
+\NormalTok{             graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                 \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate)), }
+    \FunctionTok{data.frame}\NormalTok{(}
+      \AttributeTok{x =} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from =}\NormalTok{ x\_limits[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,  }
+              \AttributeTok{to =}\NormalTok{ x\_limits[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{+} \DecValTok{1}\NormalTok{, }
+              \AttributeTok{by =}\NormalTok{ .}\DecValTok{05}\NormalTok{), }
+      \AttributeTok{group =} \FunctionTok{unique}\NormalTok{(graph.data}\SpecialCharTok{$}\NormalTok{group)[}\DecValTok{2}\NormalTok{]}
+\NormalTok{    ) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ymin =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{{-}} 
+\NormalTok{               (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                      \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
+\NormalTok{               graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+             \AttributeTok{ymax =}\NormalTok{ (graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{*}\NormalTok{ x) }\SpecialCharTok{+} 
+\NormalTok{               (cutoff}\SpecialCharTok{*}\NormalTok{graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                      \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)) }\SpecialCharTok{+}
+\NormalTok{               graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+                   \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate))}
+\NormalTok{  )}
+  
+  \CommentTok{\# make point data to draw on the intercepts }
+\NormalTok{  pointdata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{x =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{),}
+  \AttributeTok{y =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+  \AttributeTok{group =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group),}
+  \AttributeTok{ymin =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{{-}} 
+\NormalTok{    cutoff }\SpecialCharTok{*}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error), }
+  \AttributeTok{ymax =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate) }\SpecialCharTok{+} 
+\NormalTok{    cutoff }\SpecialCharTok{*}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)}
+\NormalTok{  )}
+  
+  \CommentTok{\# make the line data to draw on the slopes}
+\NormalTok{  linedata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{slope =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"=\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+  \AttributeTok{intercept =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+  \AttributeTok{group =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group)}
+\NormalTok{  )}
+  
+  \CommentTok{\# make the distributions for the residuals }
+\NormalTok{  violindata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{y =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rnorm}\NormalTok{(}\AttributeTok{n =} \DecValTok{1000}\NormalTok{, }
+            \AttributeTok{mean =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+            \AttributeTok{sd =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error)), }
+        \FunctionTok{rnorm}\NormalTok{(}\AttributeTok{n =} \DecValTok{1000}\NormalTok{, }
+            \AttributeTok{mean =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(estimate), }
+            \AttributeTok{sd =}\NormalTok{ graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(std.error))),}
+  \AttributeTok{group =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group), }\DecValTok{1000}\NormalTok{),}
+            \FunctionTok{rep}\NormalTok{(graph.data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(op }\SpecialCharTok{==} \StringTok{"\textasciitilde{}\textasciitilde{}"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+              \FunctionTok{slice\_tail}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(group), }\DecValTok{1000}\NormalTok{)), }
+  \AttributeTok{x =} \DecValTok{1}
+\NormalTok{  )}
+  
+  \CommentTok{\# make the latent mean data for right panel}
+\NormalTok{  latent\_means }\OtherTok{\textless{}{-}} \FunctionTok{lavPredict}\NormalTok{(model\_results, }
+                               \AttributeTok{type =} \StringTok{"lv"}\NormalTok{, }
+                               \AttributeTok{label =} \ConstantTok{TRUE}\NormalTok{,}
+                               \AttributeTok{assemble =} \ConstantTok{TRUE}\NormalTok{, }
+                               \AttributeTok{append.data =} \ConstantTok{TRUE}\NormalTok{)}
+  
+\NormalTok{  latent\_means}\SpecialCharTok{$}\NormalTok{lv }\OtherTok{\textless{}{-}}\NormalTok{ latent\_means[ , lv\_name]}
+  
+  \CommentTok{\# make a plot of the variance}
+\NormalTok{  variance\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(violindata, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \DecValTok{1}\NormalTok{, }\AttributeTok{y =}\NormalTok{ y, }\AttributeTok{color =}\NormalTok{ group, }\AttributeTok{fill =}\NormalTok{ group)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_split\_violin}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{theme\_void}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{stat\_summary}\NormalTok{(}\AttributeTok{fun =} \StringTok{"mean"}\NormalTok{,}
+               \AttributeTok{geom =} \StringTok{"crossbar"}\NormalTok{, }
+               \AttributeTok{width =} \FloatTok{0.5}\NormalTok{,}
+               \AttributeTok{colour =} \StringTok{"black"}\NormalTok{)}
+  
+  \CommentTok{\# make the plot with intercepts and slopes}
+\NormalTok{  intercept\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+} 
+  \CommentTok{\# basic set up}
+  \FunctionTok{theme\_classic}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Latent Variable"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Observed Variable"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{coord\_cartesian}\NormalTok{(}\AttributeTok{xlim =}\NormalTok{ x\_limits, }\AttributeTok{ylim =}\NormalTok{ y\_limits) }\SpecialCharTok{+} 
+  \CommentTok{\# plot the intercepts }
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data =}\NormalTok{ pointdata, }
+             \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{y =}\NormalTok{ y, }\AttributeTok{color =}\NormalTok{ group), }
+             \AttributeTok{inherit.aes =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_errorbar}\NormalTok{(}\AttributeTok{data =}\NormalTok{ pointdata,}
+                \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{ymin =}\NormalTok{ ymin, }\AttributeTok{ymax =}\NormalTok{ ymax, }\AttributeTok{color =}\NormalTok{ group), }
+                \AttributeTok{inherit.aes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{width =}\NormalTok{ .}\DecValTok{10}\NormalTok{) }\SpecialCharTok{+} 
+  \CommentTok{\# plot the slopes}
+  \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{data =}\NormalTok{ linedata,}
+              \FunctionTok{aes}\NormalTok{(}\AttributeTok{slope =}\NormalTok{ slope, }\AttributeTok{intercept =}\NormalTok{ intercept, }\AttributeTok{color =}\NormalTok{ group)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data =}\NormalTok{ ribbondata, }
+              \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{ymin =}\NormalTok{ ymin, }\AttributeTok{ymax =}\NormalTok{ ymax, }\AttributeTok{fill =}\NormalTok{ group), }
+              \AttributeTok{inherit.aes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_color\_discrete}\NormalTok{(}\AttributeTok{name =} \StringTok{"Group"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_fill\_discrete}\NormalTok{(}\AttributeTok{name =} \StringTok{"Group"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \DecValTok{0}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.line.y =} \FunctionTok{element\_blank}\NormalTok{())}
+  
+  \CommentTok{\# make the latent means plot}
+\NormalTok{  mean\_plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(latent\_means, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ lv, }\AttributeTok{fill =}\NormalTok{ group)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_density}\NormalTok{(}\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{theme\_classic}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Latent Variable"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Density"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{data =}\NormalTok{ latent\_means }\SpecialCharTok{\%\textgreater{}\%}
+                 \FunctionTok{group\_by}\NormalTok{(group) }\SpecialCharTok{\%\textgreater{}\%} 
+                 \FunctionTok{summarize}\NormalTok{(}\AttributeTok{mean =} \FunctionTok{mean}\NormalTok{(lv)), }
+               \FunctionTok{aes}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ mean, }\AttributeTok{color =}\NormalTok{ group)) }\SpecialCharTok{+} 
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{coord\_cartesian}\NormalTok{(}\AttributeTok{xlim =}\NormalTok{ x\_limits)}
+  
+\NormalTok{  y\_range }\OtherTok{=} \FunctionTok{abs}\NormalTok{(y\_limits[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{{-}}\NormalTok{ y\_limits[}\DecValTok{1}\NormalTok{])}
+  
+  \CommentTok{\# line up the two plots }
+\NormalTok{  prow }\OtherTok{\textless{}{-}} \FunctionTok{plot\_grid}\NormalTok{(}
+\NormalTok{    intercept\_plot }\SpecialCharTok{+} 
+      \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Item Invariance"}\NormalTok{) }\SpecialCharTok{+} 
+      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+} 
+      \FunctionTok{annotation\_custom}\NormalTok{(}\FunctionTok{ggplotGrob}\NormalTok{(variance\_plot), }
+                        \AttributeTok{xmin =}\NormalTok{ .}\DecValTok{25}\NormalTok{, }\AttributeTok{xmax =} \DecValTok{1}\NormalTok{, }
+                        \AttributeTok{ymin =}\NormalTok{ y\_limits[}\DecValTok{1}\NormalTok{], }
+                        \AttributeTok{ymax =}\NormalTok{ y\_limits[}\DecValTok{2}\NormalTok{]}\SpecialCharTok{{-}}\NormalTok{y\_range}\SpecialCharTok{/}\FloatTok{1.8}\NormalTok{),}
+\NormalTok{    mean\_plot }\SpecialCharTok{+} 
+      \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Latent Mean Distribution"}\NormalTok{) }\SpecialCharTok{+} 
+      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{),}
+    \AttributeTok{align =} \StringTok{\textquotesingle{}vh\textquotesingle{}}\NormalTok{,}
+    \AttributeTok{hjust =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}
+    \AttributeTok{nrow =} \DecValTok{1}
+\NormalTok{  )}
+  
+  \CommentTok{\# get the lengend}
+\NormalTok{  legend\_b }\OtherTok{\textless{}{-}} \FunctionTok{get\_legend}\NormalTok{(}
+\NormalTok{    intercept\_plot }\SpecialCharTok{+} 
+      \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{1}\NormalTok{)) }\SpecialCharTok{+}
+      \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)}
+\NormalTok{  )}
+  
+  \CommentTok{\# send out the plot }
+  \FunctionTok{plot\_grid}\NormalTok{(prow, legend\_b, }\AttributeTok{ncol =} \DecValTok{1}\NormalTok{, }\AttributeTok{rel\_heights =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, .}\DecValTok{1}\NormalTok{))}
+  
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
 
 
 \end{document}

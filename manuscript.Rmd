@@ -18,9 +18,7 @@ affiliation:
     institution   : "Harrisburg University of Science and Technology"
 
 authornote: |
-  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
-
-  Enter author note here.
+  Thank you to K.D. Valentine and Chelsea Parlett-Pelleriti for feedback on some ugly graphs.  
 
 abstract: |
   Latent variable modeling as a lens for psychometric theory is a popular tool for social scientists to examine measurement of constructs [@beaujean2014]. Journals such as *Assessment* regularly publish articles supporting new or previously established measures of latent constructs (e.g., depression, anxiety) wherein a measurement model is established for the scale in question. These measurement models designate the relationship between the measured, observed variables, and the underlying construct, with the assumption that these relations hold in many samples. Confirmatory factor analysis can be used to investigate the replicability and generalizability of the measurement model in new samples, while multi-group confirmatory factor analysis is used to examine the measurement model across groups within samples [@brown2015]. With the rise of the replication crisis and "psychology's renaissance" [@nelson2018], interest in divergence in measurement has increased, often focused on small parameter differences within the latent model. While the statistical procedure for examining measurement invariance is moderately well established, it is clear that the toolkit for inspecting these results is lacking. This manuscript will outline ways to visualize potential non-invariance, to supplement large numbers of tables that often overwhelm a reader within these published reports. Further, given these visualizations, readers will learn how to interpret the impact and size of the proposed non-invariance in models. While it is tempting to suggest that problems with replication and generalizability are simply issues with measurement, it is crucial to remember that all models have variability and error, even those models estimating the differences between item functioning, such as multi-group confirmatory factor analysis. This manuscript will help provide a framework for researchers interested in registered reports in this area.
@@ -52,6 +50,15 @@ library(ggplot2)
 library(introdataviz)
 library(dmacs)
 library(cowplot)
+
+# make smaller outputs
+def.source.hook  <- knitr::knit_hooks$get("source")
+knitr::knit_hooks$set(source = function(x, options) {
+  x <- def.source.hook(x, options)
+  x <- ifelse(!is.null(options$size), 
+         paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"), 
+         x)
+})
 ```
 
 ```{r cfa-function, include = FALSE}
@@ -64,9 +71,15 @@ mgcfa <- function(data, group, model){
   model.group1 <- cfa(model = model, data = subset(data, group == group_names[1]))
   model.group2 <- cfa(model = model, data = subset(data, group == group_names[2]))
   model.configural <- cfa(model = model, data = data, group = group, meanstructure = T)
-  model.metric <- cfa(model = model, data = data, group = group, group.equal = "loadings")
-  model.scalar <- cfa(model = model, data = data, group = group, group.equal = c("loadings", "intercepts"))
-  model.strict <- cfa(model = model, data = data, group = group, group.equal =  c("loadings", "intercepts", "residuals"))
+  model.metric <- cfa(model = model, data = data, 
+                      group = group, meanstructure = T,
+                      group.equal = "loadings")
+  model.scalar <- cfa(model = model, data = data, 
+                      group = group, meanstructure = T, 
+                      group.equal = c("loadings", "intercepts"))
+  model.strict <- cfa(model = model, data = data, 
+                      group = group, meanstructure = T, 
+                      group.equal =  c("loadings", "intercepts", "residuals"))
   
   model_coef <- bind_rows(
     tidy(model.overall, conf.level = .95) %>% mutate(model = "overall"), 
@@ -113,6 +126,15 @@ y_limits = c(min(df.large.res$q4), max(df.large.res$q4))
 ci_level = .95
 model_results = results.invariant$model.configural
 lv_name = "lv"
+
+  data_coef = partial.coef
+  model_step = "intercepts"
+  item_name = "RS6"
+  x_limits = c(-1,1)
+  y_limits = c(min(DF$RS7), max(DF$RS7))
+  model_results = partial.rs.2.picture
+  ci_level = .95
+  lv_name = "RS"
 ```
 
 ```{r plot-function, include = FALSE}
@@ -131,11 +153,15 @@ plot_mgcfa <- function(data_coef, # output from model_coef
                df = sum(unlist(model_results@Data@nobs)), 
                lower.tail = F)
   
+  # get group variable
+  group_var <- model_results@Data@group
+  group_labels <- model_results@Data@group.label
+  
   # first get the data
   graph.data <- data_coef %>% # put in tidy coefficients
   filter(model == model_step) %>% # pick a model
   filter(grepl(item_name, term)) %>%  # pick a question
-  mutate(group = factor(group, levels = names(table(data_coef$group)), labels = c("Group 1", "Group 2"))) 
+  mutate(group = factor(group, levels = names(table(data_coef$group)), labels = group_labels)) 
   
   # make ribbon data y = slope*x + intercept for ci for slopes 
   ribbondata <- bind_rows(
@@ -215,16 +241,14 @@ plot_mgcfa <- function(data_coef, # output from model_coef
   )
   
   # make the latent mean data for right panel
-  latent_predict <- predict(model_results)
-  latent_means <- data.frame(
-    c(latent_predict[[1]], latent_predict[[2]])
-    )
-  colnames(latent_means) <- colnames(latent_predict[[1]])
-  latent_means$group <- rep(names(latent_predict), 
-                  times = c(length(latent_predict[[1]]), 
-                           length(latent_predict[[2]])))
+  latent_means <- lavPredict(model_results, 
+                               type = "lv", 
+                               label = TRUE,
+                               assemble = TRUE, 
+                               append.data = TRUE)
   
   latent_means$lv <- latent_means[ , lv_name]
+  latent_means$group <- latent_means[ , group_var]
   
   # make a plot of the variance
   variance_plot <- 
@@ -271,18 +295,21 @@ plot_mgcfa <- function(data_coef, # output from model_coef
     ylab("Density") + 
     geom_vline(data = latent_means %>% group_by(group) %>% summarize(mean = mean(lv)), 
                aes(xintercept = mean, color = group)) + 
-    theme(legend.position = "none") 
+    theme(legend.position = "none") + 
+    coord_cartesian(xlim = x_limits)
   
   y_range = abs(y_limits[2] - y_limits[1])
   
   # line up the two plots 
   prow <- plot_grid(
     intercept_plot + 
+      ggtitle("Item Invariance") + 
       theme(legend.position = "none") + 
       annotation_custom(ggplotGrob(variance_plot), 
                         xmin = .25, xmax = 1, 
                         ymin = y_limits[1], ymax = y_limits[2]-y_range/1.8),
     mean_plot + 
+      ggtitle("Latent Mean Distribution") + 
       theme(legend.position = "none"),
     align = 'vh',
     hjust = -1,
@@ -308,21 +335,19 @@ set.seed(84393)
 knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
-Outline
+Psychological assessments play a critical role in our ability to measure and analyze constructs to support theories and experimental hypotheses. Defining and creating assessments to validly and reliability measure constructs is often difficult because phenomenon, such as anxiety, are often not directly observable. Instead, we use surveys and questionnaires to indirectly assess the underlying construct [@devellis2022]. Latent variable modeling (i.e., structural equation modeling) is a popular tool for the validation of developed survey instruments to verify scale dimensionalality, structure, and model fit. A simple search for scale development reveals thousands of articles in psychology that examine new and previously published work, thus, illustrating the interest in both measurement and the use of validation techniques. Unfortunately, except in specialty journals, much of the validity evidence and/or development for measures used in empirical studies is not reported within the journal article [@barry2014, @weidman2017]. Without this information, it is difficult to interpret individual study conclusions, as validity information allows for judgment of usefulness of the measured values [@flake2020]. Further, the current focus on replication [@makel2012, @makel2014, @zwaan2018], reproducibility [@nelson2018], and the credibility of our results [@vazire2022] has demonstrated questionable measurement practices - decisions that researchers make like survey selection and scoring that impact the results of the study [@flake2020]. Transparent reporting of the use and creation of scales can improve both interpretation and reproducibility when using surveys developed to measure latent constructs [@shadish2001].
 
--   talk about LVM
+A secondary concern for developed measures is the potential for differential responding and assessment within target populations. For example, @trent2013 examined for potential variability in the Revised Child Anxiety and Depression Scale in White and Black youths [@chorpita2000]. They found that the scale mostly functioned the same for both White and Black individuals but differences in averages on individual items could potentially affect the scoring and interpretation of the scale results. This comparison of sub-populations is the test of measurement invariance [@meredith1993]. Invariance or equivalence implies that the scale operates in the same fashion for each sub-group, and thus, differences in the final latent variable scores can interpretated as differences in populations. Non-invariance suggests that individuals respond or interpret items differently, and thus, differences in scores may represent different scores on the latent variable in the population or differences in measurement. Non-invariant measurement may lead to misleading results when making group comparisons, and assessing invariance has become a popular technique in scale development [@vandeschoot2015].
 
--   talk about cfa
+Measurement invariance is typically analyzed using confirmatory factor analysis, specifically, multi-group confirmatory factor analysis (MGCFA) or less often, with item response theory [@stark2006, @tay2015]. First, the model is examined with the factor structure proposed for the latent and observed variables, and then often these models are assessed for each group separately. The two models are then combined together into one nested CFA in order to determine configural invariance [@brown2015, @byrne2001, @kline2016]. Configural invariance tests if the proposed factor structure is the same between groups. In this model, all other estimated parameters are allowed to vary between groups. The general approach is to use this model as a baseline for starting a sequential analysis of further restrictions between group parameters (i.e., more restrictive with each step). However, models without configural invariance can occur and often point to misspecification for the observed and latent variables within one group (i.e., cross loadings of items onto other latent variables or correlated error terms for one group only).
 
--   talk about mgcfa
+Next, the estimated parameter between each observed variable and its latent variable are constrained to be equal between groups for metric invariance. For example, item 1's factor loading must be equal to item 1's factor loading for each group. This test examines if the items represent the same relationship to the latent variable, or if specific items have weaker or stronger relationships in specific groups. Finding non-invariance at this stage generally points to items that have different functioning or interpretation for one group. At the third model, the item intercepts (i.e., item averages) are restricted across groups for scalar invariance. Scalar non-invariance would indicate that items have the same strength of relationship with their latent variable, just one group has a higher overall average on that item. Last (although sometimes not used), we may consider constraining error variances for each observed variable to be equal across groups for strict invariance. Strict non-invariance can occur when one group has a higher range of values on the observed variable, thus showing a larger variance. For example, if using a Likert scale, one group may use the full 1 to 7 range (creating a flatter distribution and larger variance), while the other group shows a ceiling effect of only using 5 to 7.
 
--   how are measurement and replication/crisis related
+These concepts have been explored and implemented for the last fifty years [@jöreskog1971, @sörbom1978] and implemented in the most popular structural equation modeling programs [@jöreskog2001, @rosseel2012, @boker2011]. @byrne1989 extended the ideas of multi-group testing by suggesting partial invariance [followed by @meredith1993]. Partial invariance occurs when non-invariance is found but can be attributed to only a few parameter estimate differences between groups (i.e., items 1 and 2 have different factor loadings but all others are the same). This testing provided an advantage to understand where the potential non-invariance may occur for further study and interpretation guidelines. To determine when non-invariance and partial invariance occurred, each model is sequentially compared to the previous model using some form of a difference test. Traditionally, since models were nested, a chi-square difference test was used [@meade2008, @cheung2002]; however, given the known issues with chi-square [@thompson1996], people have favored empirical cutoffs for differences in fit indices. As the field pushes back against favoring cutoff criteria and rules of thumb [@marsh2004, @putnick2016], an effect size measure for translating "how much" non-invariance was developed $d_{MACS}$ [@nye2011]. This effect size examines the differences in observed variables between the two groups for both the factor loading and the item intercept; thus, any differences in either or both will increase the effect size for non-invariance [@stark2006].
 
--   why it is a bad idea to say that replication/crisis are *because* bad measurement
+With $d_{MACS}$ and measurement invariance testing, researchers can begin to quantify how and where their construct measurement may vary between groups. However, given the large number of studies that show non-invariance, it is clear that equivalence can be hard to meet. It is difficult to know if non-invariance occurs because of random sampling error, true population differences, or differences in replication and reproducibility of the construct in a new sample. Further, it is important to remember that the parameter estimates that we are testing are just that - estimates. All the parameter estimates have measures of standard error to indicate that they are more than likely variable with a new sample or population. Given that this information is generally ignored during the examination of measurement invariance, it may be that we are claiming that many scales are non-invariant, when in reality, the differences between loadings or item intercepts are small and unimportant. $d_{MACS}$ provides the opportunity to begin to think about the smallest effect size of interest or the smallest meaningful effect size [@lakens2017, @anvari2021]. As mentioned, $d_{MACS}$ has only really been explored for a combined intercept and loadings, and while useful, does not necessarily allow a researcher to pinpoint specific issues within an observed variable. The purpose of this manuscript is provide readers with a framework for visualization of differences in loadings, intercepts, and variances for each item, and the impact of those differences on the distribution of the latent mean. No known visualization techniques have been proposed for measurement invariance. By creating panel visualizations, we can supplement a researchers ability to judge the strength of the non-invariance differences and effect size for each item. Coupled with other indicators (i.e., fit indice differences, $d_{MACS}$), we can move toward a better understanding of how much measurement non-invariance is meaningful.
 
--   how can we visualize and interpret MGCFA to help us understand the impact of measurement differences
-
-By the end of this tutorial manuscript, readers will:
+By the end of this manuscript, readers will:
 
 1.  Be able to create visualizations for common steps to multi-group confirmatory factor analysis.
 2.  Be able to interpret the impact and size of potential non-invariance on measurement.
@@ -334,42 +359,68 @@ By the end of this tutorial manuscript, readers will:
 
 Data was simulated using the `simulateData` function in the *R* package `lavaan` [@rosseel2012] assuming multivariate normality using a $\mu$ of 0 and $\sigma$ of 1 for the data. This function allows you to write `lavaan` syntax for your model with estimated values to generate data for observed variables. The data included two groups of individuals ("Group 1", "Group 2") for a multi-group confirmatory factor analysis (\$n\_{group}\$ = 250, *N* = 500). The latent variables were assumed to be continuous normal. The model consisted of five observed items predicted by one latent variable (`lv =~ q1 + q2 + q3 + q4 + q5`); however, the demonstration in this manuscript extends to multiple latent variables and other combinations of observed variables. Each item was assumed to be related to the latent variable with loadings approximately equal to .40 to .80, except when cases of non-invariance on the loadings was assumed.
 
-The @brown2015 steps of testing measurement invariance are demonstrated in this manuscript for illustration purposes, but in line with @stark2006 suggestions, the visualizations show the impact of loadings and intercepts together. The configural model was analyzed nesting both groups into the same CFA model requiring that both groups show the same model structure, but all other parameters are free to vary between groups. The metric model constrained the factor loadings of each group to be equal within the model. The scalar model then constrained the item intercepts (i.e., item mean) to be equal across groups. Finally, the strict model constrained the item variances (i.e., error variances) to be equal for each item across groups. These models are normally tested sequentially, and a convenience function `mgcfa` is provided in the supplemental documents for this manuscript.
+The @brown2015 steps of testing measurement invariance are demonstrated in this manuscript for illustration purposes, but in line with @stark2006 suggestions, the visualizations show the impact of loadings and intercepts together. The configural model was analyzed nesting both groups into the same CFA model requiring that both groups show the same model structure, but all other parameters are free to vary between groups. The metric model constrained the factor loadings of each group to be equal within the model. The scalar model then constrained the item intercepts (i.e., item mean) to be equal across groups. Finally, the strict model constrained the item variances (i.e., error variances) to be equal for each item across groups. These models are normally tested sequentially, and a convenience function `mgcfa` is provided in the supplemental documents for this manuscript. Fit indices for the steps for multi-group models are presented in the appendix for comparison of cutoff rules of thumb [@cheung2002] to effect sizes and visualizations presented in this manuscript. Fit indices include Akaike Information Criterion [AIC, @akaike1998], Bayesian Information Criterion [BIC, @schwarz1978], Comparative Fit Index [CFI, @bentler1990], Tucker Lewis Index [TLI, @tucker1973], root mean squared error of approximation RMSEA [@steiger1990], and standardized root mean squar residual [SRMR, @bentler1995].
 
 The data was then simulated to represent invariance across all model steps, small, medium, and large invariance using $d_{MACS}$ estimated sizes from @nye2019. While $d_{MACS}$ is used primarily for an effect size of the (non)-invariance for intercepts and loadings together, a similar approach was taken for the estimation of small, medium, and large effects on the residuals. The effect size is presented for all models, calculated from the *dmacs* package [@dueber2023, @nye2011]. Only one item in each model was manipulated from the invariant model to create the non-invariant models.
 
+# Results
+
 ```{r create-models}
 # overall model
-model.overall <- "lv =~ q1 + q2 + q3 + q4 + q5"
+model.overall <- "lv =~ q1 + q2 + q3 + q4 + q5
+q1 ~ 0*1
+lv ~ 1"
 
 # build invariant model one factor
 model.invariant.g1 <- "lv =~ .8*q1 + .4*q2 + .6*q3 + .3*q4 + .6*q5 
 q4 ~~ 1*q4
-q4 ~ 0*1"
+q4 ~ 0*1
+q1 ~ 0*1
+lv ~ 1"
 model.invariant.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .3*q4 + .61*q5
 q4 ~~ 1*q4
-q4 ~ 0*1"
+q4 ~ 0*1
+q1 ~ 0*1
+lv ~ 1"
 
 # loadings
-model.small.load.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .5*q4 + .61*q5"
-model.med.load.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .6*q4 + .61*q5"
-model.large.load.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + 1.1*q4 + .61*q5"
+model.small.load.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .5*q4 + .61*q5
+q1 ~ 0*1
+lv ~ 1"
+model.med.load.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .6*q4 + .61*q5
+q1 ~ 0*1
+lv ~ 1"
+model.large.load.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + 1.1*q4 + .61*q5
+q1 ~ 0*1
+lv ~ 1"
 
 # build invariance on intercepts .25, .50, and .75
 model.small.int.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
-q4 ~ .25*1"
+q4 ~ .25*1
+q1 ~ 0*1
+lv ~ 1"
 model.med.int.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
-q4 ~ .5*1"
+q4 ~ .5*1
+q1 ~ 0*1
+lv ~ 1"
 model.large.int.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
-q4 ~ .75*1"
+q4 ~ .75*1
+q1 ~ 0*1
+lv ~ 1"
 
 # build invariance on residuals .25, .50, and .75
 model.small.res.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
-q4 ~~ .75*q4"
+q4 ~~ .75*q4
+q1 ~ 0*1
+lv ~ 1"
 model.med.res.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
-q4 ~~ .5*q4"
+q4 ~~ .5*q4
+q1 ~ 0*1
+lv ~ 1"
 model.large.res.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .34*q4 + .61*q5
-q4 ~~ .25*q4"
+q4 ~~ .25*q4
+q1 ~ 0*1
+lv ~ 1"
 ```
 
 ```{r create-data}
@@ -527,6 +578,98 @@ d_med_res <- lavaan_dmacs(results.med.res$model.configural, RefGroup = "Group 1"
 d_large_res <- lavaan_dmacs(results.large.res$model.configural, RefGroup = "Group 1")
 ```
 
+## Code Examples
+
+The complete code for this manuscript can be found at <https://osf.io/wev5f/>, and the function code for the convenience function for multi-group models and plots is found in the appendix. First, we would create our model code in `lavaan` syntax. The `lv` latent variable predicts the five measured variables, which are present as columns in our `df.invariant` dataset. You would include the dataframe in the `data` argument of our function, the name of the grouping variable in quotes for `group`, and the `lavaan` model syntax in the `model` argument. The `mgcfa` function code runs an overall model with all data, regardless of group, each group separately on the model, then the steps described above: configural, metric, scalar, and strict invariance.
+
+`lavaan` automatically sets the mean (i.e., the intercept) for latent variables to zero. If we wish to visualize the impact of the changes in parameter estimates across groups on the latent means, we need to allow the latent mean estimation with `lv ~ 1`. However, adding this estimation into our model will create a non-identified model. To solve this problem, you can set one of the intercepts of another variable to a value to scale the model. Here we will set the scale of the model by using `q1 ~ 0*1`, thus, scaling the expected means to zero. With simulation, this step is easy to know which variable to pick - we set the intercept on the variable we know did not show differences. In real data, you may wish to run the model steps *without* setting this option, examine the results of a configural or separate models, and then add the option for the values most similar. Additionally, you could complete partial invariance steps to determine which value appears most consistent to fix.
+
+```{r eval = T, include = T, echo = T, size = "small"}
+# create lavaan model
+model.overall <- "
+# overall one-factor model
+lv =~ q1 + q2 + q3 + q4 + q5
+# set the intercept (mean) of q1 to zero
+q1 ~ 0*1
+# allow the lv intercept to be freely estimated
+lv ~ 1"
+# look at the data
+head(df.invariant)
+# run our mgcfa function to run all models
+results.invariant <- mgcfa(data = df.invariant, #dataframe
+                           group = "group", 
+                           model = model.overall)
+# what is saved for you
+names(results.invariant)
+```
+
+The results are saved as a list and include the following:
+
+1)  `model_coef`: a tidy dataframe with *all* model's coefficients saved from the `lavaan` outputs. Note that we can see that the intercept `~1` is set for question 1 but freely estimated for the latent variable.
+
+```{r echo = T, include = T, size = "small"}
+results.invariant$model_coef[1:10 , ]
+```
+
+2)  `model_fit`: a tidy dataframe with *all* model's fit indices saved from the `lavaan` outputs.
+
+```{r echo = T, include = T, size = "small"}
+head(results.invariant$model_fit)
+```
+
+3)  Saved `lavaan` fitted objects that you can use the `summary()`, `parameterEstimates()`, `fitIndices()`, etc. on. Overall model indicates the model without grouping variables testing all data on the proposed model structure. This model is then tested separately for each group (`model.group1`, `model.group2`). The final models follow the @brown2015 naming convention for sequential steps for testing MGCFA for measurement invariance (`model.configural`, `model.metric`, `model.scalar`, `model.strict`).
+
+The results from the `model_coef` table can then be used directly in the suggested plotting function. The plot outputs will be described below. First, here are the arguments for the function:
+
+1)  `data_coef`: A tidy dataframe of the parameter estimates from the models. This function assumes you have used `broom::tidy()` on the saved model from `lavaan` and added a column called "model" with the name of the model step. This function will only run for models that have used the grouping function (i.e., configural, metric, scalar, and strict or other combinations/steps you wish to examine).
+
+2)  `model_step`: Which model do you want to plot? You should match this name to the one you want to extract from your model column in the `data_coef`.
+
+3)  `item_name`: Which observed variable from your model syntax do you want to plot? Please list this variable name exactly how it appears in the model.
+
+4)  `x_limits`: What do you want the x-axits limits to be for your invariance plot? The default option is to assume the latent variable is standardized, and therefore, -1 to 1 is recommended. Use only two numbers, a lower and upper limit. This value also constrains the latent mean diagram to help zoom in on group differences because the scale of latent means is usually centered over zero. You can use this parameter to zoom out to a more traditional histogram using `c(-2, 2)`.
+
+5)  `y_limits`: What do you want the y-axits limits to be for your invariance plot? Given that the latent variable is used to predict the observed values in the data, you could use the minimum and maximum values found in the data. If that range is large, consider reducing this value to be able to visualize the results (i.e., otherwise it may be too zoomed out to judge group differences). Use only two numbers, a lower and upper limit.
+
+6)  `ci_level`: What confidence limit do you want to plot? Use 1 - $\alpha$.
+
+7)  `model_results`: In this argument, include the saved `lavaan` output for the model listed in the `model_step` argument.
+
+8)  `lv_name`: Include the name of the latent variable, exactly how it is listed in your `lavaan` syntax. You should plot the latent variable that the `item_name` is linked to. If you have items that load onto multiple latent variables, you will need to make multiple plots.
+
+```{r eval = F, echo = T, include = T, size = "small"}
+plot_mgcfa(
+  data_coef = results.invariant$model_coef, # output from model_coef
+  model_step = "configural", # which model do you want to plot
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # latent variable limits to graph
+  y_limits = c(min(df.invariant$q4), max(df.invariant$q4)), # Y min and max in data 
+  ci_level = .95, # what ci do you want
+  model_results = results.invariant$model.configural, # what model results do you want 
+  lv_name = "lv" # which latent variable do you want 
+)
+```
+
+## Visualization of Invariance
+
+The output from this model can be found in Figure \@ref(fig:invariant-pic). On the left hand side, the item invariance is plotted, and on the right hand side, the latent mean distributions for the two groups are plotted. In the item invariance sub-plot, the visualization includes all three components traditionally seen in MGCFA testing steps: loadings, intercepts, and residuals. Each visualization element was designed to match the traditional visualization for that type of output. All parameter estimates are plotted on the unstandardized estimates and their confidence interval based on the standard error of the estimate.
+
+### Loadings
+
+Factor loadings represent the slope of the regression equation for the latent variable predicting the scores on the observed variable ($\hat{Y} \sim b_0 + b_1X + \epsilon$). Therefore, the latent variable is shown on the x-axis using standardized values (i.e., *z*-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The y-axis indicates the observed variable scores, and here, the plot includes the entire range of the scale of the data for item four. The coefficient ($b_1$) for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_tail() %>% pull(estimate))`. The ribbon bands around the plotted slopes indicate the confidence interval for that estimate. In this plot, while the coefficients for each group are not literally equal, the overlapping and parallel slope bands indicate they are not different practically.
+
+### Intercepts
+
+The item intercepts ($b_0$) are plotted on the middle line where they would cross the y-axis at a latent variable score of zero. These are represented by a dot with a set of confidence error bars around the point. The intercept for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))`. In this invariant depiction, the overlap in the intercepts is clear, indicating they are not different. You can use `y_limits` to zoom in on the graph if these are too small to be distinguishable.
+
+### Residuals
+
+Residuals are trickier to plot, as they are the left over error when predicting the observed variables $\epsilon$. It is tempting to plot this value as the confidence band around the slope, however, that defeats the purpose of understanding that the slopes are estimated separately from the residuals, and both have an associated variability around their parameter estimate. Therefore, residuals are represented in the inset picture at the bottom right of the item invariance plot. The black bars represent the estimated residual for each group (group 1: `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_head() %>% pull(estimate))`, group 2: `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_tail() %>% pull(estimate))`). The distributions are plotted to represent the normal spread of values using the standard error of the residuals. The violin plot allows for direct comparison of those residuals and their potential distributions. Note that the placement has nothing to do with the x or y-axis and is designed to always show in the same location, regardless of size/value.
+
+### Latent Means
+
+The overall impact of differences on the latent means can be found in the right hand visualization. The latent means are calculated by using the `lavPredict` function and then plotted as overlapping histograms. The vertical colored lines represent the mean for each group, and the spread of the distribution can be examined using the density coloring. Finally, group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the dataset or whichever group is the first that appears when using the `levels()` command.
+
 ```{r invariant-pic, include = T, fig.cap = "Invariant Model Visualization"}
 plot_mgcfa(
   data_coef = results.invariant$model_coef, # output from model_coef
@@ -539,6 +682,12 @@ plot_mgcfa(
   lv_name = "lv"
 )
 ```
+
+### Graphing Effect Size
+
+The $d_{MACS}$ value for item 4 in the invariant model was `r apa_num(d_invariant)$DMACS[4]`, representing a nil or unimportant difference in this manuscript. It is important to note that while @nye2019 suggests specific sizes for small, medium, and large, each researcher should determine for themselves what effects represent. Figure \@ref(fig:small-load-pic) displays the results from the small ($d_{MACS}$ = `r apa_num(d_small_load)$DMACS[4]`) difference in loadings, while Figure \@ref(fig:med-load-pic) displays the results from the medium ($d_{MACS}$ = `r apa_num(d_med_load)$DMACS[4]`) difference in loadings, and Figure \@ref(fig:large-load-pic) shows the large ($d_{MACS}$ = `r apa_num(d_large_load)$DMACS[4]`) differences. When investigating the slope values, we can clearly see the change in the loading for the second group (the only manipulated variable, although random dataset generation may also change intercepts and residuals slightly). At the medium effect size, we see that the confidence bands do not overlap (at the edges), and at the large effect size, we can see a clear separation of two lines. Note that the intercepts in this model are estimated as equal so the loading representation will not literally separate, but the steepness of the lines is the indicator of the difference between the slopes. You can imagine these lines are interpreted like a simple slopes analysis for interactions in regression [@cohen2003]. When simple slopes for interactions are plotted, if they are parallel, there is no interaction, and if they cross, then there is an interaction. Here, we can use this same logic. If they are parallel, there is likely invariance (they are the same), and the further from parallel they become, the larger the effect size for the differences between group loadings.
+
+The latent means in Figure \@ref(fig:large-load-pic) do appear to show differences, albeit visually small. The latent means diagram shows the impact of any group differences that aren't constrained, and this image shows the configural model (as the metric model would force them to be equal). In the simulated model, the *only* manipulated parameter is question 4's loading. In real models, the differences may be larger due to other variation found in the parameter estimates. Therefore, once you discover items you believe would make a model "partially" invariant, you may wish to estimate that model and graph the item again using the partially invariant model to see only the effect of the non-invariant items. Additionally, consider that we set the scaling of the model to 0. The estimate for the lv mean in the large loading model was group 1: `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate))`, and group 2: `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))`, which results in `r apa_num(results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate) - results.invariant$model_coef %>% filter(model == "configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))` difference in group means. The practical implications of this difference will depend on the research and interpretations of the researcher.
 
 ```{r small-load-pic, include = T, fig.cap = "Small Loadings Model Visualization"}
 plot_mgcfa(
@@ -579,6 +728,7 @@ plot_mgcfa(
 )
 ```
 
+For intercepts, the small (Figure \@ref(fig:small-int-pic)), medium (Figure \@ref(fig:med-int-pic)), and large (Figure \@ref(fig:large-int-pic)) depictions represent $d_{MACS}$ values of `r apa_num(d_small_int)$DMACS[4]`, `r apa_num(d_med_int)$DMACS[4]`, and `r apa_num(d_large_int)$DMACS[4]`, respectively. Intercept differences can be clearly seen represented by the spacing out of the intercept locations (and thus, the overall line as well). Note how little the intercept differences appear to influence the latent variable means and distributions.
 
 ```{r small-int-pic, include = T, fig.cap = "Small Intercepts Model Visualization"}
 plot_mgcfa(
@@ -619,6 +769,8 @@ plot_mgcfa(
 )
 ```
 
+Last, the effect of the residuals is plotted in small (Figure \@ref(fig:small-res-pic)), medium (Figure \@ref(fig:med-res-pic)), and large (Figure \@ref(fig:large-res-pic)) formats. While $d_{MACS}$ values are not technically avaliable for the residuals, our models showed `r apa_num(d_small_res)$DMACS[4]`, `r apa_num(d_med_res)$DMACS[4]`, and `r apa_num(d_large_res)$DMACS[4]`, respectively. These differences in values are variable due to the random generation of datasets for each measurement invariance manipulation. At first glance, the differences in the small chart may seem large, because the black lines are not touching, but notice that the distributions overlap, indicating a likely small difference. The medium and large differences better illustrate differences in residuals across groups. Further, the impact of the residuals on the shape of the latent mean distribution can also been seen (and unintentionally, in the first figures as well due to random variation). The impact is due to the standard error of the residuals, as smaller standard errors represent lepokurtic distributions (taller), and larger standard errors represent platykurtic distributions (flatter). The effect size difference of the residuals does not appear to change the effects in the latent means.
+
 ```{r small-res-pic, include = T, fig.cap = "Small Residuals Model Visualization"}
 plot_mgcfa(
   data_coef = results.small.res$model_coef, # output from model_coef
@@ -658,9 +810,125 @@ plot_mgcfa(
 )
 ```
 
+## An Example Analysis
 
+```{r eval = F, include = F}
+library(rio)
 
-# Results
+DF <- bind_rows(
+  import("data/Adult CFA.sav") %>% select(-Age) %>% 
+    mutate(sample = "Clinical"),
+  import("data/Adult EFA.sav") %>% select(-Age) %>% 
+    mutate(sample = "Clinical"),
+  import("data/Student CFA.sav") %>% select(-Age) %>% 
+    mutate(sample = "Student"),
+  import("data/Student EFA.sav") %>% select(-Age) %>% 
+    mutate(sample = "Student")
+) %>% select(RS1:RS14, sample)
+
+save(DF, file = "RS14.Rdata")
+```
+
+@aiena2014 examined the RS-14 [@wagnild2009] exploring the factor structure of the Resiliency Scale in a clinical sample receiving treatment services and a college student sample. Measurement invariance was calculated for differences separately for these samples for gender and race finding a partially invariant models with a few item intercepts or residuals that differed between groups. @aiena2014 did not compare the clinical to the student sample for measurement invariance, and it is reasonable to expect potential differences in these two populations. 
+
+```{r echo = T, include = T, size = "small"}
+load("RS14.Rdata")
+model.rs <- "RS =~ RS1+RS2+RS3+RS4+RS5+RS6+RS7+RS8+RS9+RS10+RS11+RS12+RS13+RS14"
+results.rs <- mgcfa(data = DF, 
+                    group = "sample", 
+                    model = model.rs)
+
+results.rs$model_fit %>% select(model, AIC, BIC, cfi, tli, rmsea, srmr)
+
+##write out partial codes
+partial_syntax <- paste(colnames(DF)[1:14], "~1") #all columns again 
+partial_syntax
+
+CFI_list  <- 1:length(partial_syntax)
+names(CFI_list) <- partial_syntax
+
+for (i in 1:length(partial_syntax)){
+  
+  temp <- cfa(model = model.rs, 
+              data = DF,
+              meanstructure = TRUE,
+              group = "sample",
+              group.equal = c("loadings", "intercepts"),
+              group.partial = partial_syntax[i])
+  
+  CFI_list[i] <- fitmeasures(temp, "cfi")
+}
+
+CFI_list
+
+partial.rs <- cfa(model = model.rs, 
+                  data = DF, 
+                  meanstructure = TRUE,
+                  group = "sample", 
+                  meanstructure = T, 
+                  group.equal = c("loadings", "intercepts"),
+                  group.partial = c("RS7~1")
+)
+
+tidy(partial.rs)
+glance(partial.rs)
+results.rs$model_fit
+
+partial.rs.2 <- cfa(model = model.rs, 
+                  data = DF, 
+                  meanstructure = TRUE,
+                  group = "sample", 
+                  meanstructure = T, 
+                  group.equal = c("loadings", "intercepts"),
+                  group.partial = c("RS7~1", "RS6~1")
+)
+
+tidy(partial.rs.2)
+glance(partial.rs.2)
+
+partial.rs.2.strict <- cfa(model = model.rs, 
+                  data = DF, 
+                  meanstructure = TRUE,
+                  group = "sample", 
+                  meanstructure = T, 
+                  group.equal = c("loadings", "intercepts", "residuals"),
+                  group.partial = c("RS7~1", "RS6~1")
+)
+
+tidy(partial.rs.2.strict)
+glance(partial.rs.2.strict)
+
+model.rs.picture <- "RS =~ RS1+RS2+RS3+RS4+RS5+RS6+RS7+RS8+RS9+RS10+RS11+RS12+RS13+RS14
+RS~1
+RS1~0*1"
+
+partial.rs.2.picture <- cfa(model = model.rs, 
+                  data = DF, 
+                  meanstructure = TRUE,
+                  group = "sample", 
+                  meanstructure = T, 
+                  group.equal = c("loadings", "intercepts"),
+                  group.partial = c("RS7~1", "RS6~1"))
+
+partial.coef <- tidy(partial.rs.2.picture) %>% 
+  mutate(model = "intercepts")
+
+plot_mgcfa(
+  data_coef = partial.coef,
+  model_step = "intercepts", 
+  item_name = "RS6",
+  x_limits = c(-1,1),
+  y_limits = c(min(DF$RS7), max(DF$RS7)),
+  model_results = partial.rs.2.picture, 
+  ci_level = .95,
+  lv_name = "RS"
+)
+
+```
+
+```{r echo = T, include = T, size = "small"}
+
+```
 
 # Discussion
 
@@ -679,72 +947,351 @@ Conclusions:
 
 # Appendix
 
-```{r}
+## Model Fit Statistics
+
+Model fit statistics are provided for each of the ten model combinations (invariant, three sizes for each ladings, intercepts, and residuals). These tables could be used to examine the traditional change in fit statistics cutoff rules of thumb [@cheung2002], such as $\Delta$ CFI or $\Delta$ RMSEA, to the visualizations presented in the manuscript.
+
+```{r tab1, results='asis'}
 apa_table(results.invariant$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Invariant Model")
 ```
 
-```{r}
+```{r tab2, results='asis'}
 apa_table(results.small.load$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Small Differences in Loadings")
 ```
 
-```{r}
+```{r tab3, results='asis'}
 apa_table(results.med.load$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Medium Differences in Loadings")
 ```
 
-```{r}
+```{r tab4, results='asis'}
 apa_table(results.large.load$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Large Differences in Loadings")
 ```
 
-```{r}
+```{r tab5, results='asis'}
 apa_table(results.small.int$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Small Differences in Intercepts")
 ```
 
-```{r}
+```{r tab6, results='asis'}
 apa_table(results.med.int$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Medium Differences in Intercepts")
 ```
 
-```{r}
+```{r tab7, results='asis'}
 apa_table(results.large.int$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Large Differences in Intercepts")
 ```
 
-```{r}
+```{r tab8, results='asis'}
 apa_table(results.small.res$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Small Differences in Residuals")
 ```
 
-```{r}
+```{r tab9, results='asis'}
 apa_table(results.med.res$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Medium Differences in Residuals")
 ```
 
-```{r}
+```{r tab10, results='asis'}
 apa_table(results.large.res$model_fit %>% 
             select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
           col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
           caption = "Model Fit for Large Differences in Residuals")
+```
+
+## MGCFA Convenience Function
+
+Please note that any partial invariance is not automatically included in this function. This function returns a list with all model summaries, the model coefficients in a tidy dataframe, and the model fit statistics in a tidy dataframe. You will need the libraries listed below for this function to work properly.
+
+```{r cfa-append, include = T, echo = T, size = "small"}
+library(lavaan)
+library(dplyr)
+library(broom)
+# CFA function
+mgcfa <- function(data, group, model){
+  
+  group_names <- unique(data[ , group])
+  
+  model.overall <- cfa(model = model, data = data)
+  model.group1 <- cfa(model = model, 
+                      data = subset(data, group == group_names[1]))
+  model.group2 <- cfa(model = model, 
+                      data = subset(data, group == group_names[2]))
+  model.configural <- cfa(model = model, data = data, 
+                          group = group, meanstructure = T)
+  model.metric <- cfa(model = model, data = data, 
+                      group = group, meanstructure = T,
+                      group.equal = "loadings")
+  model.scalar <- cfa(model = model, data = data, 
+                      group = group, meanstructure = T, 
+                      group.equal = c("loadings", "intercepts"))
+  model.strict <- cfa(model = model, data = data, 
+                      group = group, meanstructure = T, 
+                      group.equal =  c("loadings", "intercepts", "residuals"))
+  
+  model_coef <- bind_rows(
+    tidy(model.overall, conf.level = .95) %>% 
+      mutate(model = "overall"), 
+    tidy(model.group1, conf.level = .95) %>% 
+      mutate(model = "group1"), 
+    tidy(model.group2, conf.level = .95) %>% 
+      mutate(model = "group2"), 
+    tidy(model.configural, conf.level = .95) %>% 
+      mutate(model = "configural"), 
+    tidy(model.metric, conf.level = .95) %>% 
+      mutate(model = "metric"), 
+    tidy(model.scalar, conf.level = .95) %>% 
+      mutate(model = "scalar"), 
+    tidy(model.strict, conf.level = .95) %>% 
+      mutate(model = "strict")
+  )
+    
+  model_fit <- bind_rows(
+    glance(model.overall) %>% mutate(model = "overall"), 
+    glance(model.group1) %>% mutate(model = "group1"), 
+    glance(model.group2) %>% mutate(model = "group2"), 
+    glance(model.configural) %>% mutate(model = "configural"), 
+    glance(model.metric) %>% mutate(model = "metric"), 
+    glance(model.scalar) %>% mutate(model = "scalar"), 
+    glance(model.strict) %>% mutate(model = "strict")
+    )
+  
+  return(list(
+    "model_coef" = model_coef,
+    "model_fit" = model_fit,
+    "model.overall" = model.overall,
+    "model.group1" = model.group1,
+    "model.group2" = model.group2,
+    "model.configural" = model.configural,
+    "model.metric" = model.metric,
+    "model.scalar" = model.scalar,
+    "model.strict" = model.strict
+  ))
+  
+}
+```
+
+## Measurement Invariance Plot Function
+
+This function creates the plots shown in the manuscript. You will need the libraries listed for this function to work. Plots may be modified to rearrange for those who are familiar with `ggplot2`. Please note that the function assumes you will use the outputs from the previous `mgcfa` function or a tidy dataframe that includes the coefficients from the model with a column `model` that indicates which step of the MGCFA you are wanting to plot. If you have more than two groups, you should first filter the dataframe model coefficient outputs to only include to the two groups you want to compare. This code does not plot more than two groups (although, it could be modified for this, but the assumption here is that you only have two, as this is how you would normally proceed in a MGCFA using pairwise comparisons to find where the invariance occurs).
+
+```{r plot-append, include = T, echo = T, size = "small"}
+library(dplyr)
+library(ggplot2)
+library(cowplot)
+library(lavaan)
+# devtools::install_github("psyteachr/introdataviz")
+library(introdataviz)
+# Plot MI MGCFA
+plot_mgcfa <- function(data_coef, # output from model_coef
+                       model_step, # which model
+                       item_name, # name of observed item
+                       x_limits = c(-1,1), # LV limits to graph
+                       y_limits, # Y min and max in data 
+                       ci_level, # what ci do you want
+                       model_results, # what model results do you want 
+                       lv_name # which latent is the observed variable on
+                       ){
+  
+  # calculate cutoff
+  cutoff <- qt(p = (1-ci_level)/2, 
+               df = sum(unlist(model_results@Data@nobs)), 
+               lower.tail = F)
+  
+  # get group variable
+  group_var <- model_results@Data@group
+  group_labels <- model_results@Data@group.label
+  
+  # first get the data
+  graph.data <- data_coef %>% # put in tidy coefficients
+  filter(model == model_step) %>% # pick a model
+  filter(grepl(item_name, term)) %>%  # pick a question
+  mutate(group = factor(group, levels = names(table(data_coef$group)), labels = group_labels)) 
+  
+  # make ribbon data y = slope*x + intercept for ci for slopes 
+  ribbondata <- bind_rows(
+    data.frame(
+    x = seq(from = x_limits[1] - 1,  
+            to = x_limits[2] + 1, 
+            by = .05), 
+    group = unique(graph.data$group)[1]
+  ) %>% 
+    mutate(ymin = (graph.data %>% filter(op == "=~") %>% 
+                 slice_head() %>% pull(estimate) * x) - 
+             (cutoff*graph.data %>% filter(op == "=~") %>% 
+                    slice_head() %>% pull(std.error)) +
+             graph.data %>% filter(op == "~1") %>% 
+                 slice_head() %>% pull(estimate), 
+           ymax = (graph.data %>% filter(op == "=~") %>% 
+                 slice_head() %>% pull(estimate) * x) + 
+             (cutoff*graph.data %>% filter(op == "=~") %>% 
+                    slice_head() %>% pull(std.error)) +
+             graph.data %>% filter(op == "~1") %>% 
+                 slice_head() %>% pull(estimate)), 
+    data.frame(
+      x = seq(from = x_limits[1] - 1,  
+              to = x_limits[2] + 1, 
+              by = .05), 
+      group = unique(graph.data$group)[2]
+    ) %>% 
+      mutate(ymin = (graph.data %>% filter(op == "=~") %>% 
+                   slice_tail() %>% pull(estimate) * x) - 
+               (cutoff*graph.data %>% filter(op == "=~") %>% 
+                      slice_tail() %>% pull(std.error)) +
+               graph.data %>% filter(op == "~1") %>% 
+                   slice_tail() %>% pull(estimate), 
+             ymax = (graph.data %>% filter(op == "=~") %>% 
+                   slice_tail() %>% pull(estimate) * x) + 
+               (cutoff*graph.data %>% filter(op == "=~") %>% 
+                      slice_tail() %>% pull(std.error)) +
+               graph.data %>% filter(op == "~1") %>% 
+                   slice_tail() %>% pull(estimate))
+  )
+  
+  # make point data to draw on the intercepts 
+  pointdata <- data.frame(
+  x = c(0,0),
+  y = graph.data %>% filter(op == "~1") %>% pull(estimate), 
+  group = graph.data %>% filter(op == "~1") %>% pull(group),
+  ymin = graph.data %>% filter(op == "~1") %>% pull(estimate) - 
+    cutoff * graph.data %>% filter(op == "~1") %>% pull(std.error), 
+  ymax = graph.data %>% filter(op == "~1") %>% pull(estimate) + 
+    cutoff * graph.data %>% filter(op == "~1") %>% pull(std.error)
+  )
+  
+  # make the line data to draw on the slopes
+  linedata <- data.frame(
+  slope = graph.data %>% filter(op == "=~") %>% pull(estimate), 
+  intercept = graph.data %>% filter(op == "~1") %>% pull(estimate), 
+  group = graph.data %>% filter(op == "~1") %>% pull(group)
+  )
+  
+  # make the distributions for the residuals 
+  violindata <- data.frame(
+  y = c(rnorm(n = 1000, 
+            mean = graph.data %>% filter(op == "~~") %>% 
+              slice_head() %>% pull(estimate), 
+            sd = graph.data %>% filter(op == "~~") %>% 
+              slice_head() %>% pull(std.error)), 
+        rnorm(n = 1000, 
+            mean = graph.data %>% filter(op == "~~") %>% 
+              slice_tail() %>% pull(estimate), 
+            sd = graph.data %>% filter(op == "~~") %>% 
+              slice_tail() %>% pull(std.error))),
+  group = c(rep(graph.data %>% filter(op == "~~") %>% 
+              slice_head() %>% pull(group), 1000),
+            rep(graph.data %>% filter(op == "~~") %>% 
+              slice_tail() %>% pull(group), 1000)), 
+  x = 1
+  )
+  
+  # make the latent mean data for right panel
+  latent_means <- lavPredict(model_results, 
+                               type = "lv", 
+                               label = TRUE,
+                               assemble = TRUE, 
+                               append.data = TRUE)
+  
+  latent_means$lv <- latent_means[ , lv_name]
+  latent_means$group <- latent_means[ , group_var]
+  
+  # make a plot of the variance
+  variance_plot <- 
+  ggplot(violindata, aes(x = 1, y = y, color = group, fill = group)) + 
+  geom_split_violin() + 
+  theme_void() + 
+  theme(legend.position = "none") + 
+  stat_summary(fun = "mean",
+               geom = "crossbar", 
+               width = 0.5,
+               colour = "black")
+  
+  # make the plot with intercepts and slopes
+  intercept_plot <- 
+  ggplot() + 
+  # basic set up
+  theme_classic() + 
+  xlab("Latent Variable") + 
+  ylab("Observed Variable") + 
+  coord_cartesian(xlim = x_limits, ylim = y_limits) + 
+  # plot the intercepts 
+  geom_point(data = pointdata, 
+             aes(x = x, y = y, color = group), 
+             inherit.aes = FALSE) + 
+  geom_errorbar(data = pointdata,
+                aes(x = x, ymin = ymin, ymax = ymax, color = group), 
+                inherit.aes = FALSE, width = .10) + 
+  # plot the slopes
+  geom_abline(data = linedata,
+              aes(slope = slope, intercept = intercept, color = group)) + 
+  geom_ribbon(data = ribbondata, 
+              aes(x = x, ymin = ymin, ymax = ymax, fill = group), 
+              inherit.aes = FALSE, alpha = .2) + 
+  scale_color_discrete(name = "Group") + 
+  scale_fill_discrete(name = "Group") + 
+  geom_vline(xintercept = 0) + 
+  theme(axis.line.y = element_blank())
+  
+  # make the latent means plot
+  mean_plot <- ggplot(latent_means, aes(x = lv, fill = group)) + 
+    geom_density(alpha = .2) + 
+    theme_classic() + 
+    xlab("Latent Variable") + 
+    ylab("Density") + 
+    geom_vline(data = latent_means %>% group_by(group) %>% summarize(mean = mean(lv)), 
+               aes(xintercept = mean, color = group)) + 
+    theme(legend.position = "none") + 
+    coord_cartesian(xlim = x_limits)
+  
+  y_range = abs(y_limits[2] - y_limits[1])
+  
+  # line up the two plots 
+  prow <- plot_grid(
+    intercept_plot + 
+      ggtitle("Item Invariance") + 
+      theme(legend.position = "none") + 
+      annotation_custom(ggplotGrob(variance_plot), 
+                        xmin = .25, xmax = 1, 
+                        ymin = y_limits[1], ymax = y_limits[2]-y_range/1.8),
+    mean_plot + 
+      ggtitle("Latent Mean Distribution") + 
+      theme(legend.position = "none"),
+    align = 'vh',
+    hjust = -1,
+    nrow = 1
+  )
+  
+  # get the lengend
+  legend_b <- get_legend(
+    intercept_plot + 
+      guides(color = guide_legend(nrow = 1)) +
+      theme(legend.position = "bottom")
+  )
+  
+  # send out the plot 
+  plot_grid(prow, legend_b, ncol = 1, rel_heights = c(1, .1))
+  
+}
 ```
