@@ -5,6 +5,8 @@
 \includegraphics{manuscript_files/figure-latex/invariant-pic-1.pdf}
 \caption{\label{fig:invariant-pic}Invariant Model Visualization}
 \end{figure*}
+\efloatseparator
+ 
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
 
@@ -12,6 +14,8 @@
 \includegraphics{manuscript_files/figure-latex/small-load-pic-1.pdf}
 \caption{\label{fig:small-load-pic}Small Loadings Model Visualization}
 \end{figure*}
+\efloatseparator
+ 
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
 
@@ -19,6 +23,8 @@
 \includegraphics{manuscript_files/figure-latex/med-load-pic-1.pdf}
 \caption{\label{fig:med-load-pic}Medium Loadings Model Visualization}
 \end{figure*}
+\efloatseparator
+ 
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
 
@@ -26,6 +32,8 @@
 \includegraphics{manuscript_files/figure-latex/large-load-pic-1.pdf}
 \caption{\label{fig:large-load-pic}Large Loadings Model Visualization}
 \end{figure*}
+\efloatseparator
+ 
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
 
@@ -33,6 +41,8 @@
 \includegraphics{manuscript_files/figure-latex/small-int-pic-1.pdf}
 \caption{\label{fig:small-int-pic}Small Intercepts Model Visualization}
 \end{figure*}
+\efloatseparator
+ 
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
 
@@ -40,6 +50,8 @@
 \includegraphics{manuscript_files/figure-latex/med-int-pic-1.pdf}
 \caption{\label{fig:med-int-pic}Medium Intercepts Model Visualization}
 \end{figure*}
+\efloatseparator
+ 
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
 
@@ -47,6 +59,8 @@
 \includegraphics{manuscript_files/figure-latex/large-int-pic-1.pdf}
 \caption{\label{fig:large-int-pic}Large Intercepts Model Visualization}
 \end{figure*}
+\efloatseparator
+ 
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
 
@@ -54,6 +68,8 @@
 \includegraphics{manuscript_files/figure-latex/small-res-pic-1.pdf}
 \caption{\label{fig:small-res-pic}Small Residuals Model Visualization}
 \end{figure*}
+\efloatseparator
+ 
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
 
@@ -61,10 +77,30 @@
 \includegraphics{manuscript_files/figure-latex/med-res-pic-1.pdf}
 \caption{\label{fig:med-res-pic}Medium Residuals Model Visualization}
 \end{figure*}
+\efloatseparator
+ 
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
 
 \centering
 \includegraphics{manuscript_files/figure-latex/large-res-pic-1.pdf}
 \caption{\label{fig:large-res-pic}Large Residuals Model Visualization}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{manuscript_files/figure-latex/rs6-img-1.pdf}
+\caption{\label{fig:rs6-img}RS6 Item Invariance Visualization}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{manuscript_files/figure-latex/rs7-img-1.pdf}
+\caption{\label{fig:rs7-img}RS7 Item Invariance Visualization}
 \end{figure*}
