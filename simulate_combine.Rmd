@@ -1,0 +1,99 @@
+---
+title: "Put Together Simulations"
+author: "Erin M. Buchanan"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r}
+library(rio)
+library(dplyr)
+```
+
+## Boot RR Simulations
+
+```{r}
+full_boot <- 
+  bind_rows(  
+    import("data/boot_rr_DF_1a_mac.csv") %>% mutate(computer = paste0("computer1_", run_number)),
+    import("data/boot_rr_DF_37_mac.csv") %>% mutate(computer = paste0("computer2_", run_number)),
+    import("data/boot_rr_DF_5_sim1.csv") %>% mutate(computer = paste0("computer3_", run_number)), 
+    import("data/boot_rr_DF_5_sim2.csv") %>% mutate(computer = paste0("computer4_", run_number)),
+    import("data/boot_rr_DF_5_sim3.csv") %>% mutate(computer = paste0("computer5_", run_number)),
+    import("data/boot_rr_DF_5_sim4.csv") %>% mutate(computer = paste0("computer6_", run_number)),
+    import("data/boot_rr_DF_5_sim5.csv") %>% mutate(computer = paste0("computer7_", run_number)),
+    import("data/boot_rr_DF_5_sim6.csv") %>% mutate(computer = paste0("computer8_", run_number)),
+    import("data/boot_rr_DF_5_sim7.csv") %>% mutate(computer = paste0("computer9_", run_number)),
+    import("data/boot_rr_DF_5_sim8.csv") %>% mutate(computer = paste0("computer10_", run_number)),
+    import("data/boot_rr_DF_5_sim9.csv") %>% mutate(computer = paste0("computer11_", run_number)),
+    import("data/boot_rr_DF_18_sim10.csv") %>% mutate(computer = paste0("computer12_", run_number)),
+    import("data/boot_rr_DF_1_sim10.csv") %>% mutate(computer = paste0("computer13_", run_number)),
+    import("data/boot_rr_DF_1_erin.csv") %>% mutate(computer = paste0("computer14_", run_number)),
+    import("data/boot_rr_DF_2_erin.csv") %>% mutate(computer = paste0("computer15_", run_number)),
+    import("data/boot_rr_DF_16_erin.csv") %>% mutate(computer = paste0("computer16_", run_number))
+    ) 
+
+nrow(full_boot)/30
+
+length(table(full_boot$computer))
+
+export(full_boot, "manu_data/boot_rr_DF.csv", row.names = F)
+```
+
+## Boot Partial Simulations
+
+```{r}
+boot_DF_full <- bind_rows(
+  import("data/boot_DF_DF_sim11.csv") %>% mutate(computer = "computer11"),
+  import("data/boot_DF_DF_sim12.csv") %>% mutate(computer = "computer12"),
+  import("data/boot_DF_DF_sim13.csv") %>% mutate(computer = "computer13"),
+  import("data/boot_DF_DF_sim14.csv") %>% mutate(computer = "computer14"),
+  import("data/boot_DF_DF_sim15.csv") %>% mutate(computer = "computer15"),
+  import("data/boot_DF_DF_sim16.csv") %>% mutate(computer = "computer16"),
+  import("data/boot_DF_DF_sim17.csv") %>% mutate(computer = "computer17"),
+  import("data/boot_DF_DF_sim18.csv") %>% mutate(computer = "computer18"),
+  import("data/boot_DF_DF_sim19.csv") %>% mutate(computer = "computer19"),
+  import("data/boot_DF_DF_sim20.csv") %>% mutate(computer = "computer20")
+  )
+
+export(boot_DF_full, "manu_data/boot_DF_full.csv", row.names = F)
+
+boot_effects_summary_DF_full <- bind_rows(
+  import("data/boot_effects_summary_DF_sim11.csv") %>% mutate(computer = "computer11"),
+  import("data/boot_effects_summary_DF_sim12.csv") %>% mutate(computer = "computer12"),
+  import("data/boot_effects_summary_DF_sim13.csv") %>% mutate(computer = "computer13"),
+  import("data/boot_effects_summary_DF_sim14.csv") %>% mutate(computer = "computer14"),
+  import("data/boot_effects_summary_DF_sim15.csv") %>% mutate(computer = "computer15"),
+  import("data/boot_effects_summary_DF_sim16.csv") %>% mutate(computer = "computer16"),
+  import("data/boot_effects_summary_DF_sim17.csv") %>% mutate(computer = "computer17"),
+  import("data/boot_effects_summary_DF_sim18.csv") %>% mutate(computer = "computer18"),
+  import("data/boot_effects_summary_DF_sim19.csv") %>% mutate(computer = "computer19"),
+  import("data/boot_effects_summary_DF_sim20.csv") %>% mutate(computer = "computer20")
+  )
+
+export(boot_effects_summary_DF_full, "manu_data/boot_effects_summary_DF_full.csv", row.names = F)
+
+boot_partial_summary_full <- bind_rows(
+  import("data/boot_partial_summary_DF_sim11.csv") %>% mutate(computer = "computer11"),
+  import("data/boot_partial_summary_DF_sim12.csv") %>% mutate(computer = "computer12"),
+  import("data/boot_partial_summary_DF_sim13.csv") %>% mutate(computer = "computer13"),
+  import("data/boot_partial_summary_DF_sim14.csv") %>% mutate(computer = "computer14"),
+  import("data/boot_partial_summary_DF_sim15.csv") %>% mutate(computer = "computer15"),
+  import("data/boot_partial_summary_DF_sim16.csv") %>% mutate(computer = "computer16"),
+  import("data/boot_partial_summary_DF_sim17.csv") %>% mutate(computer = "computer17"),
+  import("data/boot_partial_summary_DF_sim18.csv") %>% mutate(computer = "computer18"),
+  import("data/boot_partial_summary_DF_sim19.csv") %>% mutate(computer = "computer19"),
+  import("data/boot_partial_summary_DF_sim20.csv") %>% mutate(computer = "computer20")
+  )
+
+export(boot_partial_summary_full, "manu_data/boot_partial_summary_DF_full.csv", row.names = F)
+```
+

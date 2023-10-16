@@ -1,0 +1,532 @@
+---
+title: "Simulate Bootstrapped Partial Invariance"
+author: "Erin M. Buchanan"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r libraries}
+library(papaja)
+library(lavaan)
+library(broom)
+library(dplyr)
+library(ggplot2)
+library(cowplot)
+library(ggridges)
+library(tidyr)
+library(rio)
+
+# devtools::install_github("psyteachr/introdataviz")
+# devtools::install_github("doomlab/visualizemi")
+library(introdataviz)
+library(visualizemi)
+```
+
+## Simulate Bootstraps
+
+```{r create-models}
+# overall model
+model.overall <- "lv =~ q1 + q2 + q3 + q4 + q5
+q1 ~ 0*1
+lv ~ 1"
+
+# build invariant model one factor
+model.invariant.g1 <- "lv =~ .8*q1 + .4*q2 + .6*q3 + .3*q4 + .6*q5 
+q4 ~~ 1*q4
+q4 ~ 0*1
+q1 ~ 0*1
+lv ~ 1"
+model.invariant.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~~ 1*q4
+q4 ~ 0*1
+q1 ~ 0*1
+lv ~ 1"
+
+# loadings .5, .8, 1.1
+model.small.load.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .5*q4 + .61*q5
+q1 ~ 0*1
+lv ~ 1"
+model.med.load.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .8*q4 + .61*q5
+q1 ~ 0*1
+lv ~ 1"
+model.large.load.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + 1.1*q4 + .61*q5
+q1 ~ 0*1
+lv ~ 1"
+
+# build invariance on intercepts .25, .50, and .75
+model.small.int.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~ .25*1
+q1 ~ 0*1
+lv ~ 1"
+model.med.int.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~ .5*1
+q1 ~ 0*1
+lv ~ 1"
+model.large.int.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~ .75*1
+q1 ~ 0*1
+lv ~ 1"
+
+# build invariance on residuals .25, .50, and .75
+model.small.res.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~~ .75*q4
+q1 ~ 0*1
+lv ~ 1"
+model.med.res.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~~ .5*q4
+q1 ~ 0*1
+lv ~ 1"
+model.large.res.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~~ .25*q4
+q1 ~ 0*1
+lv ~ 1"
+```
+
+```{r boot-loop}
+# a place to hold stuff
+boot_summary_loop <- list()
+boot_effects_loop <- list()
+boot_DF_loop <- list()
+
+for (i in 1:100){
+  
+  set.seed(round(abs(rnorm(1)*100)))
+  df.invariant <- df.small.load <- df.med.load <- df.large.load <- 
+    df.small.int <- df.med.int <- df.large.int <- df.small.res <- 
+    df.med.res <- df.large.res <-   
+    results.invariant <- results.small.load <- 
+    results.med.load <- results.large.load <- 
+    results.small.int <- results.med.int <- 
+    results.large.int <- results.small.res <- 
+    results.med.res <- results.large.res <-   
+    boot.partialinvariant <- boot.partialsmall.load <- 
+    boot.partialmed.load <- boot.partiallarge.load <- 
+    boot.partialsmall.int <- boot.partialmed.int <- 
+    boot.partiallarge.int <- boot.partialsmall.res <- 
+    boot.partialmed.res <- boot.partiallarge.res <- NULL
+
+  # create data ----
+    # simulate data invariant
+    df.invariant <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.invariant.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+    
+    # simulate data small load
+    df.small.load <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.small.load.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+    
+    # simulate data med load
+    df.med.load <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.med.load.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+    
+    # simulate data large load
+    df.large.load <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.large.load.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+    
+    # simulate data small int
+    df.small.int <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.small.int.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+    
+    # simulate data med int
+    df.med.int <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.med.int.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+    
+    # simulate data large int
+    df.large.int <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.large.int.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+    
+    # simulate data small res
+    df.small.res <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.small.res.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+    
+    # simulate data med res
+    df.med.res <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.med.res.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+    
+    # simulate data large res
+    df.large.res <- bind_rows(
+      simulateData(model.invariant.g1, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 1"), 
+      simulateData(model.large.res.g2, sample.nobs = 250, 
+                   meanstructure = T, model.type = "cfa"
+                   ) %>% 
+        mutate(group = "Group 2") 
+    )
+
+  # run the cfas -----
+    # invariant CFA
+    results.invariant <- 
+      mgcfa(model = model.overall, 
+            data = df.invariant,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+    
+    # loadings
+    results.small.load <- 
+      mgcfa(model = model.overall, 
+            data = df.small.load,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+    
+    results.med.load <- 
+      mgcfa(model = model.overall, 
+            data = df.med.load,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+    results.large.load <- 
+      mgcfa(model = model.overall, 
+            data = df.large.load,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+    
+    # intercepts
+    results.small.int <- 
+      mgcfa(model = model.overall, 
+            data = df.small.int,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+    results.med.int <- 
+      mgcfa(model = model.overall, 
+            data = df.med.int,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+    results.large.int <- 
+      mgcfa(model = model.overall, 
+            data = df.large.int,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+    
+    # residuals
+    results.small.res <-
+      mgcfa(model = model.overall, 
+            data = df.small.res,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+    results.med.res <- 
+      mgcfa(model = model.overall, 
+            data = df.med.res,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+    results.large.res <- 
+      mgcfa(model = model.overall, 
+            data = df.large.res,
+            group = "group",
+            group.equal = c("loadings", "intercepts", "residuals"),
+            meanstructure = T)
+  
+  # calculate the bootstraps -----
+    boot.partial.invariant <- 
+      bootstrap_partial(
+        saved_model = results.invariant$invariance_models$model.loadings,
+        data = df.invariant, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.invariant$model_configural, "cfi"), 
+        partial_step = "loadings", 
+        group.equal = c("loadings")
+      )
+    
+    # loadings
+    boot.partial.small.load <- 
+      bootstrap_partial(
+        saved_model = results.small.load$invariance_models$model.loadings,
+        data = df.small.load, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.small.load$model_configural, "cfi"), 
+        partial_step = "loadings", 
+        group.equal = c("loadings")
+      )
+    
+    boot.partial.med.load <- 
+      bootstrap_partial(
+        saved_model = results.med.load$invariance_models$model.loadings,
+        data = df.med.load, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.med.load$model_configural, "cfi"), 
+        partial_step = "loadings", 
+        group.equal = c("loadings")
+      )
+    
+    boot.partial.large.load <- 
+      bootstrap_partial(
+        saved_model = results.large.load$invariance_models$model.loadings,
+        data = df.large.load, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.large.load$model_configural, "cfi"), 
+        partial_step = "loadings", 
+        group.equal = c("loadings")
+      )
+    
+    # intercepts
+    boot.partial.small.int <- 
+      bootstrap_partial(
+        saved_model = results.small.int$invariance_models$model.intercepts,
+        data = df.small.int, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.small.int$invariance_models$model.loadings, "cfi"), 
+        partial_step = "intercepts", 
+        group.equal = c("loadings", "intercepts")
+      )
+    
+    boot.partial.med.int <- 
+      bootstrap_partial(
+        saved_model = results.med.int$invariance_models$model.intercepts,
+        data = df.med.int, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.med.int$invariance_models$model.loadings, "cfi"), 
+        partial_step = "intercepts", 
+        group.equal = c("loadings", "intercepts")
+      )
+    
+    boot.partial.large.int <- 
+      bootstrap_partial(
+        saved_model = results.large.int$invariance_models$model.intercepts,
+        data = df.large.int, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.large.int$invariance_models$model.loadings, "cfi"), 
+        partial_step = "intercepts", 
+        group.equal = c("loadings", "intercepts")
+      )
+    
+    # residuals
+    boot.partial.small.res <- 
+      bootstrap_partial(
+        saved_model = results.small.res$invariance_models$model.residuals,
+        data = df.small.res, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.small.res$invariance_models$model.intercepts, "cfi"), 
+        partial_step = "residuals", 
+        group.equal = c("loadings", "intercepts", "residuals")
+      )
+    
+    boot.partial.med.res <- 
+      bootstrap_partial(
+        saved_model = results.med.res$invariance_models$model.residuals,
+        data = df.med.res, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.med.res$invariance_models$model.intercepts, "cfi"), 
+        partial_step = "residuals", 
+        group.equal = c("loadings", "intercepts", "residuals")
+      )
+    
+    boot.partial.large.res <- 
+      bootstrap_partial(
+        saved_model = results.large.res$invariance_models$model.residuals,
+        data = df.large.res, 
+        model = model.overall,
+        group = "group", 
+        nboot = 1000,
+        invariance_index = "cfi", 
+        invariance_rule = .01, 
+        invariance_compare = fitmeasures(results.large.res$invariance_models$model.intercepts, "cfi"), 
+        partial_step = "intercepts", 
+        group.equal = c("loadings", "intercepts")
+      )
+    
+    boot_summary_loop[[i]] <- bind_rows(
+      boot.partial.invariant$boot_summary %>% 
+        mutate(type = "Invariant"),
+      boot.partial.small.load$boot_summary %>% 
+        mutate(type = "Small Loadings"),
+      boot.partial.med.load$boot_summary %>% 
+        mutate(type = "Medium Loadings"),
+      boot.partial.large.load$boot_summary %>% 
+        mutate(type = "Large Loadings"),
+      boot.partial.small.int$boot_summary %>% 
+        mutate(type = "Small Intercepts"),
+      boot.partial.med.int$boot_summary %>% 
+        mutate(type = "Medium Intercepts"),
+      boot.partial.large.int$boot_summary %>% 
+        mutate(type = "Large Intercepts"),
+      boot.partial.small.res$boot_summary %>% 
+        mutate(type = "Small Residuals"),
+      boot.partial.med.res$boot_summary %>% 
+        mutate(type = "Medium Residuals"),
+      boot.partial.large.res$boot_summary %>% 
+        mutate(type = "Large Residuals")
+    ) %>% 
+      mutate(run_number = i)
+    
+    boot_effects_loop[[i]] <- bind_rows(
+      boot.partial.invariant$boot_effects %>% 
+        mutate(type = "Invariant"),
+      boot.partial.small.load$boot_effects %>% 
+        mutate(type = "Small Loadings"),
+      boot.partial.med.load$boot_effects %>% 
+        mutate(type = "Medium Loadings"),
+      boot.partial.large.load$boot_effects %>% 
+        mutate(type = "Large Loadings"),
+      boot.partial.small.int$boot_effects %>% 
+        mutate(type = "Small Intercepts"),
+      boot.partial.med.int$boot_effects %>% 
+        mutate(type = "Medium Intercepts"),
+      boot.partial.large.int$boot_effects %>% 
+        mutate(type = "Large Intercepts"),
+      boot.partial.small.res$boot_effects %>% 
+        mutate(type = "Small Residuals"),
+      boot.partial.med.res$boot_effects %>% 
+        mutate(type = "Medium Residuals"),
+      boot.partial.large.res$boot_effects %>% 
+        mutate(type = "Large Residuals")
+    ) %>% 
+      mutate(run_number = i)
+    
+    boot_DF_loop[[i]] <- bind_rows(
+      boot.partial.invariant$boot_DF %>% 
+        mutate(type = "Invariant"),
+      boot.partial.small.load$boot_DF %>% 
+        mutate(type = "Small Loadings"),
+      boot.partial.med.load$boot_DF %>% 
+        mutate(type = "Medium Loadings"),
+      boot.partial.large.load$boot_DF %>% 
+        mutate(type = "Large Loadings"),
+      boot.partial.small.int$boot_DF %>% 
+        mutate(type = "Small Intercepts"),
+      boot.partial.med.int$boot_DF %>% 
+        mutate(type = "Medium Intercepts"),
+      boot.partial.large.int$boot_DF %>% 
+        mutate(type = "Large Intercepts"),
+      boot.partial.small.res$boot_DF %>% 
+        mutate(type = "Small Residuals"),
+      boot.partial.med.res$boot_DF %>% 
+        mutate(type = "Medium Residuals"),
+      boot.partial.large.res$boot_DF %>% 
+        mutate(type = "Large Residuals")
+    ) %>% 
+      mutate(run_number = i)
+    
+    boot_partial_summary_DF <- bind_rows(boot_summary_loop)
+    boot_effects_summary_DF <- bind_rows(boot_effects_loop)
+    boot_DF_DF <- bind_rows(boot_DF_loop)
+    
+    export(boot_partial_summary_DF, paste0("data/boot_partial_summary_DF", i, ".csv"), row.names = F)
+    export(boot_effects_summary_DF, paste0("data/boot_partial_summary_DF", i, ".csv"), row.names = F)
+    export(boot_DF_DF, paste0("data/boot_DF_DF", i, ".csv"), row.names = F)
+}
+
+
+
+```

@@ -1,0 +1,28 @@
+---
+appendix: "appendix_5.Rmd"
+---
+
+## Invariance Plots Effect Sizes by Condition
+
+```{r inv-effect-condition, include = TRUE}
+
+for (cond in conditions){
+  effect_invariance_plot <- 
+  ggplot(boot_summary_long %>% 
+           filter(type == cond), aes(term, d, color = type_estimate)) + 
+  theme_classic() + 
+  facet_wrap(~invariant, labeller = as_labeller(label_graph)) +
+  scale_color_discrete(name = "Type of Estimate") + 
+  geom_point(aes(size = n)) + 
+  geom_errorbar(aes(ymin = d_low, ymax = d_high), width = 0.2) + 
+  xlab("Estimated Item") + 
+  ylab("Group Effect Size") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), 
+        legend.position = "bottom") + 
+  geom_hline(yintercept = 0) + 
+  coord_flip() + 
+    ggtitle(paste0(cond, " Graph Results"))
+  
+  print(effect_invariance_plot)
+}
+```

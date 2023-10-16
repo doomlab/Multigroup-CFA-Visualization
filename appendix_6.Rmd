@@ -1,0 +1,22 @@
+---
+appendix: "appendix_6.Rmd"
+---
+
+## Density Plots by Condition
+
+```{r density-effects-condition, include = TRUE}
+for (cond in conditions){
+  density_plot <- ggplot(density_long %>% 
+                         filter(type == cond), 
+                       aes(x = estimate, y = term, fill = group)) + 
+  geom_density_ridges(alpha = 0.7, scale = 0.9) + 
+  facet_grid(invariant ~ type_estimate) + 
+  theme_classic() + 
+  xlab("Estimated Score") + 
+  ylab("Parameter") + 
+  scale_fill_discrete(name = "Group") + 
+    ggtitle(paste0(cond, " Graph Results"))
+
+print(density_plot)
+}
+```

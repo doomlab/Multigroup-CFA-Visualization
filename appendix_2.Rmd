@@ -1,0 +1,88 @@
+---
+appendix: "appendix_2.Rmd"
+---
+
+## MGCFA Model Fit Statistics
+
+Model fit statistics are provided for each of the ten model combinations (invariant, three sizes for each ladings, intercepts, and residuals). These tables could be used to examine the traditional change in fit statistics cutoff rules of thumb [@cheung2002], such as $\Delta$ CFI or $\Delta$ RMSEA, to the visualizations presented in the manuscript.
+
+```{r tab1, results='asis'}
+apa_table(results.invariant$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr),
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Invariant Model")
+```
+
+```{r tab2, results='asis'}
+apa_table(results.small.load$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Small Differences in Loadings")
+```
+
+```{r tab3, results='asis'}
+apa_table(results.med.load$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Medium Differences in Loadings")
+```
+
+```{r tab4, results='asis'}
+apa_table(results.large.load$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr),
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Large Differences in Loadings")
+```
+
+```{r tab5, results='asis'}
+apa_table(results.small.int$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Small Differences in Intercepts")
+```
+
+```{r tab6, results='asis'}
+apa_table(results.med.int$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr),
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Medium Differences in Intercepts")
+```
+
+```{r tab7, results='asis'}
+apa_table(results.large.int$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr),
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Large Differences in Intercepts")
+```
+
+```{r tab8, results='asis'}
+apa_table(results.small.res$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Small Differences in Residuals")
+```
+
+```{r tab9, results='asis'}
+apa_table(results.med.res$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Medium Differences in Residuals")
+```
+
+```{r tab10, results='asis'}
+apa_table(results.large.res$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Large Differences in Residuals")
+```
+

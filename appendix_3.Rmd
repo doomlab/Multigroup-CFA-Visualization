@@ -1,0 +1,178 @@
+---
+appendix: "appendix_3.Rmd"
+---
+
+## Simulated Parital Invariance Results
+
+```{r p-tab11, results = 'asis', eval = T}
+partial.invariant <-
+  partial_mi(
+    saved_model = results.invariant$invariance_models$model.residuals,
+    data = df.invariant,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "residuals")
+
+apa_table(partial.invariant$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Residuals on Invariant Data")
+```
+
+```{r p-tab12, results = 'asis', eval = T}
+partial.small.load <-
+  partial_mi(
+    saved_model = results.small.load$invariance_models$model.loadings,
+    data = df.small.load,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "loadings")
+
+apa_table(partial.small.load$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Loadings for Small Loading Data")
+```
+
+```{r p-tab13, results = 'asis', eval = T}
+partial.med.load <-
+  partial_mi(
+    saved_model = results.med.load$invariance_models$model.loadings,
+    data = df.med.load,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "loadings")
+
+apa_table(partial.med.load$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Loadings for Medium Loading Data")
+```
+
+```{r p-tab14, results = 'asis', eval = T}
+partial.large.load <-
+  partial_mi(
+    saved_model = results.large.load$invariance_models$model.loadings,
+    data = df.large.load,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "loadings")
+
+apa_table(partial.large.load$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Loadings for Large Loading Data")
+```
+
+```{r p-tab15, results = 'asis', eval = T}
+partial.small.int <-
+  partial_mi(
+    saved_model = results.small.int$invariance_models$model.intercepts,
+    data = df.small.int,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "intercepts")
+
+apa_table(partial.small.int$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Loadings for Small Intercept Data")
+```
+
+```{r p-tab16, results = 'asis', eval = T}
+partial.med.int <-
+  partial_mi(
+    saved_model = results.med.int$invariance_models$model.intercepts,
+    data = df.med.int,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "intercepts")
+
+apa_table(partial.med.int$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Loadings for Medium Intercept Data")
+```
+
+```{r p-tab17, results = 'asis', eval = T}
+partial.large.int <-
+  partial_mi(
+    saved_model = results.large.int$invariance_models$model.intercepts,
+    data = df.large.int,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "intercepts")
+
+apa_table(partial.large.int$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Loadings for Large Intercept Data")
+```
+
+```{r p-tab18, results = 'asis', eval = T}
+partial.small.res <-
+  partial_mi(
+    saved_model = results.small.res$invariance_models$model.residuals,
+    data = df.small.res,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "residuals")
+
+apa_table(partial.small.res$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Loadings for Small Residual Data")
+```
+
+```{r p-tab19, results = 'asis', eval = T}
+partial.med.res <-
+  partial_mi(
+    saved_model = results.med.res$invariance_models$model.residuals,
+    data = df.med.res,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "residuals")
+
+apa_table(partial.med.res$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Loadings for Medium Residual Data")
+```
+
+```{r p-tab20, results = 'asis', eval = T}
+partial.large.res <-
+  partial_mi(
+    saved_model = results.large.res$invariance_models$model.residuals,
+    data = df.large.res,
+    model = model.overall,
+    group = "group",
+    group.equal = c("loadings", "intercepts", "residuals"),
+    partial_step = "residuals")
+
+apa_table(partial.large.res$fit_table %>% 
+  dplyr::select(free.parameter, cfi, rmsea), 
+  digits = 3, 
+  col.names = c("Estimated Parameter", "CFI", "RSMEA"),
+  caption = "Fit Estimates for Partial Invariance Loadings for Large Residual Data")
+```
+
+\newpage 
+

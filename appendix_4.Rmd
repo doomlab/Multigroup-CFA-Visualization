@@ -1,0 +1,29 @@
+---
+appendix: "appendix_4.Rmd"
+---
+## Invariance Plots Difference Scores by Condition
+
+```{r inv-plots-condition, include = TRUE}
+conditions <- unique(boot_long$type)
+
+for (cond in conditions){
+  invariance_plot <- ggplot(boot_long %>% 
+                              filter(type == cond), 
+                          aes(term, difference, color = type_estimate)) + 
+  stat_summary(fun = mean, geom = "point", 
+               position = position_dodge(width = 0.9)) + 
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", 
+               position = position_dodge(width = 0.9), 
+               width = 0.2) + 
+  theme_classic() + 
+  xlab("Estimated Item") + 
+  ylab("Difference Score Between Groups") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), legend.position = "bottom") + 
+  facet_wrap(~index_difference, labeller = as_labeller(label_graph)) + 
+  scale_color_discrete(name = "Type of Estimate") + 
+    coord_flip() + 
+    ggtitle(paste0(cond, " Graph Results"))
+
+print(invariance_plot)
+}
+```
