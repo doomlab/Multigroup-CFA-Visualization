@@ -2,7 +2,7 @@
 appendix: "appendix_5.Rmd"
 ---
 
-## Invariance Plots Effect Sizes by Condition
+# Invariance Plots Effect Sizes by Condition
 
 ```{r inv-effect-condition, include = TRUE}
 
@@ -24,5 +24,9 @@ for (cond in conditions){
     ggtitle(paste0(cond, " Graph Results"))
   
   print(effect_invariance_plot)
+  
+  ggsave(paste0("figures/", cond, "_effect.png"), dpi = 300, 
+       width = 8, 
+       units = "in")
 }
 ```

@@ -15,9 +15,9 @@ Overall & 126,722.491 & 126,888.707 & 0.934 & 0.923 & 0.094 & 0.036\\
 Group Clinical & 52,961.421 & 53,099.720 & 0.919 & 0.904 & 0.090 & 0.044\\
 Group Student & 69,100.985 & 69,254.310 & 0.928 & 0.915 & 0.108 & 0.035\\
 Configural & 122,118.406 & 122,617.055 & 0.926 & 0.912 & 0.102 & 0.036\\
-loadings & 122,144.532 & 122,566.010 & 0.925 & 0.918 & 0.098 & 0.043\\
-intercepts & 122,544.109 & 122,888.415 & 0.911 & 0.910 & 0.103 & 0.052\\
-residuals & 126,466.241 & 126,727.438 & 0.780 & 0.793 & 0.156 & 0.086\\
+Loadings & 122,144.532 & 122,566.010 & 0.925 & 0.918 & 0.098 & 0.043\\
+Intercepts & 122,544.109 & 122,888.415 & 0.911 & 0.910 & 0.103 & 0.052\\
+Residuals & 126,466.241 & 126,727.438 & 0.780 & 0.793 & 0.156 & 0.086\\
 \bottomrule
 \end{tabular}
 
@@ -36,25 +36,25 @@ residuals & 126,466.241 & 126,727.438 & 0.780 & 0.793 & 0.156 & 0.086\\
 
 \caption{\label{tab:table-boot-effects}Boot Partial Effects Results for RS-14 Intercepts}
 
-\begin{tabular}{lllllll}
+\begin{tabular}{lllll}
 \toprule
-term & \multicolumn{1}{c}{non\_invariant} & \multicolumn{1}{c}{random\_non\_invariant} & \multicolumn{1}{c}{h\_nmi} & \multicolumn{1}{c}{h\_mi} & \multicolumn{1}{c}{h\_nmi\_p} & \multicolumn{1}{c}{h\_mi\_p}\\
+Term & Non-Invariant & Random Non-Invariant & $h_{nmi}$ & $h_{nmi_p}$\\
 \midrule
-RS \textasciitilde{}1 & 0.991 & 0.007 & 2.784 & -2.784 & 0.886 & -0.886\\
-RS1 \textasciitilde{}1 & 0.989 & 0.007 & 2.764 & -2.764 & 0.880 & -0.880\\
-RS10 \textasciitilde{}1 & 0.988 & 0.007 & 2.755 & -2.755 & 0.877 & -0.877\\
-RS11 \textasciitilde{}1 & 0.991 & 0.007 & 2.784 & -2.784 & 0.886 & -0.886\\
-RS12 \textasciitilde{}1 & 0.991 & 0.007 & 2.784 & -2.784 & 0.886 & -0.886\\
-RS13 \textasciitilde{}1 & 0.991 & 0.007 & 2.784 & -2.784 & 0.886 & -0.886\\
-RS14 \textasciitilde{}1 & 0.990 & 0.007 & 2.774 & -2.774 & 0.883 & -0.883\\
-RS2 \textasciitilde{}1 & 0.985 & 0.007 & 2.728 & -2.728 & 0.869 & -0.869\\
-RS3 \textasciitilde{}1 & 0.988 & 0.007 & 2.755 & -2.755 & 0.877 & -0.877\\
-RS4 \textasciitilde{}1 & 0.990 & 0.007 & 2.774 & -2.774 & 0.883 & -0.883\\
-RS5 \textasciitilde{}1 & 0.984 & 0.007 & 2.720 & -2.720 & 0.866 & -0.866\\
-RS6 \textasciitilde{}1 & 0.979 & 0.007 & 2.683 & -2.683 & 0.854 & -0.854\\
-RS7 \textasciitilde{}1 & 0.974 & 0.007 & 2.650 & -2.650 & 0.844 & -0.844\\
-RS8 \textasciitilde{}1 & 0.991 & 0.007 & 2.784 & -2.784 & 0.886 & -0.886\\
-RS9 \textasciitilde{}1 & 0.987 & 0.007 & 2.746 & -2.746 & 0.874 & -0.874\\
+RS  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
+RS1  Intercept & 0.989 & 0.007 & 2.764 & 0.880\\
+RS10  Intercept & 0.988 & 0.007 & 2.755 & 0.877\\
+RS11  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
+RS12  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
+RS13  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
+RS14  Intercept & 0.990 & 0.007 & 2.774 & 0.883\\
+RS2  Intercept & 0.985 & 0.007 & 2.728 & 0.869\\
+RS3  Intercept & 0.988 & 0.007 & 2.755 & 0.877\\
+RS4  Intercept & 0.990 & 0.007 & 2.774 & 0.883\\
+RS5  Intercept & 0.984 & 0.007 & 2.720 & 0.866\\
+RS6  Intercept & 0.979 & 0.007 & 2.683 & 0.854\\
+RS7  Intercept & 0.974 & 0.007 & 2.650 & 0.844\\
+RS8  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
+RS9  Intercept & 0.987 & 0.007 & 2.746 & 0.874\\
 \bottomrule
 \end{tabular}
 

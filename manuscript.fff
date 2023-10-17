@@ -165,7 +165,7 @@
 
 \centering
 \includegraphics{manuscript_files/figure-latex/rs-partial-pic-1.pdf}
-\caption{\label{fig:rs-partial-pic}RS14 scale invariance for item intercepts. The left panel indicates the raw score difference between groups and items, while the right panel indicates the effect size for group differences based on invariance.}
+\caption{\label{fig:rs-partial-pic}RS-14 scale invariance for item intercepts. The left panel indicates the raw score difference between groups and items, while the right panel indicates the effect size for group differences based on invariance.}
 \end{figure*}
 \efloatseparator
  
@@ -174,5 +174,5 @@
 
 \centering
 \includegraphics{manuscript_files/figure-latex/rs-partial-pic2-1.pdf}
-\caption{\label{fig:rs-partial-pic2}RS14 scale invariance density plots, illustrating invariant versus non-invariant bootstrapped and random runs for each parameter.}
+\caption{\label{fig:rs-partial-pic2}RS-14 scale invariance density plots, illustrating invariant versus non-invariant bootstrapped and random runs for each parameter.}
 \end{figure*}

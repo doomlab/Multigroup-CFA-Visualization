@@ -2,7 +2,7 @@
 appendix: "appendix_3.Rmd"
 ---
 
-## Simulated Parital Invariance Results
+# Simulated Partial Invariance Results
 
 ```{r p-tab11, results = 'asis', eval = T}
 partial.invariant <-
@@ -174,5 +174,4 @@ apa_table(partial.large.res$fit_table %>%
   caption = "Fit Estimates for Partial Invariance Loadings for Large Residual Data")
 ```
 
-\newpage 
 

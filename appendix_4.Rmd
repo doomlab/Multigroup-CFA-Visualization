@@ -1,7 +1,8 @@
 ---
 appendix: "appendix_4.Rmd"
 ---
-## Invariance Plots Difference Scores by Condition
+
+# Invariance Plots Difference Scores by Condition
 
 ```{r inv-plots-condition, include = TRUE}
 conditions <- unique(boot_long$type)
@@ -25,5 +26,9 @@ for (cond in conditions){
     ggtitle(paste0(cond, " Graph Results"))
 
 print(invariance_plot)
+
+ggsave(paste0("figures/", cond, "_diff.png"), dpi = 300, 
+       width = 8, 
+       units = "in")
 }
 ```

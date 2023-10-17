@@ -2,7 +2,7 @@
 appendix: "appendix_1.Rmd"
 ---
 
-## Simulating from models
+# Simulating from models
 
 Here's an example of how to simulate directly from a `lavaan` model:
 
@@ -54,7 +54,7 @@ df.invariant <- bind_rows(
 
 \newpage
 
-## Simulating from matrices
+# Simulating from matrices
 
 Here's an example of how to simulate using `MASS` and covariance or correlation matrices. 
 

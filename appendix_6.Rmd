@@ -2,7 +2,7 @@
 appendix: "appendix_6.Rmd"
 ---
 
-## Density Plots by Condition
+# Density Plots by Condition
 
 ```{r density-effects-condition, include = TRUE}
 for (cond in conditions){
@@ -18,5 +18,9 @@ for (cond in conditions){
     ggtitle(paste0(cond, " Graph Results"))
 
 print(density_plot)
+
+ggsave(paste0("figures/", cond, "_density.png"), dpi = 300, 
+       width = 8, 
+       units = "in")
 }
 ```
