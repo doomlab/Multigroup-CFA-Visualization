@@ -5,7 +5,8 @@ appendix: "appendix_7.Rmd"
 ## Replication Test 
 
 ```{r setup}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = TRUE, include = TRUE,
+                      message = FALSE, warning = FALSE, size = "small")
 ```
 
 ```{r libraries-appendix7, message = FALSE}
@@ -187,7 +188,9 @@ boot.model.rs
 
 ```{r echo = F}
 boot.model.rs <- import("manu_data/boot.model.rs.appendix7.csv")
-boot.model.rs
+boot.model.rs %>% 
+  dplyr::select(model, non_invariant, random_non_invariant, 
+         h_nmi, h_nmi_p)
 ```
 
 In this case, we do not see loadings print out. That implies that all models in both real data and randomized data are invariant because the function only calculates information for non-invariance. We see that the intercepts are unlikely to ever replicate across Chinese and English samples. This result is not surprising given the large number of relaxed parameters required to achieve partial invariance. 
@@ -225,7 +228,9 @@ boot.partial.rs <- list(
 ### Each Parameter on the Overall Model Invariance
 
 ```{r}
-boot.partial.rs$boot_effects
+boot.partial.rs$boot_effects %>% 
+  dplyr::select(term, non_invariant, random_non_invariant, 
+         h_nmi, h_nmi_p)
 ```
 
 In this output, we see that all the bootstrapped runs of the real data are non-invariant, even when each parameter is relaxed individually. A few runs of the random data are *non*-invariant (meaning most are actually invariant when randomized). This indicates that no one parameter is likely the reason for non-invariance, as they all show large non-replication effects. If we use the `boot_summary`, we can see the effect size for each parameter when the two intercepts are compared to each other (as the chart above shows the overall model invariance effect). 
@@ -233,10 +238,14 @@ In this output, we see that all the bootstrapped runs of the real data are non-i
 ### Each Parameter's Standardized Difference Score
 
 ```{r}
-boot.partial.rs$boot_summary
+boot.partial.rs$boot_summary %>% 
+  dplyr::select(term, invariant, n_boot, d_boot)
+
+boot.partial.rs$boot_summary %>% 
+  dplyr::select(term, invariant, n_random, d_random)
 ```
 
-With the bootstrap summary, we see that no invariant intercept runs are found. Note that the `RS~1` does not calculate *d* because the *sd* is zero (thus, this would cause an error as *sd* is part of the denominator). The random runs also do not show a *d* score because the effect size is only calculated when at least 10% of the runs in `n_boot` or `n_random` are found. Since we only have 10 or 11 in that column, no effect size is calculated. The differences in the intercepts for the real data (`boot` columns) appear to be medium to large, showing *d* scores from 0.3 to 0.6. Therefore, we might expect that the English and Chinese samples have different average endorsement levels of the RS14. 
+With the bootstrap summary, we see that no invariant intercept runs are found (not all columns shown to save space). Note that the `RS~1` does not calculate *d* because the *sd* is zero (thus, this would cause an error as *sd* is part of the denominator). The random runs also do not show a *d* score because the effect size is only calculated when at least 10% of the runs in `n_boot` or `n_random` are found. Since we only have a few in that column, no effect size is calculated. The differences in the intercepts for the real data (`boot` columns) appear to be medium to large, showing *d* scores from 0.3 to 0.6. Therefore, we might expect that the English and Chinese samples have different average endorsement levels of the RS14. 
 
 ```{r}
 boot.partial.rs$density_plot

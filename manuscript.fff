@@ -176,3 +176,21 @@
 \includegraphics{manuscript_files/figure-latex/rs-partial-pic2-1.pdf}
 \caption{\label{fig:rs-partial-pic2}RS-14 scale invariance density plots, illustrating invariant versus non-invariant bootstrapped and random runs for each parameter.}
 \end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{manuscript_files/figure-latex/rs14-chinese-pic-1.pdf}
+\caption{\label{fig:rs14-chinese-pic}The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group.}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{manuscript_files/figure-latex/rs14-chinese-effect-pic-1.pdf}
+\caption{\label{fig:rs14-chinese-effect-pic}Effect size differences for item intercepts on the English versus Chinese samples for the RS14.}
+\end{figure*}

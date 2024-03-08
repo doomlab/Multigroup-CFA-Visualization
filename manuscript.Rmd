@@ -1328,12 +1328,14 @@ The @aiena2014 data used in our previous example was first filtered to only coll
 
 The results of model bootstrapping indicated that the effect of the loadings was likely to replicate (only invariant results were found), but the intercepts were never found to be invariant compared to a randomized sample ($h_{nmi_p}$ = 1). Therefore, we would expect that these differences are persistent, either due to the adaptation or cultural differences in resiliency across samples. The bootstrapped partial invariance demonstrates that each item intercept has a medium to large difference between the two samples as shown in Figure \@ref(fig:rs14-chinese-effect-pic), which may explain why full or partial invariance cannot be achieved. This result does not invalidate either version of the scale, but informs researchers of potential baseline differences in item responding for the two samples. Therefore, careful interpretation should be made when comparing these two samples in other instances, as differences in latent means may be the default finding, but with these results one may determine if their results are different from expectations of general scale responding. 
 
-```{r rs14-chinese-pic, include = T, fig.cap = "The differences in intercepts for the second item on the Rs14 by language sample. The differences between intercepts are shown on the left hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group."}
-knitr::include_graphics("figures/rs14-chinese-RS2.png")
+```{r rs14-chinese-pic, include = T, fig.cap = "The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group."}
+load("manu_data/fig-chinese-rs2.Rdata")
+complete
 ```
 
-```{r rs14-chinese-effect-pic, include = T, fig.cap = ""}
-knitr::include_graphics("figures/rs14-chinese-effect_invariance_plot.png")
+```{r rs14-chinese-effect-pic, fig.width = 6, include = T, fig.cap = "Effect size differences for item intercepts on the English versus Chinese samples for the RS14.", warnings = FALSE, message = FALSE}
+load("manu_data/boot.partial.rs.appendix7.Rdata")
+effect_invariance_plot
 ```
 
 # Discussion
@@ -1374,5 +1376,4 @@ What do the results of a study on measurement invariance with these results tell
 ```
 
 ```{r child = "appendix_7.Rmd"}
-
 ```

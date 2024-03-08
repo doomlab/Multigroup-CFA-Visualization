@@ -1397,11 +1397,16 @@ The Aiena et al. (2014) data used in our previous example was first filtered to 
 The results of model bootstrapping indicated that the effect of the loadings was likely to replicate (only invariant results were found), but the intercepts were never found to be invariant compared to a randomized sample (\(h_{nmi_p}\) = 1). Therefore, we would expect that these differences are persistent, either due to the adaptation or cultural differences in resiliency across samples. The bootstrapped partial invariance demonstrates that each item intercept has a medium to large difference between the two samples as shown in Figure \ref{fig:rs14-chinese-effect-pic}, which may explain why full or partial invariance cannot be achieved. This result does not invalidate either version of the scale, but informs researchers of potential baseline differences in item responding for the two samples. Therefore, careful interpretation should be made when comparing these two samples in other instances, as differences in latent means may be the default finding, but with these results one may determine if their results are different from expectations of general scale responding.
 
 \begin{figure}
-\includegraphics[width=8in]{figures/rs14-chinese-RS2} \caption{The differences in intercepts for the second item on the Rs14 by language sample. The differences between intercepts are shown on the left hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group.}\label{fig:rs14-chinese-pic}
+\centering
+\includegraphics{manuscript_files/figure-latex/rs14-chinese-pic-1.pdf}
+\caption{\label{fig:rs14-chinese-pic}The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group.}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=8in]{figures/rs14-chinese-effect_invariance_plot} \end{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/rs14-chinese-effect-pic-1.pdf}
+\caption{\label{fig:rs14-chinese-effect-pic}Effect size differences for item intercepts on the English versus Chinese samples for the RS14.}
+\end{figure}
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
@@ -2390,10 +2395,8 @@ Examining partial invariance reveals several potential candidates for partial in
 \subsection{Bootstrap Model}\label{bootstrap-model}}
 
 \begin{verbatim}
-##        model non_invariant random_non_invariant    h_nmi      h_mi h_nmi_p
-## 1 intercepts             1                    0 3.141593 -3.141593       1
-##   h_mi_p
-## 1     -1
+##        model non_invariant random_non_invariant    h_nmi h_nmi_p
+## 1 intercepts             1                    0 3.141593       1
 \end{verbatim}
 
 In this case, we do not see loadings print out. That implies that all models in both real data and randomized data are invariant because the function only calculates information for non-invariance. We see that the intercepts are unlikely to ever replicate across Chinese and English samples. This result is not surprising given the large number of relaxed parameters required to achieve partial invariance.
@@ -2405,24 +2408,22 @@ In this case, we do not see loadings print out. That implies that all models in 
 \subsubsection{Each Parameter on the Overall Model Invariance}\label{each-parameter-on-the-overall-model-invariance}}
 
 \begin{verbatim}
-## # A tibble: 15 x 7
-##    term       non_invariant random_non_invariant h_nmi  h_mi h_nmi_p h_mi_p
-##    <chr>              <dbl>                <dbl> <dbl> <dbl>   <dbl>  <dbl>
-##  1 "RS ~1 "           0.991                0.007  2.78 -2.78   0.886 -0.886
-##  2 "RS1 ~1 "          0.989                0.007  2.76 -2.76   0.880 -0.880
-##  3 "RS10 ~1 "         0.988                0.007  2.75 -2.75   0.877 -0.877
-##  4 "RS11 ~1 "         0.991                0.007  2.78 -2.78   0.886 -0.886
-##  5 "RS12 ~1 "         0.991                0.007  2.78 -2.78   0.886 -0.886
-##  6 "RS13 ~1 "         0.991                0.007  2.78 -2.78   0.886 -0.886
-##  7 "RS14 ~1 "         0.99                 0.007  2.77 -2.77   0.883 -0.883
-##  8 "RS2 ~1 "          0.985                0.007  2.73 -2.73   0.869 -0.869
-##  9 "RS3 ~1 "          0.988                0.007  2.75 -2.75   0.877 -0.877
-## 10 "RS4 ~1 "          0.99                 0.007  2.77 -2.77   0.883 -0.883
-## 11 "RS5 ~1 "          0.984                0.007  2.72 -2.72   0.866 -0.866
-## 12 "RS6 ~1 "          0.979                0.007  2.68 -2.68   0.854 -0.854
-## 13 "RS7 ~1 "          0.974                0.007  2.65 -2.65   0.844 -0.844
-## 14 "RS8 ~1 "          0.991                0.007  2.78 -2.78   0.886 -0.886
-## 15 "RS9 ~1 "          0.987                0.007  2.75 -2.75   0.874 -0.874
+##        term non_invariant random_non_invariant    h_nmi  h_nmi_p
+## 1    RS ~1              1                0.002 3.052120 0.971520
+## 2   RS1 ~1              1                0.001 3.078337 0.979865
+## 3  RS10 ~1              1                0.002 3.052120 0.971520
+## 4  RS11 ~1              1                0.002 3.052120 0.971520
+## 5  RS12 ~1              1                0.002 3.052120 0.971520
+## 6  RS13 ~1              1                0.002 3.052120 0.971520
+## 7  RS14 ~1              1                0.002 3.052120 0.971520
+## 8   RS2 ~1              1                0.002 3.052120 0.971520
+## 9   RS3 ~1              1                0.002 3.052120 0.971520
+## 10  RS4 ~1              1                0.002 3.052120 0.971520
+## 11  RS5 ~1              1                0.002 3.052120 0.971520
+## 12  RS6 ~1              1                0.002 3.052120 0.971520
+## 13  RS7 ~1              1                0.001 3.078337 0.979865
+## 14  RS8 ~1              1                0.002 3.052120 0.971520
+## 15  RS9 ~1              1                0.002 3.052120 0.971520
 \end{verbatim}
 
 In this output, we see that all the bootstrapped runs of the real data are non-invariant, even when each parameter is relaxed individually. A few runs of the random data are \emph{non}-invariant (meaning most are actually invariant when randomized). This indicates that no one parameter is likely the reason for non-invariance, as they all show large non-replication effects. If we use the \texttt{boot\_summary}, we can see the effect size for each parameter when the two intercepts are compared to each other (as the chart above shows the overall model invariance effect).
@@ -2431,30 +2432,44 @@ In this output, we see that all the bootstrapped runs of the real data are non-i
 \subsubsection{Each Parameter's Standardized Difference Score}\label{each-parameters-standardized-difference-score}}
 
 \begin{verbatim}
-## # A tibble: 30 x 26
-## # Groups:   term, invariant [30]
-##    term       invariant mean_boot_1 mean_boot_2 sd_boot_1 sd_boot_2
-##    <chr>      <lgl>           <dbl>       <dbl>     <dbl>     <dbl>
-##  1 "RS ~1 "   FALSE            0        -0.121      0        0.623 
-##  2 "RS ~1 "   TRUE             0        -0.0110     0        0.680 
-##  3 "RS1 ~1 "  FALSE            3.33      3.11       0.529    0.123 
-##  4 "RS1 ~1 "  TRUE             3.34      3.07       0.550    0.112 
-##  5 "RS10 ~1 " FALSE            3.35      3.01       0.740    0.286 
-##  6 "RS10 ~1 " TRUE             3.37      2.95       0.725    0.268 
-##  7 "RS11 ~1 " FALSE            2.88      2.70       0.489    0.0510
-##  8 "RS11 ~1 " TRUE             2.79      2.68       0.528    0.0281
-##  9 "RS12 ~1 " FALSE            3.42      3.12       0.657    0.197 
-## 10 "RS12 ~1 " TRUE             3.30      3.08       0.733    0.183 
-## # i 20 more rows
-## # i 20 more variables: mean_boot_difference <dbl>, sd_boot_difference <dbl>,
-## #   mean_boot_fit <dbl>, sd_boot_fit <dbl>, n_boot <int>, mean_random_1 <dbl>,
-## #   mean_random_2 <dbl>, sd_random_1 <dbl>, sd_random_2 <dbl>,
-## #   mean_random_difference <dbl>, sd_random_difference <dbl>,
-## #   mean_random_fit <dbl>, sd_random_fit <dbl>, n_random <int>,
-## #   d_boot_low <dbl>, d_boot <dbl>, d_boot_high <dbl>, d_random_low <dbl>, ...
+##        term invariant n_boot     d_boot
+## 1    RS ~1      FALSE   1000         NA
+## 2   RS1 ~1      FALSE   1000  0.2913872
+## 3  RS10 ~1      FALSE   1000  0.3596961
+## 4  RS11 ~1      FALSE   1000 -0.6589317
+## 5  RS12 ~1      FALSE   1000 -0.3010202
+## 6  RS13 ~1      FALSE   1000 -0.4005088
+## 7  RS14 ~1      FALSE   1000 -0.5665988
+## 8   RS2 ~1      FALSE   1000 -0.5540349
+## 9   RS3 ~1      FALSE   1000 -0.6218628
+## 10  RS4 ~1      FALSE   1000 -0.6245830
+## 11  RS5 ~1      FALSE   1000 -0.3334520
+## 12  RS6 ~1      FALSE   1000 -0.5014247
+## 13  RS7 ~1      FALSE   1000 -0.2381644
+## 14  RS8 ~1      FALSE   1000 -0.6333750
+## 15  RS9 ~1      FALSE   1000 -0.5986866
 \end{verbatim}
 
-With the bootstrap summary, we see that no invariant intercept runs are found. Note that the \texttt{RS\textasciitilde{}1} does not calculate \emph{d} because the \emph{sd} is zero (thus, this would cause an error as \emph{sd} is part of the denominator). The random runs also do not show a \emph{d} score because the effect size is only calculated when at least 10\% of the runs in \texttt{n\_boot} or \texttt{n\_random} are found. Since we only have 10 or 11 in that column, no effect size is calculated. The differences in the intercepts for the real data (\texttt{boot} columns) appear to be medium to large, showing \emph{d} scores from 0.3 to 0.6. Therefore, we might expect that the English and Chinese samples have different average endorsement levels of the RS14.
+\begin{verbatim}
+##        term invariant n_random d_random
+## 1    RS ~1      FALSE        2       NA
+## 2   RS1 ~1      FALSE        1       NA
+## 3  RS10 ~1      FALSE        2       NA
+## 4  RS11 ~1      FALSE        2       NA
+## 5  RS12 ~1      FALSE        2       NA
+## 6  RS13 ~1      FALSE        2       NA
+## 7  RS14 ~1      FALSE        2       NA
+## 8   RS2 ~1      FALSE        2       NA
+## 9   RS3 ~1      FALSE        2       NA
+## 10  RS4 ~1      FALSE        2       NA
+## 11  RS5 ~1      FALSE        2       NA
+## 12  RS6 ~1      FALSE        2       NA
+## 13  RS7 ~1      FALSE        1       NA
+## 14  RS8 ~1      FALSE        2       NA
+## 15  RS9 ~1      FALSE        2       NA
+\end{verbatim}
+
+With the bootstrap summary, we see that no invariant intercept runs are found (not all columns shown to save space). Note that the \texttt{RS\textasciitilde{}1} does not calculate \emph{d} because the \emph{sd} is zero (thus, this would cause an error as \emph{sd} is part of the denominator). The random runs also do not show a \emph{d} score because the effect size is only calculated when at least 10\% of the runs in \texttt{n\_boot} or \texttt{n\_random} are found. Since we only have a few in that column, no effect size is calculated. The differences in the intercepts for the real data (\texttt{boot} columns) appear to be medium to large, showing \emph{d} scores from 0.3 to 0.6. Therefore, we might expect that the English and Chinese samples have different average endorsement levels of the RS14.
 
 \includegraphics{manuscript_files/figure-latex/unnamed-chunk-110-1.pdf}
 
