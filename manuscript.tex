@@ -721,7 +721,7 @@ In this function, each parameter with the appropriate \emph{lavaan} syntax is re
 \hypertarget{package-function-2}{%
 \subsubsection{Package Function}\label{package-function-2}}
 
-The \texttt{bootstrap\_rr} function in \emph{visualizemi} was designed to estimate the likely replication of overall model invariance with the assumption that the data used for the estimation represents the larger population. The following arguments are used:
+The \texttt{bootstrap\_model} function in \emph{visualizemi} was designed to estimate the likely replication of overall model invariance with the assumption that the data used for the estimation represents the larger population. The following arguments are used:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
@@ -749,7 +749,7 @@ The \texttt{bootstrap\_rr} function in \emph{visualizemi} was designed to estima
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{boot.model.invariant }\OtherTok{\textless{}{-}} 
-  \FunctionTok{bootstrap\_rr}\NormalTok{(}
+  \FunctionTok{bootstrap\_model}\NormalTok{(}
     \CommentTok{\# saved configural model }
     \AttributeTok{saved\_configural =}\NormalTok{ results.invariant}\SpecialCharTok{$}\NormalTok{model\_configural,}
     \CommentTok{\# dataframe}
@@ -775,6 +775,7 @@ The \texttt{bootstrap\_rr} function in \emph{visualizemi} was designed to estima
 The data included in this function will be sampled, with replacement, at the same size as the current dataset, and the included invariance equality constraints are estimated. Each step will be compared to the previous step using the invariance index and comparison rule entered. The output is a dataframe of the proportion of non-invariant bootstraps from the real data and the same bootstrapped dataset with the group labels randomly assigned. The effect size comparison of proportions, \(h\), for non-invariant comparisons:
 
 \[h_{nmi} = 2 \times (asin\sqrt{p_{data}} - asin\sqrt{p_{random}})\]
+
 The alternative, \(h_{mi}\), for effect size of measurement invariance replication would simply be the inverse sign of \(h_{nmi}\) and is also included in the table. Two additional columns \(h_{nmi_p}\) and \(h_{nmi_p}\) represent the \(h\) values divided by the upper bound of \(h\) (i.e., \(\pi\)), to help with interpretation of the effect size (thus, bounding \(h\) to -1 to 1).
 
 \hypertarget{simulated-results-1}{%
@@ -1167,7 +1168,7 @@ By examining our estimates, we can see that item seven on the RS-14 is estimated
 
 \CommentTok{\# examine the loadings }
 \NormalTok{partial.rs}\FloatTok{.2}\SpecialCharTok{$}\NormalTok{model\_coef }\SpecialCharTok{\%\textgreater{}\%} 
-  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{==} \StringTok{"RS6 \textasciitilde{}1 "}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{==} \StringTok{"RS6 \textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
   \FunctionTok{filter}\NormalTok{(model }\SpecialCharTok{==} \StringTok{"intercepts"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
 \NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(term, group, estimate, std.error)}
 \end{Highlighting}
@@ -1176,11 +1177,8 @@ By examining our estimates, we can see that item seven on the RS-14 is estimated
 \normalsize
 
 \begin{verbatim}
-## # A tibble: 2 x 4
-##   term      group estimate std.error
-##   <chr>     <int>    <dbl>     <dbl>
-## 1 "RS6 ~1 "     1     5.00    0.0605
-## 2 "RS6 ~1 "     2     4.54    0.0533
+## # A tibble: 0 x 4
+## # i 4 variables: term <chr>, group <int>, estimate <dbl>, std.error <dbl>
 \end{verbatim}
 
 \small
@@ -1282,7 +1280,7 @@ Next, we would examine our replication potential for this model. Given our curre
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{boot.model.rs }\OtherTok{\textless{}{-}} 
-  \FunctionTok{bootstrap\_rr}\NormalTok{(}
+  \FunctionTok{bootstrap\_model}\NormalTok{(}
     \AttributeTok{saved\_configural =}\NormalTok{ results.rs}\SpecialCharTok{$}\NormalTok{model\_configural,}
     \AttributeTok{data =}\NormalTok{ DF,}
     \AttributeTok{model =}\NormalTok{ model.rs, }
@@ -1389,14 +1387,30 @@ RS9  Intercept & 0.987 & 0.007 & 2.746 & 0.874\\
 \caption{\label{fig:rs-partial-pic2}RS-14 scale invariance density plots, illustrating invariant versus non-invariant bootstrapped and random runs for each parameter.}
 \end{figure}
 
+\hypertarget{an-example-extension}{%
+\subsection{An Example Extension}\label{an-example-extension}}
+
+One benefit of the open science movement on scale development is the publication of datasets or covariance tables with published articles. We can extend our examination of potential replication on other variables that may effect assessment of underlying phenomena. For example, scale translation across languages is not only impacted by the literal conversion of concepts from one language to another, but also the cultural and societal norms of the target population (Cha et al., 2007; Chang et al., 1999; Yu et al., 2004). The RS14 was tested in Chinese speaking samples in Chen et al. (2020) across five different large samples and determined that the scale showed good psychometric properties for use within Chinese speaking samples as a one-factor model of resiliency. Given these results, another researcher may assume that the models would be comparable between English speaking (i.e., likely United States) and Chinese speaking samples. With the published data, we can use \texttt{visualizemi} to determine if the RS14 is invariant across language/culture, and if the results would likely replicate if tested on a new set of samples, and what, if any, effect size differences are found in parameters. The code used for this analysis is presented in Appendix 7.
+
+The Aiena et al. (2014) data used in our previous example was first filtered to only college students, as we have already noted that clinical samples show slightly different intercepts for at least two of the items from student samples. The Chen et al. (2020) data also included college students, which allows us to test a comparable sample that varies on translation and culture. The test of measurement invariance indicated that the factor structure and loadings were invariant across groups. Much like our test of clinical versus student samples, the results indicated that the intercepts were not consistent across groups. Within the English clinical/student sample, partial invariance could be achieved by relaxing two item intercept constraints (item 6 and 7). To achieve ``partial'' invariance between the Chinese and English speaking samples, we would need to relax more than half of the items (specifically, eight items: 1, 2, 3, 4, 10, 11, 12, 14), and it would be difficult to suggest partial invariance given this finding. \(d_{MACS}\) values range from 0.26 to 0.32 for the eight items which could be interpreted a small to medium given Nye et al. (2019)'s simulation study. Figure \ref{fig:rs14-chinese-pic} portrays the results from the second item on the RS14 (\emph{life accomplishments}).
+
+The results of model bootstrapping indicated that the effect of the loadings was likely to replicate (only invariant results were found), but the intercepts were never found to be invariant compared to a randomized sample (\(h_{nmi_p}\) = 1). Therefore, we would expect that these differences are persistent, either due to the adaptation or cultural differences in resiliency across samples. The bootstrapped partial invariance demonstrates that each item intercept has a medium to large difference between the two samples as shown in Figure \ref{fig:rs14-chinese-effect-pic}, which may explain why full or partial invariance cannot be achieved. This result does not invalidate either version of the scale, but informs researchers of potential baseline differences in item responding for the two samples. Therefore, careful interpretation should be made when comparing these two samples in other instances, as differences in latent means may be the default finding, but with these results one may determine if their results are different from expectations of general scale responding.
+
+\begin{figure}
+\includegraphics[width=8in]{figures/rs14-chinese-RS2} \caption{The differences in intercepts for the second item on the Rs14 by language sample. The differences between intercepts are shown on the left hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group.}\label{fig:rs14-chinese-pic}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=8in]{figures/rs14-chinese-effect_invariance_plot} \end{figure}
+
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
 
 In this tutorial, we examined how to use multiple tools to examine measurement invariance and its potential replication. Model fit comparisons and statistics can be paired with the proposed effect size measures, and a visualization to examine individual items and the overall latent mean scores. The impact of potential replication was estimated on the overall model and the individual parameters. Using real data, the effect of two non-invariant item intercepts was examined and visualized. This tutorial manuscript has provided a concrete way to plan for pre-registration and/or registered reports. Researchers could simulate results based on published or previously collected data to determine the likelihood and size of potential replication. They could plan and pre-register a smallest effect of interest. For example, we may determine that an \(h_{nmi_p}\) value above .20 represents an important level of non-invariance for our model overall, while \(h_{nmi_p}\) \textgreater{} .30 for any individual parameter warrant caution against invariance for groups. Others have begun to discuss the importance of focusing on effects in the scale of the data and their practical importance (Anvari \& Lakens, 2021; Cumming, 2012).
 
-From the example, our interpretation may be that the difference between group's latent means is large, as a 0.72 change on a 7 point scale is approximately 10\% more resiliency for students when compared to the clinical sample. Practically, 10\% in resiliency for an area of the United States (Mississippi) often hit with natural disasters (hurricanes, tornadoes, floods) and high levels of poverty would be very important. Even the smaller difference of .5 point on each individual item could translate into increases in resiliency, and these results may elucidate avenues for further exploration into areas of focus within resiliency, given the items.
+From the example, our interpretation may be that the difference between group's latent means is large, as a 0.72 change on a 7 point scale is approximately 10\% more resiliency for students when compared to the clinical sample. Practically, 10\% in resiliency for an area of the United States (Mississippi) often hit with natural disasters (hurricanes, tornadoes, floods) and high levels of poverty would be very important. Even the smaller difference of .5 point on each individual item could translate into increases in resiliency, and these results may elucidate avenues for further exploration into areas of focus within resiliency, given the items. The secondary example showed that we can extend these results to other samples to examine other potentially impactful variables on assessment. The findings replicate in the sense that the scale shows the same invariant issues with intercepts on a Chinese versus English sample comparison. However, in this analysis, it is clear that the differences in items averages are much larger and across all items, rather than a few.
 
-What do the results of a study on measurement invariance with these results tell us about replication, generalizability, and validity overall? If a researcher decides their effects are large, they should likely caution against suggesting that these scores are directly comparable without weighting or other adjustment. Let's consider a scenario wherein the change metric between models picked (i.e., \(\Delta\)CFI, \(\Delta\)RMSEA) indicates a ``significant'' change in model fit. However, if both the effect size and a visual inspection of the invariance indicates a small difference, we may decide to lessen the practical importance of those results, much like ``just significant'' \emph{p}-values with small effect sizes are treated now. Given that the goal of measurement invariance is to compare \emph{estimates}, we should expect some differences across samples due to the nature of sampling and estimation. It may be that many of the published models presented represent these effects - small variations between groups due to sampling error or other small crud - but do not represent a fundamental problem with the measurement or generalizability of the results.
+What do the results of a study on measurement invariance with these results tell us about replication, generalizability, and validity overall? If a researcher decides their effects are large, they should likely caution against suggesting that these scores are directly comparable without weighting or other adjustment. Let's consider a scenario wherein the change metric between models picked (i.e., \(\Delta\)CFI, \(\Delta\)RMSEA) indicates a ``significant'' change in model fit. However, if both the effect size and a visual inspection of the invariance indicates a small difference, we may decide to lessen the practical importance of those results, much like ``just significant'' \emph{p}-values with small effect sizes are treated now. The results from our Chinese versus English comparison show us the other scenario: non-invariant results that clearly indicate differences with a large effect size on both replication and item average differences. Given that the goal of measurement invariance is to compare \emph{estimates}, we should expect some differences across samples due to the nature of sampling and estimation. It may be that many of the published models presented represent these effects - small variations between groups due to sampling error or other small crud - but do not represent a fundamental problem with the measurement or generalizability of the results. The \texttt{visualizemi} package is one useful tool to help sort out if findings are this small sampling error or differences in samples due to other variables.
 
 \newpage
 
@@ -1437,6 +1451,15 @@ Byrne, B. M., Shavelson, R. J., \& Muthén, B. (1989). Testing for the equivalen
 
 \leavevmode\vadjust pre{\hypertarget{ref-cao2022}{}}%
 Cao, C., \& Liang, X. (2022). The impact of model size on the sensitivity of fit measures in measurement invariance testing. \emph{Structural Equation Modeling: A Multidisciplinary Journal}, \emph{29}(5), 744--754. \url{https://doi.org/10.1080/10705511.2022.2056893}
+
+\leavevmode\vadjust pre{\hypertarget{ref-cha2007}{}}%
+Cha, E.-S., Kim, K. H., \& Erlen, J. A. (2007). Translation of scales in cross{-}cultural research: issues and techniques. \emph{Journal of Advanced Nursing}, \emph{58}(4), 386--395. \url{https://doi.org/10.1111/j.1365-2648.2007.04242.x}
+
+\leavevmode\vadjust pre{\hypertarget{ref-chang1999}{}}%
+Chang, A. M., Chau, J. P. C., \& Holroyd, E. (1999). Translation of questionnaires and issues of equivalence. \emph{Journal of Advanced Nursing}, \emph{29}(2), 316--322. \url{https://doi.org/10.1046/j.1365-2648.1999.00891.x}
+
+\leavevmode\vadjust pre{\hypertarget{ref-chen2020}{}}%
+Chen, W., Xie, E., Tian, X., \& Zhang, G. (2020). Psychometric properties of the Chinese version of the Resilience Scale (RS-14): Preliminary results. \emph{PLOS ONE}, \emph{15}(10), e0241606. \url{https://doi.org/10.1371/journal.pone.0241606}
 
 \leavevmode\vadjust pre{\hypertarget{ref-cheung2002}{}}%
 Cheung, G. W., \& Rensvold, R. B. (2002). Evaluating Goodness-of-Fit Indexes for Testing Measurement Invariance. \emph{Structural Equation Modeling: A Multidisciplinary Journal}, \emph{9}(2), 233--255. \url{https://doi.org/10.1207/s15328007sem0902_5}
@@ -1557,6 +1580,9 @@ Wickham, H. (2016). \emph{ggplot2: Elegant graphics for data analysis}. Springer
 
 \leavevmode\vadjust pre{\hypertarget{ref-wilke2020}{}}%
 Wilke, C. O. (2020). \emph{Cowplot: Streamlined plot theme and plot annotations for 'ggplot2'}. \url{https://CRAN.R-project.org/package=cowplot}
+
+\leavevmode\vadjust pre{\hypertarget{ref-yu2004}{}}%
+Yu, D. S. F., Lee, D. T. F., \& Woo, J. (2004). Issues and Challenges of Instrument Translation. \emph{Western Journal of Nursing Research}, \emph{26}(3), 307--320. \url{https://doi.org/10.1177/0193945903260554}
 
 \leavevmode\vadjust pre{\hypertarget{ref-zwaan2018}{}}%
 Zwaan, R. A., Etz, A., Lucas, R. E., \& Donnellan, M. B. (2018). Making replication mainstream. \emph{Behavioral and Brain Sciences}, \emph{41}, e120. \url{https://doi.org/10.1017/S0140525X17001972}
@@ -2215,6 +2241,230 @@ lv \textasciitilde{}\textasciitilde{} lv & 0.562 & 0.137\\
 \section{Density Plots by Condition}\label{density-plots-by-condition}}
 
 \includegraphics{manuscript_files/figure-latex/density-effects-condition-1.pdf} \includegraphics{manuscript_files/figure-latex/density-effects-condition-2.pdf} \includegraphics{manuscript_files/figure-latex/density-effects-condition-3.pdf} \includegraphics{manuscript_files/figure-latex/density-effects-condition-4.pdf} \includegraphics{manuscript_files/figure-latex/density-effects-condition-5.pdf} \includegraphics{manuscript_files/figure-latex/density-effects-condition-6.pdf} \includegraphics{manuscript_files/figure-latex/density-effects-condition-7.pdf} \includegraphics{manuscript_files/figure-latex/density-effects-condition-8.pdf} \includegraphics{manuscript_files/figure-latex/density-effects-condition-9.pdf} \includegraphics{manuscript_files/figure-latex/density-effects-condition-10.pdf}
+
+\hypertarget{replication-test}{%
+\subsection{Replication Test}\label{replication-test}}
+
+\hypertarget{data}{%
+\subsection{Data}\label{data}}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   group       sample
+##   <chr>        <int>
+## 1 Chen          1010
+## 2 Schulenberg   1765
+\end{verbatim}
+
+\hypertarget{mgcfa}{%
+\subsection{MGCFA}\label{mgcfa}}
+
+\begin{verbatim}
+## # A tibble: 7 x 7
+##   model                 AIC     BIC   cfi   tli  rmsea   srmr
+##   <chr>               <dbl>   <dbl> <dbl> <dbl>  <dbl>  <dbl>
+## 1 Overall           113442. 113608. 0.939 0.928 0.0890 0.0344
+## 2 Group Schulenberg  69101.  69254. 0.928 0.915 0.108  0.0353
+## 3 Group Chen         42603.  42741. 0.929 0.916 0.0766 0.0399
+## 4 Configural        111760. 112258. 0.929 0.916 0.0975 0.0347
+## 5 loadings          111789. 112210. 0.927 0.921 0.0946 0.0427
+## 6 intercepts        112785. 113129. 0.892 0.891 0.111  0.0599
+## 7 residuals         113318. 113579. 0.873 0.880 0.116  0.0661
+\end{verbatim}
+
+Overall, the one-factor model fits the data well. Each group also shows adequate model fit. If we use \(\Delta\)CFI \textless= .01, we find that the loadings would be considered invariant across the English and Chinese samples. The intercepts were not invariant.
+
+\hypertarget{partial-invariance}{%
+\subsection{Partial Invariance}\label{partial-invariance}}
+
+\begin{verbatim}
+## # A tibble: 15 x 2
+##    free.parameter cfi       
+##    <chr>          <lvn.vctr>
+##  1 "RS2 ~1 "      0.8970997 
+##  2 "RS11 ~1 "     0.8963948 
+##  3 "RS4 ~1 "      0.8961938 
+##  4 "RS12 ~1 "     0.8960095 
+##  5 "RS14 ~1 "     0.8954496 
+##  6 "RS1 ~1 "      0.8954215 
+##  7 "RS10 ~1 "     0.8953395 
+##  8 "RS3 ~1 "      0.8948455 
+##  9 "RS5 ~1 "      0.8945236 
+## 10 "RS7 ~1 "      0.8941450 
+## 11 "RS8 ~1 "      0.8920022 
+## 12 "RS13 ~1 "     0.8919491 
+## 13 "RS9 ~1 "      0.8919293 
+## 14 "RS ~1 "       0.8917757 
+## 15 "RS6 ~1 "      0.8917604
+\end{verbatim}
+
+Examining partial invariance reveals several potential candidates for partial invariance. In this next section, we relaxed group constraints until we achieved partial invariance (i.e., \(\Delta\)CFI \textless= .01). We will need to find our CFI as at least 0.92. More than half the items are necessary to achieve ``partial'' invariance (which really implies no invariance is likely possible).
+
+\begin{verbatim}
+## # A tibble: 1 x 6
+##       AIC     BIC   cfi   tli  rmsea   srmr
+##     <dbl>   <dbl> <dbl> <dbl>  <dbl>  <dbl>
+## 1 111935. 112326. 0.922 0.917 0.0966 0.0462
+\end{verbatim}
+
+\begin{verbatim}
+## # A tibble: 6 x 3
+##   term       English Chinese
+##   <chr>        <dbl>   <dbl>
+## 1 "RS1 ~1 "     5.24    4.78
+## 2 "RS3 ~1 "     5.14    5.46
+## 3 "RS4 ~1 "     5.29    5.71
+## 4 "RS5 ~1 "     5.13    5.13
+## 5 "RS7 ~1 "     5.26    5.26
+## 6 "RS12 ~1 "    5.57    5.16
+\end{verbatim}
+
+\begin{verbatim}
+##  RS1  RS2  RS3  RS4  RS5  RS6  RS7  RS8  RS9 RS10 RS11 RS12 RS13 RS14 
+## 0.32 0.29 0.23 0.30 0.00 0.00 0.00 0.00 0.00 0.29 0.27 0.29 0.00 0.26
+\end{verbatim}
+
+\hypertarget{visualize-invariance}{%
+\subsection{Visualize Invariance}\label{visualize-invariance}}
+
+\begin{verbatim}
+## Plot for RS2
+\end{verbatim}
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-1.pdf}
+
+\begin{verbatim}
+## -------
+## Plot for RS11
+\end{verbatim}
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-2.pdf}
+
+\begin{verbatim}
+## -------
+## Plot for RS4
+\end{verbatim}
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-3.pdf}
+
+\begin{verbatim}
+## -------
+## Plot for RS12
+\end{verbatim}
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-4.pdf}
+
+\begin{verbatim}
+## -------
+## Plot for RS14
+\end{verbatim}
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-5.pdf}
+
+\begin{verbatim}
+## -------
+## Plot for RS1
+\end{verbatim}
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-6.pdf}
+
+\begin{verbatim}
+## -------
+## Plot for RS10
+\end{verbatim}
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-7.pdf}
+
+\begin{verbatim}
+## -------
+## Plot for RS3
+\end{verbatim}
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-8.pdf}
+
+\begin{verbatim}
+## -------
+\end{verbatim}
+
+\hypertarget{bootstrap-model}{%
+\subsection{Bootstrap Model}\label{bootstrap-model}}
+
+\begin{verbatim}
+##        model non_invariant random_non_invariant    h_nmi      h_mi h_nmi_p
+## 1 intercepts             1                    0 3.141593 -3.141593       1
+##   h_mi_p
+## 1     -1
+\end{verbatim}
+
+In this case, we do not see loadings print out. That implies that all models in both real data and randomized data are invariant because the function only calculates information for non-invariance. We see that the intercepts are unlikely to ever replicate across Chinese and English samples. This result is not surprising given the large number of relaxed parameters required to achieve partial invariance.
+
+\hypertarget{bootstrap-partial-invariance}{%
+\subsection{Bootstrap Partial Invariance}\label{bootstrap-partial-invariance}}
+
+\hypertarget{each-parameter-on-the-overall-model-invariance}{%
+\subsubsection{Each Parameter on the Overall Model Invariance}\label{each-parameter-on-the-overall-model-invariance}}
+
+\begin{verbatim}
+## # A tibble: 15 x 7
+##    term       non_invariant random_non_invariant h_nmi  h_mi h_nmi_p h_mi_p
+##    <chr>              <dbl>                <dbl> <dbl> <dbl>   <dbl>  <dbl>
+##  1 "RS ~1 "           0.991                0.007  2.78 -2.78   0.886 -0.886
+##  2 "RS1 ~1 "          0.989                0.007  2.76 -2.76   0.880 -0.880
+##  3 "RS10 ~1 "         0.988                0.007  2.75 -2.75   0.877 -0.877
+##  4 "RS11 ~1 "         0.991                0.007  2.78 -2.78   0.886 -0.886
+##  5 "RS12 ~1 "         0.991                0.007  2.78 -2.78   0.886 -0.886
+##  6 "RS13 ~1 "         0.991                0.007  2.78 -2.78   0.886 -0.886
+##  7 "RS14 ~1 "         0.99                 0.007  2.77 -2.77   0.883 -0.883
+##  8 "RS2 ~1 "          0.985                0.007  2.73 -2.73   0.869 -0.869
+##  9 "RS3 ~1 "          0.988                0.007  2.75 -2.75   0.877 -0.877
+## 10 "RS4 ~1 "          0.99                 0.007  2.77 -2.77   0.883 -0.883
+## 11 "RS5 ~1 "          0.984                0.007  2.72 -2.72   0.866 -0.866
+## 12 "RS6 ~1 "          0.979                0.007  2.68 -2.68   0.854 -0.854
+## 13 "RS7 ~1 "          0.974                0.007  2.65 -2.65   0.844 -0.844
+## 14 "RS8 ~1 "          0.991                0.007  2.78 -2.78   0.886 -0.886
+## 15 "RS9 ~1 "          0.987                0.007  2.75 -2.75   0.874 -0.874
+\end{verbatim}
+
+In this output, we see that all the bootstrapped runs of the real data are non-invariant, even when each parameter is relaxed individually. A few runs of the random data are \emph{non}-invariant (meaning most are actually invariant when randomized). This indicates that no one parameter is likely the reason for non-invariance, as they all show large non-replication effects. If we use the \texttt{boot\_summary}, we can see the effect size for each parameter when the two intercepts are compared to each other (as the chart above shows the overall model invariance effect).
+
+\hypertarget{each-parameters-standardized-difference-score}{%
+\subsubsection{Each Parameter's Standardized Difference Score}\label{each-parameters-standardized-difference-score}}
+
+\begin{verbatim}
+## # A tibble: 30 x 26
+## # Groups:   term, invariant [30]
+##    term       invariant mean_boot_1 mean_boot_2 sd_boot_1 sd_boot_2
+##    <chr>      <lgl>           <dbl>       <dbl>     <dbl>     <dbl>
+##  1 "RS ~1 "   FALSE            0        -0.121      0        0.623 
+##  2 "RS ~1 "   TRUE             0        -0.0110     0        0.680 
+##  3 "RS1 ~1 "  FALSE            3.33      3.11       0.529    0.123 
+##  4 "RS1 ~1 "  TRUE             3.34      3.07       0.550    0.112 
+##  5 "RS10 ~1 " FALSE            3.35      3.01       0.740    0.286 
+##  6 "RS10 ~1 " TRUE             3.37      2.95       0.725    0.268 
+##  7 "RS11 ~1 " FALSE            2.88      2.70       0.489    0.0510
+##  8 "RS11 ~1 " TRUE             2.79      2.68       0.528    0.0281
+##  9 "RS12 ~1 " FALSE            3.42      3.12       0.657    0.197 
+## 10 "RS12 ~1 " TRUE             3.30      3.08       0.733    0.183 
+## # i 20 more rows
+## # i 20 more variables: mean_boot_difference <dbl>, sd_boot_difference <dbl>,
+## #   mean_boot_fit <dbl>, sd_boot_fit <dbl>, n_boot <int>, mean_random_1 <dbl>,
+## #   mean_random_2 <dbl>, sd_random_1 <dbl>, sd_random_2 <dbl>,
+## #   mean_random_difference <dbl>, sd_random_difference <dbl>,
+## #   mean_random_fit <dbl>, sd_random_fit <dbl>, n_random <int>,
+## #   d_boot_low <dbl>, d_boot <dbl>, d_boot_high <dbl>, d_random_low <dbl>, ...
+\end{verbatim}
+
+With the bootstrap summary, we see that no invariant intercept runs are found. Note that the \texttt{RS\textasciitilde{}1} does not calculate \emph{d} because the \emph{sd} is zero (thus, this would cause an error as \emph{sd} is part of the denominator). The random runs also do not show a \emph{d} score because the effect size is only calculated when at least 10\% of the runs in \texttt{n\_boot} or \texttt{n\_random} are found. Since we only have 10 or 11 in that column, no effect size is calculated. The differences in the intercepts for the real data (\texttt{boot} columns) appear to be medium to large, showing \emph{d} scores from 0.3 to 0.6. Therefore, we might expect that the English and Chinese samples have different average endorsement levels of the RS14.
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-110-1.pdf}
+
+The examination of the density plot shows how group 1 (Schulenberg English) tends to show lower average scores than group 2 (Chen Chinese) for most but not all items.
+
+We can view the mean difference or standardized mean difference by using:
+
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-111-1.pdf} \includegraphics{manuscript_files/figure-latex/unnamed-chunk-111-2.pdf}
+
+When effects are non-invariant in the randomized data, the mean difference is still fairly small, but we see large mean differences in intercepts when the bootstrapped data is non-invariant. In the effect size graph, we can see that this effect is medium to large for all the parameters.
 
 
 \end{document}

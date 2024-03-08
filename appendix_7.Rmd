@@ -1,0 +1,270 @@
+---
+appendix: "appendix_7.Rmd"
+---
+
+## Replication Test 
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r libraries-appendix7, message = FALSE}
+set.seed(890343)
+library(rio)
+library(dplyr)
+library(visualizemi)
+library(papaja)
+library(tidyr)
+library(dmacs)
+library(ggplot2)
+library(scales)
+library(introdataviz)
+library(lavaan)
+```
+
+## Data
+
+```{r}
+# our data
+load("manu_data/RS14.Rdata")
+
+DF <- DF
+
+# take only interesting columns and give a label
+DF <- DF %>% 
+  # make it comparable by only testing students
+  filter(DF$sample == "Student") %>% 
+  mutate(group = "Schulenberg") %>% 
+  dplyr::select(RS1:RS14, group) 
+
+# Chen et al.
+DF.pone <- import("manu_data/data1-RS14.dta")
+# take only interesting columns and give a label
+DF.pone <- DF.pone %>% 
+  dplyr::select(starts_with("rs")) %>% 
+  mutate(group = "Chen")
+# match column style
+colnames(DF.pone)[1:14] <- toupper(colnames(DF.pone)[1:14]) 
+
+# create one dataset
+DF.combo <- bind_rows(DF, DF.pone)
+
+DF.combo %>% 
+  group_by(group) %>% 
+  summarize(sample = n())
+```
+
+## MGCFA
+
+```{r}
+# build the one-factor model 
+model.rs <- "RS =~ RS1+RS2+RS3+RS4+RS5+RS6+RS7+RS8+RS9+RS10+RS11+RS12+RS13+RS14"
+
+# run the multi-group CFA
+results.rs <- mgcfa(
+  model = model.rs,
+  data = DF.combo, 
+  group = "group", 
+  group.equal = c("loadings", "intercepts", "residuals")
+  )
+
+# examine the results
+results.rs$model_fit %>% 
+        dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr)
+```
+
+Overall, the one-factor model fits the data well. Each group also shows adequate model fit. If we use $\Delta$CFI <= .01, we find that the loadings would be considered invariant across the English and Chinese samples. The intercepts were not invariant. 
+
+## Partial Invariance
+
+```{r}
+partial.rs <-
+  partial_mi(
+    saved_model = results.rs$invariance_models$model.intercepts,
+    data = DF.combo,
+    model = model.rs,
+    group = "group",
+    # be sure to do only up to the step you are interested in
+    group.equal = c("loadings", "intercepts"),
+    partial_step = "intercepts")
+
+partial.rs$fit_table %>% 
+  dplyr::select(free.parameter, cfi) %>% 
+  arrange(-cfi)
+```
+
+Examining partial invariance reveals several potential candidates for partial invariance. In this next section, we relaxed group constraints until we achieved partial invariance (i.e., $\Delta$CFI <= .01). We will need to find our CFI as at least `r results.rs$model_fit %>% filter(model == "Configural") %>% pull(cfi) %>% apa_num() %>% as.numeric() - .01`. More than half the items are necessary to achieve "partial" invariance (which really implies no invariance is likely possible).
+
+```{r}
+# run the partially invariant model with group.partial
+partial.rs.1 <- mgcfa(model = model.rs, 
+                  data = DF.combo, 
+                  group = "group", 
+                  group.equal = c("loadings", "intercepts"),
+                  group.partial = c("RS2 ~1", "RS11 ~1",
+                                    "RS4 ~1", "RS12 ~1",
+                                    "RS14 ~1", "RS1 ~1",
+                                    "RS10 ~1", "RS3 ~ 1"),
+                  meanstructure = TRUE)
+
+# examine the fit indices 
+partial.rs.1$model_fit %>% 
+  filter(model == "intercepts") %>% 
+  dplyr::select(AIC, BIC, cfi, tli, rmsea, srmr)
+
+# examine the intercepts 
+partial.rs.1$model_coef %>% 
+  filter(model == "intercepts") %>% 
+  dplyr::select(term, group, estimate) %>% 
+  pivot_wider(id_cols = c("term"), 
+              names_from = "group", 
+              values_from = "estimate") %>% 
+  dplyr::rename(English = `1`, 
+                Chinese = `2`) %>% 
+  filter(term %in% c("RS1 ~1 ", "RS12 ~1 ",
+                     "RS7 ~1 ", "RS4 ~1 ",
+                     "RS5 ~1 ", "RS3 ~1 "))
+
+# effect size model 
+round(lavaan_dmacs(partial.rs.1$invariance_models$model.intercepts, "Chen")$DMACS, 2)
+```
+
+## Visualize Invariance
+
+```{r}
+for (i in c("RS2", "RS11",
+            "RS4", "RS12",
+            "RS14", "RS1",
+            "RS10", "RS3")){
+  cat(paste0("Plot for ", i, "\n"))
+  print(plot_mi(
+    # output from model_coef
+    data_coef = partial.rs.1$model_coef, 
+    # which model do you want to plot
+    model_step = "intercepts", 
+    # name of observed item
+    item_name = i, 
+    # latent variable limits to graph
+    x_limits = c(-1,1), 
+    # Y min and max in data 
+    y_limits = c(min(DF.combo[ , i]), max(DF.combo[ , i])),
+    # what ci do you want
+    conf.level = .95, 
+    # what model results do you want 
+    model_results = partial.rs.1$invariance_models$model.intercepts,
+    # which latent variable do you want 
+    lv_name = "RS" 
+)$complete)
+  
+  ggsave(paste0("figures/rs14-chinese-", i, ".png"), 
+         dpi = 300, 
+         width = 8, 
+         units = "in")
+  
+  cat(paste0("-------\n"))
+  
+}
+
+```
+
+## Bootstrap Model
+
+```{r eval = F}
+boot.model.rs <- 
+  bootstrap_model(
+    saved_configural = results.rs$model_configural,
+    data = DF.combo,
+    model = model.rs, 
+    group = "group", 
+    nboot = 1000, 
+    invariance_index = "cfi",
+    invariance_rule = .01, 
+    group.equal = c("loadings", "intercepts")
+)
+
+boot.model.rs
+```
+
+```{r echo = F}
+boot.model.rs <- import("manu_data/boot.model.rs.appendix7.csv")
+boot.model.rs
+```
+
+In this case, we do not see loadings print out. That implies that all models in both real data and randomized data are invariant because the function only calculates information for non-invariance. We see that the intercepts are unlikely to ever replicate across Chinese and English samples. This result is not surprising given the large number of relaxed parameters required to achieve partial invariance. 
+
+## Bootstrap Partial Invariance
+
+```{r eval = F, message = F}
+boot.partial.rs <- 
+  bootstrap_partial(
+    saved_model = results.rs$invariance_models$model.intercepts,
+    data = DF.combo,
+    model = model.rs, 
+    group = "group", 
+    nboot = 1000, 
+    invariance_index = "cfi",
+    invariance_rule = .01, 
+    invariance_compare = fitmeasures(results.rs$invariance_models$model.loadings, "cfi"), 
+    partial_step = "intercepts",
+    group.equal = c("loadings", "intercepts")
+)
+```
+
+```{r echo = F}
+load("manu_data/boot.partial.rs.appendix7.Rdata")
+boot.partial.rs <- list(
+  "boot_DF" = boot_DF,
+  "boot_summary" = boot_summary,
+  "density_plot" = density_plot, 
+  "invariance_plot" = invariance_plot, 
+  "boot_effects" = boot_effects, 
+  "effect_invariance_plot" = effect_invariance_plot
+)
+```
+
+### Each Parameter on the Overall Model Invariance
+
+```{r}
+boot.partial.rs$boot_effects
+```
+
+In this output, we see that all the bootstrapped runs of the real data are non-invariant, even when each parameter is relaxed individually. A few runs of the random data are *non*-invariant (meaning most are actually invariant when randomized). This indicates that no one parameter is likely the reason for non-invariance, as they all show large non-replication effects. If we use the `boot_summary`, we can see the effect size for each parameter when the two intercepts are compared to each other (as the chart above shows the overall model invariance effect). 
+
+### Each Parameter's Standardized Difference Score
+
+```{r}
+boot.partial.rs$boot_summary
+```
+
+With the bootstrap summary, we see that no invariant intercept runs are found. Note that the `RS~1` does not calculate *d* because the *sd* is zero (thus, this would cause an error as *sd* is part of the denominator). The random runs also do not show a *d* score because the effect size is only calculated when at least 10% of the runs in `n_boot` or `n_random` are found. Since we only have 10 or 11 in that column, no effect size is calculated. The differences in the intercepts for the real data (`boot` columns) appear to be medium to large, showing *d* scores from 0.3 to 0.6. Therefore, we might expect that the English and Chinese samples have different average endorsement levels of the RS14. 
+
+```{r}
+boot.partial.rs$density_plot
+
+ggsave(paste0("figures/rs14-chinese-density_plot.png"), 
+       dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+The examination of the density plot shows how group 1 (Schulenberg English) tends to show lower average scores than group 2 (Chen Chinese) for most but not all items. 
+
+We can view the mean difference or standardized mean difference by using: 
+
+```{r}
+boot.partial.rs$invariance_plot
+
+ggsave(paste0("figures/rs14-chinese-invariance_plot.png"), 
+       dpi = 300, 
+       width = 8, 
+       units = "in")
+
+boot.partial.rs$effect_invariance_plot
+
+ggsave(paste0("figures/rs14-chinese-effect_invariance_plot.png"), 
+       dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+When effects are non-invariant in the randomized data, the mean difference is still fairly small, but we see large mean differences in intercepts when the bootstrapped data is non-invariant. In the effect size graph, we can see that this effect is medium to large for all the parameters. 
