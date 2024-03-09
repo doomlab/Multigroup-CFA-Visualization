@@ -269,7 +269,7 @@ Measurement invariance has been explored and implemented for the last fifty year
 
 With \(d_{MACS}\) and measurement invariance testing, researchers can begin to quantify how and where their construct measurement may vary between groups. Yet, given the large number of studies that show non-invariance, it is clear that equivalence can be hard to meet. It is difficult to know if non-invariance occurs because of random sampling error, true population differences, or differences in replication and reproducibility of the construct in a new sample. The field of psychology is increasingly interested in pre-registration (i.e., registering plans for a study before data collection, Nosek et al., 2018) and the promotion of transparency in study design, implementation, and analysis (Mayo-Wilson et al., 2021), in addition to supporting replication studies (Zwaan et al., 2018). Registered (replication) reports provide an advantageous avenue for the pre-registration of measurement tests, as they allow a researcher the ability to have their study accepted in principle, regardless of the results of a test of construct validity, reliability, or measurement invariance (Hobson, 2019; Nosek \& Lakens, 2014). However, there are few tools that can provide effect size measures for models, individual parameters, or visualization for researchers to plan for future studies. \(d_{MACS}\) provides the opportunity to begin to think about the smallest effect size of interest or the smallest meaningful effect size for measurement invariance and replication (Anvari \& Lakens, 2021; i.e., two studies with overlapping confidence intervals ``replicate,'' even if the test of measurement invariance does not, Lakens, 2017). As mentioned, \(d_{MACS}\) has only really been explored for a combined intercept and loadings, and while useful, does not necessarily allow a researcher to pinpoint specific issues within an observed variable.
 
-Therefore, purpose of this manuscript is describe an \emph{R} package, \texttt{visualizemi}, that provides functionality to calculate multi-group confirmatory factor analysis, partial invariance tests, visualizations of the size of non-invariance, and potential effect sizes for overall models and individual parameters. No known visualization techniques have been proposed for measurement invariance. By creating panel visualizations, we can supplement a researchers ability to judge the strength of the non-invariance differences and effect size for each item. The proposed effect sizes demonstrate the likelihood of replication with a similar sample as compared to a randomly assigned group model, thus, illustrating what type of measurement one might expect to find, and how different that is from random chance. Within this technique, the individual parameter effect sizes can calculated: both the group differences within a model as compared to random and the likelihood of a parameter replication compared to random groups. Coupled with other indicators (i.e., fit indices differences, \(d_{MACS}\)), we can move toward a better understanding of how much measurement non-invariance is meaningful. This tutorial and package will help researchers plan future studies and aid in the ability to estimate a smallest effect of interest for measurement invariance studies, rather than relying on fit indices and rules of thumb alone.
+Therefore, purpose of this manuscript is to describe an \emph{R} package, \texttt{visualizemi}, that provides functionality to calculate multi-group confirmatory factor analysis, partial invariance tests, visualizations of the size of non-invariance, and potential effect sizes for overall models and individual parameters. No known visualization techniques have been proposed for measurement invariance. By creating panel visualizations, we can supplement a researcher's ability to judge the strength of the non-invariance differences and effect size for each item. The proposed effect sizes demonstrate the likelihood of replication with a similar sample as compared to a randomly assigned group model, thus, illustrating what type of measurement one might expect to find, and how different that is from random chance. Within this technique, the individual parameter effect sizes can be calculated: both the group differences within a model as compared to random and the likelihood of a parameter replication compared to random groups. Coupled with other indicators (i.e., fit indices differences, \(d_{MACS}\)), we can move toward a better understanding of how much measurement non-invariance is meaningful. This tutorial and package will help researchers plan future studies and aid in the ability to estimate a smallest effect of interest for measurement invariance studies, rather than relying on fit indices and rules of thumb alone.
 
 By the end of this tutorial manuscript, readers will:
 
@@ -277,7 +277,7 @@ By the end of this tutorial manuscript, readers will:
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Learn how to use \emph{visualizemi} to analyze multi-group confirmatory factor analysis, examine partial invariance, and create visualizations of parameters.
+  Learn how to use \emph{visualizemi} to analyze multi-group confirmatory factor analysis, examine partial for invariance, and create visualizations of parameters.
 \item
   Learn how to estimate the potential replication of multi-group models and their parameters using bootstrapping compared to a random group model.
 \item
@@ -542,7 +542,7 @@ The outputs from this function are several \emph{ggplot2} objects that can be ed
 \def\labelenumi{\arabic{enumi})}
 \tightlist
 \item
-  \texttt{complete}: The output from this model can be found in Figure \ref{fig:invariant-pic}. On the left hand side, the item invariance is plotted, and on the right hand side, the latent mean distributions for the two groups are plotted. In the item invariance sub-plot, the visualization includes all three components traditionally seen in MGCFA testing steps: loadings, intercepts, and residuals. Each visualization element was designed to match the traditional visualization for that type of output. All parameter estimates are plotted on the unstandardized estimates and their confidence interval based on the standard error of the estimate. All plots are made with \emph{ggplot2} and \emph{cowplot} (Wilke, 2020).
+  \texttt{complete}: The output from this model can be found in Figure \ref{fig:invariant-pic}. On the left-hand side, the item invariance is plotted, and on the right-hand side, the latent mean distributions for the two groups are plotted. In the item invariance sub-plot, the visualization includes all three components traditionally seen in MGCFA testing steps: loadings, intercepts, and residuals. Each visualization element was designed to match the traditional visualization for that type of output. All parameter estimates are plotted on the unstandardized estimates and their confidence interval based on the standard error of the estimate. All plots are made with \emph{ggplot2} and \emph{cowplot} (Wilke, 2020).
 \end{enumerate}
 
 \begin{figure}
@@ -556,7 +556,7 @@ The outputs from this function are several \emph{ggplot2} objects that can be ed
 \setcounter{enumi}{1}
 \tightlist
 \item
-  \texttt{intercept}: Only the left hand side of the complete plot designed to represent intercepts and factor loadings. Factor loadings represent the slope of the regression equation for the latent variable predicting the scores on the observed variable (\(\hat{Y} \sim b_0 + b_1X + \epsilon\)). The y-axis indicates the observed variable scores, and here, the plot includes the entire range of the scale of the data for item four. The coefficient (\(b_1\)) for group 1 was 0.40, while the coefficient for group 2 was 0.21. The ribbon bands around the plotted slopes indicate the confidence interval for that estimate. In this plot, while the coefficients for each group are not literally equal, the overlapping and parallel slope bands indicate they are not different practically.
+  \texttt{intercept}: Only the left-hand side of the complete plot designed to represent intercepts and factor loadings. Factor loadings represent the slope of the regression equation for the latent variable predicting the scores on the observed variable (\(\hat{Y} \sim b_0 + b_1X + \epsilon\)). The y-axis indicates the observed variable scores, and here, the plot includes the entire range of the scale of the data for item four. The coefficient (\(b_1\)) for group 1 was 0.40, while the coefficient for group 2 was 0.21. The ribbon bands around the plotted slopes indicate the confidence interval for that estimate. In this plot, while the coefficients for each group are not literally equal, the overlapping and parallel slope bands indicate they are not different practically.
 \end{enumerate}
 
 The item intercepts (\(b_0\)) are plotted on the middle line where they would cross the y-axis at a latent variable score of zero. These are represented by a dot with a set of confidence error bars around the point. The intercept for group 1 was 0.07, while the coefficient for group 2 was 0.03. In this invariant depiction, the overlap in the intercepts is clear, indicating they are not different. You can use \texttt{y\_limits} to zoom in on the graph if these are too small to be distinguishable.
@@ -565,7 +565,7 @@ The item intercepts (\(b_0\)) are plotted on the middle line where they would cr
 \def\labelenumi{\arabic{enumi})}
 \setcounter{enumi}{2}
 \item
-  \texttt{mean}: The right hand side of the complete plot graphing the latent variable means and density from the data. The latent variable is shown on the x-axis using standardized values (i.e., \emph{z}-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The lines indicate the means of the latent variables from the simulated dataset. Group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the data set or whichever group is the first that appears when using the \texttt{levels()} command.
+  \texttt{mean}: The right-hand side of the complete plot graphing the latent variable means and density from the data. The latent variable is shown on the x-axis using standardized values (i.e., \emph{z}-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The lines indicate the means of the latent variables from the simulated dataset. Group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the data set or whichever group is the first that appears when using the \texttt{levels()} command.
 \item
   \texttt{variance}: A split geom violin plot indicating the variance distribution of the plotted item. Residuals are trickier to plot, as they are the left over error when predicting the observed variables \(\epsilon\). It is tempting to plot this value as the confidence band around the slope, however, that defeats the purpose of understanding that the slopes are estimated separately from the residuals, and both have an associated variability around their parameter estimate. Therefore, residuals are represented in the inset picture at the bottom right of the item invariance plot. The black bars represent the estimated residual for each group (group 1: 0.91, group 2: 1.22). The distributions are plotted to represent the normal spread of values using the standard error of the residuals. The violin plot allows for direct comparison of those residuals and their potential distributions. Note that the placement has nothing to do with the x or y-axis and is designed to always show in the same location, regardless of size/value. The plots are included separately so they can be arranged in a different fashion if desired.
 \end{enumerate}
@@ -573,7 +573,7 @@ The item intercepts (\(b_0\)) are plotted on the middle line where they would cr
 \hypertarget{simulated-results}{%
 \subsubsection{Simulated Results}\label{simulated-results}}
 
-The \(d_{MACS}\) value for item 4 in the invariant model was 0.16, representing a nil or unimportant difference in this manuscript. It is important to note that while Nye et al. (2019) suggests specific sizes for small, medium, and large, each researcher should determine for themselves what effects represent. Figure \ref{fig:small-load-pic} displays the results from the small (\(d_{MACS}\) = 0.27) difference in loadings, while Figure \ref{fig:med-load-pic} displays the results from the medium (\(d_{MACS}\) = 0.53) difference in loadings, and Figure \ref{fig:large-load-pic} shows the large (\(d_{MACS}\) = 0.68) differences. When investigating the slope values, we can clearly see the change in the loading for the second group (the only manipulated variable, although random data set generation may also change intercepts and residuals slightly). At the medium effect size, we see that the confidence bands do not overlap (at the edges), and at the large effect size, we can see a clear separation of two lines. Note that the intercepts in this model are estimated as equal so the loading representation will not literally separate, but the steepness of the lines is the indicator of the difference between the slopes. You can imagine these lines are interpreted like a simple slopes analysis for interactions in regression (Cohen et al., 2003). When simple slopes for interactions are plotted, if they are parallel, there is no interaction, and if they cross, then there is an interaction. Here, we can use this same logic. If they are parallel, there is likely invariance (they are the same), and the further from parallel they become, the larger the effect size for the differences between group loadings.
+The \(d_{MACS}\) value for item 4 in the invariant model was 0.16, representing a nil or unimportant difference in this manuscript. It is important to note that while Nye et al. (2019) suggests specific sizes for small, medium, and large, each researcher should determine for themselves what effects represent. Figure \ref{fig:small-load-pic} displays the results from the small (\(d_{MACS}\) = 0.27) difference in loadings, while Figure \ref{fig:med-load-pic} displays the results from the medium (\(d_{MACS}\) = 0.61) difference in loadings, and Figure \ref{fig:large-load-pic} shows the large (\(d_{MACS}\) = 0.66) differences. When investigating the slope values, we can clearly see the change in the loading for the second group (the only manipulated variable, although random data set generation may also change intercepts and residuals slightly). At the medium effect size, we see that the confidence bands do not overlap (at the edges), and at the large effect size, we can see a clear separation of two lines. Note that the intercepts in this model are estimated as equal so the loading representation will not literally separate, but the steepness of the lines is the indicator of the difference between the slopes. You can imagine these lines are interpreted like a simple slopes analysis for interactions in regression (Cohen et al., 2003). When simple slopes for interactions are plotted, if they are parallel, there is no interaction, and if they cross, then there is an interaction. Here, we can use this same logic. If they are parallel, there is likely invariance (they are the same), and the further from parallel they become, the larger the effect size for the differences between group loadings.
 
 The latent means in Figure \ref{fig:large-load-pic} do appear to show differences, albeit visually small. The latent means diagram shows the impact of any group differences that aren't constrained, and this image shows the configural model (as the metric model would force them to be equal). In the simulated model, the \emph{only} manipulated parameter is question 4's loading. In real models, the differences may be larger due to other variation found in the parameter estimates. Therefore, once you discover items you believe would make a model ``partially'' invariant, you may wish to estimate that model and graph the item again using the partially invariant model to see only the effect of the non-invariant items. Additionally, consider that we set the scaling of the model to 0. The estimate for the lv mean in the large loading model was group 1: 0.00, and group 2: -0.06, which results in 0.06 difference in group means. The practical implications of this difference will depend on the research and interpretations of the researcher.
 
@@ -615,7 +615,7 @@ For intercepts, the small (Figure \ref{fig:small-int-pic}), medium (Figure \ref{
 \caption{\label{fig:large-int-pic}Large Intercepts Model Visualization}
 \end{figure}
 
-Last, the effect of the residuals is plotted in small (Figure \ref{fig:small-res-pic}), medium (Figure \ref{fig:med-res-pic}), and large (Figure \ref{fig:large-res-pic}) formats. While \(d_{MACS}\) values are not technically available for the residuals, our models showed 0.19, 0.19, and 0.16, respectively. These differences in values are variable due to the random generation of data sets for each measurement invariance manipulation. At first glance, the differences in the small chart may seem large, because the black lines are not touching, but notice that the distributions overlap, indicating a likely small difference. The medium and large differences better illustrate differences in residuals across groups. Further, the impact of the residuals on the shape of the latent mean distribution can also been seen (and unintentionally, in the first figures as well due to random variation). The impact is due to the standard error of the residuals, as smaller standard errors represent lepokurtic distributions (taller), and larger standard errors represent platykurtic distributions (flatter). The effect size difference of the residuals does not appear to change the effects in the latent means.
+Last, the effect of the residuals is plotted in small (Figure \ref{fig:small-res-pic}), medium (Figure \ref{fig:med-res-pic}), and large (Figure \ref{fig:large-res-pic}) formats. While \(d_{MACS}\) values are not technically available for the residuals, our models showed 0.19, 0.10, and 0.16, respectively. These differences in values are variable due to the random generation of data sets for each measurement invariance manipulation. At first glance, the differences in the small chart may seem large, because the black lines are not touching, but notice that the distributions overlap, indicating a likely small difference. The medium and large differences better illustrate differences in residuals across groups. Further, the impact of the residuals on the shape of the latent mean distribution can also been seen (and unintentionally, in the first figures as well due to random variation). The impact is due to the standard error of the residuals, as smaller standard errors represent lepokurtic distributions (taller), and larger standard errors represent platykurtic distributions (flatter). The effect size difference of the residuals does not appear to change the effects in the latent means.
 
 \begin{figure}
 \centering
@@ -765,7 +765,7 @@ The \texttt{bootstrap\_model} function in \emph{visualizemi} was designed to est
     \CommentTok{\# what is your criterion for that fit index}
     \AttributeTok{invariance\_rule =}\NormalTok{ .}\DecValTok{01}\NormalTok{,}
     \CommentTok{\# what equality constraints are you testing }
-    \AttributeTok{group.equal =} \FunctionTok{c}\NormalTok{(}\StringTok{"loadings"}\NormalTok{, }\StringTok{"intercepts"}\NormalTok{, }\StringTok{"residuals"}\NormalTok{)}
+    \AttributeTok{group.equal =} \FunctionTok{c}\NormalTok{(}\StringTok{"loadings"}\NormalTok{, }\StringTok{"intercepts"}\NormalTok{, }\StringTok{"resduals"}\NormalTok{)}
 \NormalTok{  )}
 \end{Highlighting}
 \end{Shaded}
@@ -1168,7 +1168,7 @@ By examining our estimates, we can see that item seven on the RS-14 is estimated
 
 \CommentTok{\# examine the loadings }
 \NormalTok{partial.rs}\FloatTok{.2}\SpecialCharTok{$}\NormalTok{model\_coef }\SpecialCharTok{\%\textgreater{}\%} 
-  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{==} \StringTok{"RS6 \textasciitilde{}1"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{==} \StringTok{"RS6 \textasciitilde{}1 "}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
   \FunctionTok{filter}\NormalTok{(model }\SpecialCharTok{==} \StringTok{"intercepts"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
 \NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(term, group, estimate, std.error)}
 \end{Highlighting}
@@ -1177,8 +1177,11 @@ By examining our estimates, we can see that item seven on the RS-14 is estimated
 \normalsize
 
 \begin{verbatim}
-## # A tibble: 0 x 4
-## # i 4 variables: term <chr>, group <int>, estimate <dbl>, std.error <dbl>
+## # A tibble: 2 x 4
+##   term      group estimate std.error
+##   <chr>     <int>    <dbl>     <dbl>
+## 1 "RS6 ~1 "     1     5.00    0.0605
+## 2 "RS6 ~1 "     2     4.54    0.0533
 \end{verbatim}
 
 \small
@@ -1313,7 +1316,7 @@ Next, we would examine our replication potential for this model. Given our curre
 ## 2 residuals          0.002                    0 0.0895 -0.0895  0.0285 -0.0285
 \end{verbatim}
 
-Next, we would examine the strength of the effects of replication on each parameter at the intercept level. By examining Table \ref{tab:table-boot-effects}, it is clear that most of the item means are unlikely to replicate, even though two particular items can be used to create partial invariance. Figures \ref{fig:rs-partial-pic} and \ref{fig:rs-partial-pic2} display the three plots provided in the \texttt{bootstrap\_partial()} function. In general, we should expect \(M_{D}\) = 0.23 when items are invariant and \(M_{D}\) = 0.26 when items are not invariant. The effect size of non-invariant items ranges from 0.43 to 0.62.
+Next, we would examine the strength of the effects of replication on each parameter at the intercept level. By examining Table \ref{tab:table-boot-effects}, it is clear that most of the item means are unlikely to replicate, even though two particular items can be used to create partial invariance. Figures \ref{fig:rs-partial-pic} and \ref{fig:rs-partial-pic2} display the three plots provided in the \texttt{bootstrap\_partial()} function. In general, we should expect \(M_{D}\) = 0.11 when items are invariant and \(M_{D}\) = 0.25 when items are not invariant. The effect size of non-invariant items ranges from 0.43 to 0.59.
 
 The density plot shown at the bottom of Figure \ref{fig:rs-partial-pic} illustrates the likely reasons for the differences found in the top plots. It appears that many items show a bimodal distribution within group 1 (Clinical Sample) and when items are invariant, the intercept averages to the same intercept as group 2 (Student Sample). In non-invariant estimates, the same bimodal distributions are found, but they are more extreme than the student samples, and therefore, item show different averages due to the presence of two separate means of data. Further, some items also appear to show two separate student item averages within the data. This result suggests that it would be fruitful to understand a potential predictor of these differences or other confounding variable that separates these samples, creating differences in item averages.
 
@@ -1399,7 +1402,7 @@ The results of model bootstrapping indicated that the effect of the loadings was
 \begin{figure}
 \centering
 \includegraphics{manuscript_files/figure-latex/rs14-chinese-pic-1.pdf}
-\caption{\label{fig:rs14-chinese-pic}The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group.}
+\caption{\label{fig:rs14-chinese-pic}The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left-hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group.}
 \end{figure}
 
 \begin{figure}
@@ -1785,13 +1788,13 @@ Residuals & 7,534.091 & 7,605.739 & 0.993 & 0.994 & 0.019 & 0.054\\
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-Overall & 7,598.681 & 7,661.900 & 0.946 & 0.893 & 0.078 & 0.035\\
+Overall & 7,595.822 & 7,659.041 & 1.000 & 1.017 & 0.000 & 0.012\\
 Group Group 1 & 3,765.749 & 3,818.571 & 0.976 & 0.953 & 0.047 & 0.031\\
-Group Group 2 & 3,820.090 & 3,872.912 & 0.969 & 0.938 & 0.067 & 0.034\\
-Configural & 7,585.839 & 7,712.277 & 0.972 & 0.944 & 0.058 & 0.033\\
-Loadings & 7,613.434 & 7,723.014 & 0.865 & 0.807 & 0.107 & 0.079\\
-Intercepts & 7,606.648 & 7,699.370 & 0.874 & 0.860 & 0.091 & 0.079\\
-Residuals & 7,600.057 & 7,671.705 & 0.880 & 0.895 & 0.079 & 0.091\\
+Group Group 2 & 3,815.314 & 3,868.136 & 0.996 & 0.991 & 0.025 & 0.023\\
+Configural & 7,581.063 & 7,707.501 & 0.988 & 0.976 & 0.038 & 0.027\\
+Loadings & 7,609.348 & 7,718.928 & 0.878 & 0.826 & 0.101 & 0.079\\
+Intercepts & 7,601.550 & 7,694.271 & 0.891 & 0.879 & 0.084 & 0.079\\
+Residuals & 7,596.811 & 7,668.459 & 0.890 & 0.905 & 0.075 & 0.096\\
 \bottomrule
 \end{tabular}
 
@@ -1811,13 +1814,13 @@ Residuals & 7,600.057 & 7,671.705 & 0.880 & 0.895 & 0.079 & 0.091\\
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-Overall & 7,684.982 & 7,748.201 & 0.987 & 0.973 & 0.040 & 0.023\\
+Overall & 7,665.760 & 7,728.979 & 1.000 & 1.022 & 0.000 & 0.010\\
 Group Group 1 & 3,765.749 & 3,818.571 & 0.976 & 0.953 & 0.047 & 0.031\\
-Group Group 2 & 3,857.143 & 3,909.965 & 0.992 & 0.984 & 0.037 & 0.029\\
-Configural & 7,622.892 & 7,749.330 & 0.986 & 0.972 & 0.042 & 0.030\\
-Loadings & 7,674.188 & 7,783.767 & 0.817 & 0.738 & 0.131 & 0.095\\
-Intercepts & 7,667.682 & 7,760.403 & 0.824 & 0.805 & 0.113 & 0.096\\
-Residuals & 7,683.177 & 7,754.825 & 0.762 & 0.793 & 0.116 & 0.138\\
+Group Group 2 & 3,855.953 & 3,908.775 & 0.997 & 0.995 & 0.020 & 0.023\\
+Configural & 7,621.702 & 7,748.140 & 0.989 & 0.978 & 0.036 & 0.027\\
+Loadings & 7,659.690 & 7,769.270 & 0.852 & 0.789 & 0.114 & 0.088\\
+Intercepts & 7,652.360 & 7,745.081 & 0.863 & 0.848 & 0.097 & 0.088\\
+Residuals & 7,664.853 & 7,736.502 & 0.806 & 0.832 & 0.102 & 0.135\\
 \bottomrule
 \end{tabular}
 
@@ -1941,13 +1944,13 @@ Residuals & 7,465.986 & 7,537.635 & 0.930 & 0.939 & 0.054 & 0.065\\
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-Overall & 7,382.013 & 7,445.232 & 0.997 & 0.995 & 0.016 & 0.018\\
+Overall & 7,382.876 & 7,446.095 & 0.992 & 0.985 & 0.028 & 0.020\\
 Group Group 1 & 3,765.749 & 3,818.571 & 0.976 & 0.953 & 0.047 & 0.031\\
-Group Group 2 & 3,602.905 & 3,655.727 & 1.000 & 1.013 & 0.000 & 0.023\\
-Configural & 7,368.654 & 7,495.092 & 0.992 & 0.983 & 0.028 & 0.027\\
-Loadings & 7,364.904 & 7,474.483 & 0.990 & 0.986 & 0.025 & 0.036\\
-Intercepts & 7,358.503 & 7,451.224 & 1.000 & 1.001 & 0.000 & 0.037\\
-Residuals & 7,385.958 & 7,457.607 & 0.864 & 0.881 & 0.075 & 0.098\\
+Group Group 2 & 3,601.920 & 3,654.742 & 1.000 & 1.023 & 0.000 & 0.018\\
+Configural & 7,367.669 & 7,494.108 & 0.996 & 0.992 & 0.020 & 0.025\\
+Loadings & 7,371.027 & 7,480.607 & 0.969 & 0.956 & 0.049 & 0.046\\
+Intercepts & 7,364.724 & 7,457.446 & 0.977 & 0.975 & 0.037 & 0.047\\
+Residuals & 7,386.854 & 7,458.502 & 0.877 & 0.893 & 0.076 & 0.076\\
 \bottomrule
 \end{tabular}
 
@@ -1967,13 +1970,13 @@ Residuals & 7,385.958 & 7,457.607 & 0.864 & 0.881 & 0.075 & 0.098\\
 \toprule
 Model & AIC & BIC & CFI & TLI & RMSEA & SRMR\\
 \midrule
-Overall & 7,300.856 & 7,364.075 & 0.998 & 0.995 & 0.015 & 0.018\\
+Overall & 7,301.897 & 7,365.116 & 0.993 & 0.986 & 0.026 & 0.019\\
 Group Group 1 & 3,765.749 & 3,818.571 & 0.976 & 0.953 & 0.047 & 0.031\\
-Group Group 2 & 3,453.099 & 3,505.921 & 0.954 & 0.908 & 0.069 & 0.035\\
-Configural & 7,218.848 & 7,345.287 & 0.965 & 0.929 & 0.059 & 0.033\\
-Loadings & 7,217.332 & 7,326.912 & 0.955 & 0.935 & 0.056 & 0.045\\
-Intercepts & 7,211.566 & 7,304.287 & 0.962 & 0.958 & 0.046 & 0.047\\
-Residuals & 7,304.566 & 7,376.215 & 0.562 & 0.619 & 0.137 & 0.189\\
+Group Group 2 & 3,454.309 & 3,507.131 & 0.945 & 0.889 & 0.075 & 0.036\\
+Configural & 7,220.058 & 7,346.496 & 0.960 & 0.920 & 0.063 & 0.034\\
+Loadings & 7,218.878 & 7,328.458 & 0.948 & 0.926 & 0.060 & 0.046\\
+Intercepts & 7,213.011 & 7,305.732 & 0.956 & 0.951 & 0.049 & 0.048\\
+Residuals & 7,305.660 & 7,377.309 & 0.559 & 0.617 & 0.137 & 0.189\\
 \bottomrule
 \end{tabular}
 
@@ -2045,11 +2048,11 @@ lv =\textasciitilde{} q5 & 0.994 & 0.017\\
 \toprule
 Estimated Parameter & CFI & RSMEA\\
 \midrule
-lv =\textasciitilde{} q1 & 0.880 & 0.079\\
-lv =\textasciitilde{} q2 & 0.898 & 0.074\\
-lv =\textasciitilde{} q3 & 0.878 & 0.081\\
-lv =\textasciitilde{} q4 & 0.962 & 0.045\\
-lv =\textasciitilde{} q5 & 0.907 & 0.071\\
+lv =\textasciitilde{} q1 & 0.890 & 0.075\\
+lv =\textasciitilde{} q2 & 0.904 & 0.072\\
+lv =\textasciitilde{} q3 & 0.887 & 0.078\\
+lv =\textasciitilde{} q4 & 1.000 & 0.000\\
+lv =\textasciitilde{} q5 & 0.914 & 0.068\\
 \bottomrule
 \end{tabular}
 
@@ -2069,11 +2072,11 @@ lv =\textasciitilde{} q5 & 0.907 & 0.071\\
 \toprule
 Estimated Parameter & CFI & RSMEA\\
 \midrule
-lv =\textasciitilde{} q1 & 0.762 & 0.116\\
-lv =\textasciitilde{} q2 & 0.770 & 0.117\\
-lv =\textasciitilde{} q3 & 0.762 & 0.119\\
-lv =\textasciitilde{} q4 & 0.971 & 0.041\\
-lv =\textasciitilde{} q5 & 0.842 & 0.097\\
+lv =\textasciitilde{} q1 & 0.806 & 0.102\\
+lv =\textasciitilde{} q2 & 0.812 & 0.102\\
+lv =\textasciitilde{} q3 & 0.813 & 0.102\\
+lv =\textasciitilde{} q4 & 1.000 & 0.000\\
+lv =\textasciitilde{} q5 & 0.861 & 0.088\\
 \bottomrule
 \end{tabular}
 
@@ -2193,12 +2196,12 @@ lv \textasciitilde{}\textasciitilde{} lv & 0.930 & 0.054\\
 \toprule
 Estimated Parameter & CFI & RSMEA\\
 \midrule
-q1 \textasciitilde{}\textasciitilde{} q1 & 0.869 & 0.075\\
-q2 \textasciitilde{}\textasciitilde{} q2 & 0.860 & 0.078\\
-q3 \textasciitilde{}\textasciitilde{} q3 & 0.870 & 0.075\\
-q4 \textasciitilde{}\textasciitilde{} q4 & 0.994 & 0.016\\
-q5 \textasciitilde{}\textasciitilde{} q5 & 0.862 & 0.077\\
-lv \textasciitilde{}\textasciitilde{} lv & 0.864 & 0.075\\
+q1 \textasciitilde{}\textasciitilde{} q1 & 0.879 & 0.077\\
+q2 \textasciitilde{}\textasciitilde{} q2 & 0.873 & 0.079\\
+q3 \textasciitilde{}\textasciitilde{} q3 & 0.878 & 0.077\\
+q4 \textasciitilde{}\textasciitilde{} q4 & 0.980 & 0.031\\
+q5 \textasciitilde{}\textasciitilde{} q5 & 0.873 & 0.079\\
+lv \textasciitilde{}\textasciitilde{} lv & 0.877 & 0.076\\
 \bottomrule
 \end{tabular}
 
@@ -2218,12 +2221,12 @@ lv \textasciitilde{}\textasciitilde{} lv & 0.864 & 0.075\\
 \toprule
 Estimated Parameter & CFI & RSMEA\\
 \midrule
-q1 \textasciitilde{}\textasciitilde{} q1 & 0.558 & 0.140\\
-q2 \textasciitilde{}\textasciitilde{} q2 & 0.559 & 0.140\\
-q3 \textasciitilde{}\textasciitilde{} q3 & 0.560 & 0.140\\
-q4 \textasciitilde{}\textasciitilde{} q4 & 0.972 & 0.035\\
-q5 \textasciitilde{}\textasciitilde{} q5 & 0.559 & 0.140\\
-lv \textasciitilde{}\textasciitilde{} lv & 0.562 & 0.137\\
+q1 \textasciitilde{}\textasciitilde{} q1 & 0.555 & 0.141\\
+q2 \textasciitilde{}\textasciitilde{} q2 & 0.556 & 0.141\\
+q3 \textasciitilde{}\textasciitilde{} q3 & 0.556 & 0.141\\
+q4 \textasciitilde{}\textasciitilde{} q4 & 0.967 & 0.039\\
+q5 \textasciitilde{}\textasciitilde{} q5 & 0.557 & 0.141\\
+lv \textasciitilde{}\textasciitilde{} lv & 0.559 & 0.137\\
 \bottomrule
 \end{tabular}
 
@@ -2336,56 +2339,56 @@ Examining partial invariance reveals several potential candidates for partial in
 ## Plot for RS2
 \end{verbatim}
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-1.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-107-1.pdf}
 
 \begin{verbatim}
 ## -------
 ## Plot for RS11
 \end{verbatim}
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-2.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-107-2.pdf}
 
 \begin{verbatim}
 ## -------
 ## Plot for RS4
 \end{verbatim}
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-3.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-107-3.pdf}
 
 \begin{verbatim}
 ## -------
 ## Plot for RS12
 \end{verbatim}
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-4.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-107-4.pdf}
 
 \begin{verbatim}
 ## -------
 ## Plot for RS14
 \end{verbatim}
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-5.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-107-5.pdf}
 
 \begin{verbatim}
 ## -------
 ## Plot for RS1
 \end{verbatim}
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-6.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-107-6.pdf}
 
 \begin{verbatim}
 ## -------
 ## Plot for RS10
 \end{verbatim}
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-7.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-107-7.pdf}
 
 \begin{verbatim}
 ## -------
 ## Plot for RS3
 \end{verbatim}
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-103-8.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-107-8.pdf}
 
 \begin{verbatim}
 ## -------
@@ -2471,13 +2474,13 @@ In this output, we see that all the bootstrapped runs of the real data are non-i
 
 With the bootstrap summary, we see that no invariant intercept runs are found (not all columns shown to save space). Note that the \texttt{RS\textasciitilde{}1} does not calculate \emph{d} because the \emph{sd} is zero (thus, this would cause an error as \emph{sd} is part of the denominator). The random runs also do not show a \emph{d} score because the effect size is only calculated when at least 10\% of the runs in \texttt{n\_boot} or \texttt{n\_random} are found. Since we only have a few in that column, no effect size is calculated. The differences in the intercepts for the real data (\texttt{boot} columns) appear to be medium to large, showing \emph{d} scores from 0.3 to 0.6. Therefore, we might expect that the English and Chinese samples have different average endorsement levels of the RS14.
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-110-1.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-114-1.pdf}
 
 The examination of the density plot shows how group 1 (Schulenberg English) tends to show lower average scores than group 2 (Chen Chinese) for most but not all items.
 
 We can view the mean difference or standardized mean difference by using:
 
-\includegraphics{manuscript_files/figure-latex/unnamed-chunk-111-1.pdf} \includegraphics{manuscript_files/figure-latex/unnamed-chunk-111-2.pdf}
+\includegraphics{manuscript_files/figure-latex/unnamed-chunk-115-1.pdf} \includegraphics{manuscript_files/figure-latex/unnamed-chunk-115-2.pdf}
 
 When effects are non-invariant in the randomized data, the mean difference is still fairly small, but we see large mean differences in intercepts when the bootstrapped data is non-invariant. In the effect size graph, we can see that this effect is medium to large for all the parameters.
 

@@ -112,11 +112,11 @@ Measurement invariance has been explored and implemented for the last fifty year
 
 With $d_{MACS}$ and measurement invariance testing, researchers can begin to quantify how and where their construct measurement may vary between groups. Yet, given the large number of studies that show non-invariance, it is clear that equivalence can be hard to meet. It is difficult to know if non-invariance occurs because of random sampling error, true population differences, or differences in replication and reproducibility of the construct in a new sample. The field of psychology is increasingly interested in pre-registration [i.e., registering plans for a study before data collection, @nosek2018] and the promotion of transparency in study design, implementation, and analysis [@mayo-wilson2021], in addition to supporting replication studies [@zwaan2018]. Registered (replication) reports provide an advantageous avenue for the pre-registration of measurement tests, as they allow a researcher the ability to have their study accepted in principle, regardless of the results of a test of construct validity, reliability, or measurement invariance [@hobson2019; @nosek2014]. However, there are few tools that can provide effect size measures for models, individual parameters, or visualization for researchers to plan for future studies. $d_{MACS}$ provides the opportunity to begin to think about the smallest effect size of interest or the smallest meaningful effect size for measurement invariance and replication [i.e., two studies with overlapping confidence intervals "replicate", even if the test of measurement invariance does not, @lakens2017; @anvari2021]. As mentioned, $d_{MACS}$ has only really been explored for a combined intercept and loadings, and while useful, does not necessarily allow a researcher to pinpoint specific issues within an observed variable.
 
-Therefore, purpose of this manuscript is describe an *R* package, `visualizemi`, that provides functionality to calculate multi-group confirmatory factor analysis, partial invariance tests, visualizations of the size of non-invariance, and potential effect sizes for overall models and individual parameters. No known visualization techniques have been proposed for measurement invariance. By creating panel visualizations, we can supplement a researchers ability to judge the strength of the non-invariance differences and effect size for each item. The proposed effect sizes demonstrate the likelihood of replication with a similar sample as compared to a randomly assigned group model, thus, illustrating what type of measurement one might expect to find, and how different that is from random chance. Within this technique, the individual parameter effect sizes can calculated: both the group differences within a model as compared to random and the likelihood of a parameter replication compared to random groups. Coupled with other indicators (i.e., fit indices differences, $d_{MACS}$), we can move toward a better understanding of how much measurement non-invariance is meaningful. This tutorial and package will help researchers plan future studies and aid in the ability to estimate a smallest effect of interest for measurement invariance studies, rather than relying on fit indices and rules of thumb alone.
+Therefore, purpose of this manuscript is to describe an *R* package, `visualizemi`, that provides functionality to calculate multi-group confirmatory factor analysis, partial invariance tests, visualizations of the size of non-invariance, and potential effect sizes for overall models and individual parameters. No known visualization techniques have been proposed for measurement invariance. By creating panel visualizations, we can supplement a researcher's ability to judge the strength of the non-invariance differences and effect size for each item. The proposed effect sizes demonstrate the likelihood of replication with a similar sample as compared to a randomly assigned group model, thus, illustrating what type of measurement one might expect to find, and how different that is from random chance. Within this technique, the individual parameter effect sizes can be calculated: both the group differences within a model as compared to random and the likelihood of a parameter replication compared to random groups. Coupled with other indicators (i.e., fit indices differences, $d_{MACS}$), we can move toward a better understanding of how much measurement non-invariance is meaningful. This tutorial and package will help researchers plan future studies and aid in the ability to estimate a smallest effect of interest for measurement invariance studies, rather than relying on fit indices and rules of thumb alone.
 
 By the end of this tutorial manuscript, readers will:
 
-1.  Learn how to use *visualizemi* to analyze multi-group confirmatory factor analysis, examine partial invariance, and create visualizations of parameters.
+1.  Learn how to use *visualizemi* to analyze multi-group confirmatory factor analysis, examine partial for invariance, and create visualizations of parameters.
 2.  Learn how to estimate the potential replication of multi-group models and their parameters using bootstrapping compared to a random group model.
 3.  Be able to calculate and interpret effect sizes for model and parameter replication, as well as parameter group differences.
 4.  Understand the impact of measurement variability on replication and generalizability.
@@ -530,7 +530,7 @@ names(invariant.plot)
 
 The outputs from this function are several *ggplot2* objects that can be edited or saved directly using *ggplot2* functionality [@R-ggplot2].
 
-1)  `complete`: The output from this model can be found in Figure \@ref(fig:invariant-pic). On the left hand side, the item invariance is plotted, and on the right hand side, the latent mean distributions for the two groups are plotted. In the item invariance sub-plot, the visualization includes all three components traditionally seen in MGCFA testing steps: loadings, intercepts, and residuals. Each visualization element was designed to match the traditional visualization for that type of output. All parameter estimates are plotted on the unstandardized estimates and their confidence interval based on the standard error of the estimate. All plots are made with *ggplot2* and *cowplot* [@wilke2020].
+1)  `complete`: The output from this model can be found in Figure \@ref(fig:invariant-pic). On the left-hand side, the item invariance is plotted, and on the right-hand side, the latent mean distributions for the two groups are plotted. In the item invariance sub-plot, the visualization includes all three components traditionally seen in MGCFA testing steps: loadings, intercepts, and residuals. Each visualization element was designed to match the traditional visualization for that type of output. All parameter estimates are plotted on the unstandardized estimates and their confidence interval based on the standard error of the estimate. All plots are made with *ggplot2* and *cowplot* [@wilke2020].
 
 ```{r invariant-pic, include = T, fig.cap = "Invariant Model Visualization"}
 invariant.plot$complete
@@ -540,11 +540,11 @@ ggsave("figures/invariant-visual.png", dpi = 300,
        units = "in")
 ```
 
-2)  `intercept`: Only the left hand side of the complete plot designed to represent intercepts and factor loadings. Factor loadings represent the slope of the regression equation for the latent variable predicting the scores on the observed variable ($\hat{Y} \sim b_0 + b_1X + \epsilon$). The y-axis indicates the observed variable scores, and here, the plot includes the entire range of the scale of the data for item four. The coefficient ($b_1$) for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_tail() %>% pull(estimate))`. The ribbon bands around the plotted slopes indicate the confidence interval for that estimate. In this plot, while the coefficients for each group are not literally equal, the overlapping and parallel slope bands indicate they are not different practically.
+2)  `intercept`: Only the left-hand side of the complete plot designed to represent intercepts and factor loadings. Factor loadings represent the slope of the regression equation for the latent variable predicting the scores on the observed variable ($\hat{Y} \sim b_0 + b_1X + \epsilon$). The y-axis indicates the observed variable scores, and here, the plot includes the entire range of the scale of the data for item four. The coefficient ($b_1$) for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_tail() %>% pull(estimate))`. The ribbon bands around the plotted slopes indicate the confidence interval for that estimate. In this plot, while the coefficients for each group are not literally equal, the overlapping and parallel slope bands indicate they are not different practically.
 
 The item intercepts ($b_0$) are plotted on the middle line where they would cross the y-axis at a latent variable score of zero. These are represented by a dot with a set of confidence error bars around the point. The intercept for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))`. In this invariant depiction, the overlap in the intercepts is clear, indicating they are not different. You can use `y_limits` to zoom in on the graph if these are too small to be distinguishable.
 
-3)  `mean`: The right hand side of the complete plot graphing the latent variable means and density from the data. The latent variable is shown on the x-axis using standardized values (i.e., *z*-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The lines indicate the means of the latent variables from the simulated dataset. Group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the data set or whichever group is the first that appears when using the `levels()` command.
+3)  `mean`: The right-hand side of the complete plot graphing the latent variable means and density from the data. The latent variable is shown on the x-axis using standardized values (i.e., *z*-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The lines indicate the means of the latent variables from the simulated dataset. Group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the data set or whichever group is the first that appears when using the `levels()` command.
 
 4)  `variance`: A split geom violin plot indicating the variance distribution of the plotted item. Residuals are trickier to plot, as they are the left over error when predicting the observed variables $\epsilon$. It is tempting to plot this value as the confidence band around the slope, however, that defeats the purpose of understanding that the slopes are estimated separately from the residuals, and both have an associated variability around their parameter estimate. Therefore, residuals are represented in the inset picture at the bottom right of the item invariance plot. The black bars represent the estimated residual for each group (group 1: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_head() %>% pull(estimate))`, group 2: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_tail() %>% pull(estimate))`). The distributions are plotted to represent the normal spread of values using the standard error of the residuals. The violin plot allows for direct comparison of those residuals and their potential distributions. Note that the placement has nothing to do with the x or y-axis and is designed to always show in the same location, regardless of size/value. The plots are included separately so they can be arranged in a different fashion if desired.
 
@@ -784,7 +784,7 @@ boot.model.invariant <-
     # what is your criterion for that fit index
     invariance_rule = .01,
     # what equality constraints are you testing 
-    group.equal = c("loadings", "intercepts", "residuals")
+    group.equal = c("loadings", "intercepts", "resduals")
   )
 ```
 
@@ -890,6 +890,10 @@ boot.partial.invariant <-
         # what equality constraints should be imposed 
         group.equal = c("loadings")
       )
+```
+
+```{r echo = F, eval = F}
+saveRDS(boot.partial.invariant, "manu_data/boot.partial.invariant.RData")
 ```
 
 ```{r partial-boot-print, echo = T, size = "small"}
@@ -1163,7 +1167,7 @@ partial.rs.2 <- mgcfa(model = model.rs,
 
 # examine the loadings 
 partial.rs.2$model_coef %>% 
-  filter(term == "RS6 ~1") %>% 
+  filter(term == "RS6 ~1 ") %>% 
   filter(model == "intercepts") %>% 
   dplyr::select(term, group, estimate, std.error)
 # examine the fit indices 
@@ -1286,6 +1290,11 @@ boot.partial.rs <-
 )
 ```
 
+```{r}
+# saveRDS(boot.partial.rs, "manu_data/boot.partial.rs.RData")
+boot.partial.rs <- readRDS("manu_data/boot.partial.rs.RData")
+```
+
 ```{r table-boot-effects, results='asis'}
 apa_table(boot.partial.rs$boot_effects %>% 
             dplyr::select(term, non_invariant, random_non_invariant, h_nmi, h_nmi_p) %>% 
@@ -1298,6 +1307,30 @@ apa_table(boot.partial.rs$boot_effects %>%
 ```
 
 ```{r rs-partial-pic, include = T, fig.cap="RS-14 scale invariance for item intercepts. The left panel indicates the raw score difference between groups and items, while the right panel indicates the effect size for group differences based on invariance."}
+
+get_legend <- function(plot, legend = NULL) {
+
+    gt <- ggplotGrob(plot)
+
+    pattern <- "guide-box"
+    if (!is.null(legend)) {
+      pattern <- paste0(pattern, "-", legend)
+    }
+
+    indices <- grep(pattern, gt$layout$name)
+
+    not_empty <- !vapply(
+      gt$grobs[indices],
+      inherits, what = "zeroGrob",
+      FUN.VALUE = logical(1)
+    )
+    indices <- indices[not_empty]
+
+    if (length(indices) > 0) {
+      return(gt$grobs[[indices[1]]])
+    }
+    return(NULL)
+  }
 
 legend_all <- get_legend(boot.partial.rs$effect_invariance_plot +
                            theme(legend.direction = "horizontal",
@@ -1328,7 +1361,7 @@ The @aiena2014 data used in our previous example was first filtered to only coll
 
 The results of model bootstrapping indicated that the effect of the loadings was likely to replicate (only invariant results were found), but the intercepts were never found to be invariant compared to a randomized sample ($h_{nmi_p}$ = 1). Therefore, we would expect that these differences are persistent, either due to the adaptation or cultural differences in resiliency across samples. The bootstrapped partial invariance demonstrates that each item intercept has a medium to large difference between the two samples as shown in Figure \@ref(fig:rs14-chinese-effect-pic), which may explain why full or partial invariance cannot be achieved. This result does not invalidate either version of the scale, but informs researchers of potential baseline differences in item responding for the two samples. Therefore, careful interpretation should be made when comparing these two samples in other instances, as differences in latent means may be the default finding, but with these results one may determine if their results are different from expectations of general scale responding. 
 
-```{r rs14-chinese-pic, include = T, fig.cap = "The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group."}
+```{r rs14-chinese-pic, include = T, fig.cap = "The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left-hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group."}
 load("manu_data/fig-chinese-rs2.Rdata")
 complete
 ```
