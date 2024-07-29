@@ -3,7 +3,7 @@
 \PassOptionsToPackage{hyphens}{url}
 %
 \documentclass[
-  man,floatsintext]{apa7}
+  man]{apa7}
 \usepackage{amsmath,amssymb}
 \usepackage{iftex}
 \ifPDFTeX
@@ -228,6 +228,12 @@
   }
 {}{\PatchFailed}
 \keywords{multigroup confirmatory factor analysis, measurement invariance, visualization, effect size}
+\DeclareDelayedFloatFlavor{ThreePartTable}{table}
+\DeclareDelayedFloatFlavor{lltable}{table}
+\DeclareDelayedFloatFlavor*{longtable}{table}
+\makeatletter
+\renewcommand{\efloat@iwrite}[1]{\immediate\expandafter\protected@write\csname efloat@post#1\endcsname{}}
+\makeatother
 \usepackage{lineno}
 
 \linenumbers
@@ -332,7 +338,7 @@ If a specific step within the MGCFA testing framework shows non-invariance, part
 
 \section{Package Functions}\label{package-functions}
 
-The complete code for this manuscript can be found at \url{https://osf.io/wev5f/}. This tutorial was registered at \url{https://osf.io/vwf4d}, and the example provided at the end of the manuscript was added after that registration. The \emph{R} package and replication/effect sizes was added after the original manuscript submission. The simulation study used to design plotting functions and test effect sizes can be found in the supplemental materials, along with worked code examples.
+The \%\textgreater\% code for this manuscript can be found at \url{https://osf.io/wev5f/}. This tutorial was registered at \url{https://osf.io/vwf4d}, and the example provided at the end of the manuscript was added after that registration. The \emph{R} package and replication/effect sizes was added after the original manuscript submission. The simulation study used to design plotting functions and test effect sizes can be found in the supplemental materials, along with worked code examples.
 
 \subsection{\texorpdfstring{MGCFA: \texttt{mgcfa()} Function}{MGCFA: mgcfa() Function}}\label{mgcfa-mgcfa-function}
 
@@ -344,7 +350,7 @@ First, we would create our model code in \emph{lavaan} syntax (Rosseel, 2012). T
 \item
   the model syntax in the \texttt{model} argument.
 \item
-  the dataframe in the \texttt{data} argument of our functionl
+  the dataframe in the \texttt{data} argument of our function
 \item
   the name of the grouping variable in quotes for \texttt{group}.
 \item
@@ -446,8 +452,15 @@ The outputs from this function are several \emph{ggplot2} objects that can be ed
 \end{enumerate}
 
 The item intercepts (\(b_0\)) are plotted on the middle line where they would cross the y-axis at a latent variable score of zero. These are represented by a dot with a set of confidence error bars around the point. In this invariant depiction, the overlap in the intercepts is clear, indicating they are not different. You can use \texttt{y\_limits} to zoom in on the graph if these are too small to be distinguishable.
-3) \texttt{mean}: The right-hand side of the complete plot graphing the latent variable means and density from the data. The latent variable is shown on the x-axis using standardized values (i.e., \emph{z}-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The lines indicate the means of the latent variables from the simulated dataset. Group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the data set or whichever group is the first that appears when using the \texttt{levels()} command.
-4) \texttt{variance}: A split geom violin plot indicating the variance distribution of the plotted item. Residuals are trickier to plot, as they are the left over error when predicting the observed variables \(\epsilon\). It is tempting to plot this value as the confidence band around the slope, however, that defeats the purpose of understanding that the slopes are estimated separately from the residuals, and both have an associated variability around their parameter estimate. Therefore, residuals are represented in the inset picture at the bottom right of the item invariance plot. The black bars represent the estimated residual for each group. The distributions are plotted to represent the normal spread of values using the standard error of the residuals. The violin plot allows for direct comparison of those residuals and their potential distributions. Note that the placement has nothing to do with the x or y-axis and is designed to always show in the same location, regardless of size/value. The plots are included separately so they can be arranged in a different fashion if desired.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{2}
+\item
+  \texttt{mean}: The right-hand side of the complete plot graphing the latent variable means and density from the data. The latent variable is shown on the x-axis using standardized values (i.e., \emph{z}-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The lines indicate the means of the latent variables from the simulated dataset. Group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the data set or whichever group is the first that appears when using the \texttt{levels()} command.
+\item
+  \texttt{variance}: A split geom violin plot indicating the variance distribution of the plotted item. Residuals are trickier to plot, as they are the left over error when predicting the observed variables \(\epsilon\). It is tempting to plot this value as the confidence band around the slope, however, that defeats the purpose of understanding that the slopes are estimated separately from the residuals, and both have an associated variability around their parameter estimate. Therefore, residuals are represented in the inset picture at the bottom right of the item invariance plot. The black bars represent the estimated residual for each group. The distributions are plotted to represent the normal spread of values using the standard error of the residuals. The violin plot allows for direct comparison of those residuals and their potential distributions. Note that the placement has nothing to do with the x or y-axis and is designed to always show in the same location, regardless of size/value. The plots are included separately so they can be arranged in a different fashion if desired.
+\end{enumerate}
 
 \subsection{\texorpdfstring{Model Replication and Effect Sizes: \texttt{bootstrap\_model()} Function}{Model Replication and Effect Sizes: bootstrap\_model() Function}}\label{model-replication-and-effect-sizes-bootstrap_model-function}
 
@@ -484,22 +497,22 @@ The alternative, \(h_{mi}\), for effect size of measurement invariance replicati
 
 After examining the overall model potential replication effect size, the individual parameters within a model can be bootstrapped for partial invariance to with that parameter relaxed (overall partial model statistics) and the difference in group parameter estimates (parameter effect size). This function uses arguments seen in other functions, so they will not be repeated here. The general setup consists of using the model you think could be partially invariant in the \texttt{saved\_model} argument and the fit index for comparison for the model with less constraints in \texttt{invariance\_compare}. The \texttt{partial\_step} argument will be used to determine which operation syntax (i.e.~\texttt{=\textasciitilde{}} for loadings) to relax for modeling.
 
-The saved output includes several dataframes and plots. The first is the \texttt{boot\_DF} which the summary of each run in a dataframe for plotting or summarization. This dataframe includes the estimate for each paramter (\texttt{term}) separated by group and type (\texttt{boot\_1}, \texttt{boot\_2} are the bootstrapped estimates for group 1 and group 2, while the same \texttt{random} columns indicate the randomly assigned groups). The fit index used to determine invariance is included for bootstrapped and random estimates, and then the differences between groups and if they were ``invariant'' or not given the researcher supplied rule.
+The saved output includes several dataframes and plots. The first is the \texttt{boot\_DF} which is the summary of each bootstrapped run in a dataframe for plotting or summarization. This dataframe includes the estimate for each parameter (\texttt{term}) separated by group and type (\texttt{boot\_1}, \texttt{boot\_2} are the bootstrapped estimates for group 1 and group 2, while the same \texttt{random} columns indicate the randomly assigned groups). The fit index used to determine invariance is included for bootstrapped and random estimates, and then the differences between groups and if they were ``invariant'' or not given the researcher supplied rule.
 
-Next, the \texttt{boot\_summary} includes a summarized form of the bootstrapped results from separated by bootstrapping versus random and invariant/non-invariant. The \(d_s\) for between groups Cohen's \(d\) is included. Effect sizes are only calculated when the number of bootstrapped estimates is at least 10\% of the data - therefore, you would not receive effect sizes with almost no bootstrapped runs. This dataframe should be used to determine which parameter may be different and at what size between groups in a replication of the study. The \texttt{boot\_effects} table creates a summary similar to the overall model replication table based on the proportion of runs that were considered invariant versus not for each parameter.
+Next, the \texttt{boot\_summary} includes a summarized form of the bootstrapped results separated by bootstrapped data versus randomized data and then invariant/non-invariant outcomes. The \(d_s\) for between groups Cohen's \(d\) is included (\textbf{lakens2013?}). Effect sizes are only calculated when the number of bootstrapped estimates is at least 10\% of the data - therefore, you would not receive effect sizes with almost no bootstrapped runs. This dataframe should be used to determine which parameter may be different and the effect size potential between groups in a replication of the study. The \texttt{boot\_effects} table creates a summary similar to the overall model replication table based on the proportion of runs that were considered invariant versus not for each parameter.
 
 Plots of the results from dataframes can be found within the \texttt{bootstrap\_partial()} function. Figure \ref{fig:invariance-partial-fig} shows the difference between parameters for groups in the bootstrapped and randomly assigned group runs in simulated data. Figure \ref{fig:density-partial-fig} shows the density plot of the estimates for each group organized by bootstrapped and randomly assigned groups and the invariance decision for each bootstrapped run. Last, Figure \ref{fig:effect-partial-fig} indicates the \(d_s\) value between groups with an indication of the number of data points in each estimate (i.e., dot size). These visualizations should allow a researcher to understand the likelihood of replication for each parameter, as well as the potential size of the differences. Therefore, one could indicate a specific smallest effect size of interest, rather than a invariance cut-off rule of thumb when planning a replication or registered report.
 
 \begin{figure}
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{figures/boot-partial-invariance.png}}
-\caption{\label{fig:invariance-partial-fig}Visualization of the difference score between groups by parameter for invariant and non-invariant bootstrapped and randomly assigned group data.}
+\caption{\label{fig:invariance-partial-fig}Visualization of the difference score between groups by parameter for invariant and non-invariant bootstrapped and randomly assigned group data on simulated data.}
 \end{figure}
 
 \begin{figure}
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{figures/boot-partial-density.png}}
-\caption{\label{fig:density-partial-fig}Visualization of the number of estimates for each group by bootstrapped and randomly assigned group runs by their invariance decision.}
+\caption{\label{fig:density-partial-fig}Visualization of the number of estimates for each group by bootstrapped and randomly assigned group runs by their invariance decision on simulated data.}
 \end{figure}
 
 \begin{figure}
@@ -538,27 +551,25 @@ Residuals & 126,466.241 & 126,727.438 & 0.780 & 0.793 & 0.156 & 0.086\\
 
 \end{table}
 
-Table \ref{tab:rs-table} indicates the results after running the one-factor model. There are several guidelines for assessing assessing a degradation in model fit (Cao \& Liang, 2022; Cheung \& Rensvold, 2002; Counsell et al., 2020; Jin, 2020; Putnick \& Bornstein, 2016) but for the purposes of this illustration \(\Delta\)CFI \textgreater{} .01 will be used. Table \ref{tab:rs-table} indicates that fit was degraded when the constraint on equal item intercepts was added. The code below provides an example of testing each item individually by relaxing the constraints and recalculating the CFI. If these Items bring the CFI value back up to \(\Delta\)CFI \textless= .01 from the metric model, then the model would be considering partially invariant at the scalar level. It seems unlikely that the residuals will show invariance, if partial scalar invariance can be found, as the drop in fit is quite large.
+Table \ref{tab:rs-table} indicates the results after running the one-factor model. There are several guidelines for assessing assessing a degradation in model fit (Cao \& Liang, 2022; Cheung \& Rensvold, 2002; Counsell et al., 2020; Jin, 2020; Putnick \& Bornstein, 2016) but for the purposes of this illustration \(\Delta\)CFI \textgreater{} .01 will be used. Table \ref{tab:rs-table} indicates that fit was degraded when the constraint on equal item intercepts was added. The code online provides an example of testing each item individually by relaxing the constraints and recalculating the CFI. If these Items bring the CFI value back up to \(\Delta\)CFI \textless= .01 from the metric model, then the model would be considering partially invariant at the scalar level. It seems unlikely that the residuals will show invariance, even if partial scalar invariance can be found, as the drop in fit on the residual model is quite large.
 
-The output indicates that RS6 and RS7 are potential items that could be relaxed to improve model fit and create a partial scalar invariant model (i.e., by picking the largest CFI values). The code below show to check the addition of these items, which are added one at a time. You use the \texttt{group.partial} open to ``relax'' or freely estimate that parameter for each group separately.
-
-By examining our estimates, we can see that item seven on the RS-14 is estimated at nearly 5 points for the clinical sample, while the student sample has a lower mean around 4.5 points. Generally, students show higher means on the items of the RS-14, but when all loadings and other intercepts are constrained to be equal, and this one item is relaxed, this pattern flips so that clinical groups show higher item intercepts. Given the scale is a 1-7 Likert type scale, .5 a point represents a potentially sizable change on the scale. Item seven covers perseverance after hardship, and all items can be found in the user manual for the scale at www.resiliencecenter.com. The effect size from \(d_{MACS}\) suggests a small to medium effect, 0.28. In this next code section, we repeat this process for the RS6, as the CFI for our model with only RS7 does not achieve the levels of partial invariance for our \(\Delta\)CFI criterion (i.e., \textless= .01 downward change in fit: metric CFI = .925, partial scalar CFI = .914). See Figure \ref{fig:rs7-img} for the difference between item intercepts and latent means.
+The partial invariance results indicated that RS6 and RS7 are potential items that could be relaxed to improve model fit and create a partial scalar invariant model (i.e., by picking the largest CFI values). By examining our estimates, we can see that item seven on the RS-14 is estimated at nearly 5 points for the clinical sample, while the student sample has a lower mean around 4.5 points. Generally, students show higher means on the items of the RS-14, but when all loadings and other intercepts are constrained to be equal, and this one item is relaxed, this pattern flips so that clinical groups show higher item intercepts. Given the scale is a 1-7 Likert type scale, .5 a point represents a potentially sizable change on the scale. Item seven covers perseverance after hardship, and all items can be found in the user manual for the scale at www.resiliencecenter.com. The effect size from \(d_{MACS}\) suggests a small to medium effect, 0.28. See Figure \ref{fig:rs7-img} for the difference between item intercepts and latent means. We repeat this process for the RS6, as the CFI for our model with only RS7 does not achieve the levels of partial invariance for our \(\Delta\)CFI criterion (i.e., \textless= .01 downward change in fit: metric CFI = .925, partial scalar CFI = .914).
 
 Again, we see about a half-point difference between our clinical and student samples for item 6, which is about drive to achieve. The CFI for this model does meet the requirements for partial invariance, .917. The effect size is approximately the same at \(d_{MACS}\) = 0.28. See Figure \ref{fig:rs6-img} shows the difference between item intercepts and latent means.
 
 \begin{figure}
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs7-img-1.pdf}}
-\caption{\label{fig:rs7-img}RS7 Item Invariance Visualization}
+\caption{\label{fig:rs7-img}RS7 item non-invariance visualization showing differences in the item intercepts and latent variable.}
 \end{figure}
 
 \begin{figure}
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs6-img-1.pdf}}
-\caption{\label{fig:rs6-img}RS6 Item Invariance Visualization}
+\caption{\label{fig:rs6-img}RS6 item non-invariance visualization similar results to RS7 with differences in item intercepts.}
 \end{figure}
 
-Next, we would examine our replication potential for this model. Given our current results, we may not expect our intercepts to replicate. Given the order of \texttt{group.equal}, the boot function will select the first non-invariant step in the calculation of the effect size for potential replication. In our output, we do not see a loadings effect size, and this result occurs when \emph{none} of the bootstrapped or random results are non-invariant. Therefore, we would expect the loadings to replicate (and the effect size would be 0 difference between bootstrapped and random, both showing invariance). The intercepts show a large (i.e., close to the max possible value) non-invariant effect, and therefore, we should not expect this model to show invariance in a replication.
+Next, we would examine our replication potential for this model. Given our current results, we may not expect our intercepts to replicate. Given the order of desired steps in the \texttt{group.equal} argument, the boot function will select the first non-invariant step (as defined by the user) in the calculation of the effect size for potential replication. In our output, we do not see a loadings effect size, and this result occurs when \emph{none} of the bootstrapped or random results are non-invariant. Therefore, we would expect the loadings to replicate (and the effect size would be 0 difference between bootstrapped and random, both showing invariance). The intercepts show a large (i.e., close to the max possible value) non-invariant effect, and therefore, we should not expect this model to show invariance in a replication.
 
 Next, we would examine the strength of the effects of replication on each parameter at the intercept level. By examining Table \ref{tab:table-boot-effects}, it is clear that most of the item means are unlikely to replicate, even though two particular items can be used to create partial invariance. Figures \ref{fig:rs-partial-pic} and \ref{fig:rs-partial-pic2} display the three plots provided in the \texttt{bootstrap\_partial()} function. In general, we should expect \(M_{D}\) = 0.11 when items are invariant and \(M_{D}\) = 0.25 when items are not invariant. The effect size of non-invariant items ranges from 0.43 to 0.59.
 
@@ -593,7 +604,12 @@ RS7  Intercept & 0.961 & 0.013 & 2.515 & 0.801\\
 RS8  Intercept & 0.986 & 0.013 & 2.676 & 0.852\\
 RS9  Intercept & 0.978 & 0.013 & 2.615 & 0.832\\
 \bottomrule
+\addlinespace
 \end{tabular}
+
+\begin{tablenotes}[para]
+\normalsize{\textit{Note.} Non-Invariant and Random Non-Invariant columns represent the proportion of non-invariant simulations of out the total simulations, representing our non-replication rate. These values are converted into an effect size difference in the final two columns.}
+\end{tablenotes}
 
 \end{threeparttable}
 \end{center}
@@ -614,7 +630,7 @@ RS9  Intercept & 0.978 & 0.013 & 2.615 & 0.832\\
 
 \section{An Example Extension}\label{an-example-extension}
 
-One benefit of the open science movement on scale development is the publication of datasets or covariance tables with published articles. We can extend our examination of potential replication on other variables that may effect assessment of underlying phenomena. For example, scale translation across languages is not only impacted by the literal conversion of concepts from one language to another, but also the cultural and societal norms of the target population (Cha et al., 2007; Chang et al., 1999; Yu et al., 2004). The RS14 was tested in Chinese speaking samples in Chen et al. (2020) across five different large samples and determined that the scale showed good psychometric properties for use within Chinese speaking samples as a one-factor model of resiliency. Given these results, another researcher may assume that the models would be comparable between English speaking (i.e., likely United States) and Chinese speaking samples. With the published data, we can use \texttt{visualizemi} to determine if the RS14 is invariant across language/culture, and if the results would likely replicate if tested on a new set of samples, and what, if any, effect size differences are found in parameters. The code used for this analysis is presented in Appendix 7.
+One benefit of the open science movement on scale development is the publication of datasets or covariance tables with published articles. We can extend our examination of potential replication on other variables that may effect assessment of underlying phenomena. For example, scale translation across languages is not only impacted by the literal conversion of concepts from one language to another, but also the cultural and societal norms of the target population (Cha et al., 2007; Chang et al., 1999; Yu et al., 2004). The RS14 was tested in Chinese speaking samples in Chen et al. (2020) across five different large samples and determined that the scale showed good psychometric properties for use within Chinese speaking samples as a one-factor model of resiliency. Given these results, another researcher may assume that the models would be comparable between English speaking (i.e., likely United States) and Chinese speaking samples. With the published data, we can use \texttt{visualizemi} to determine if the RS14 is invariant across language/culture, and if the results would likely replicate if tested on a new set of samples, and what, if any, effect size differences are found in parameters. The code used for this analysis is presented in the supplemental materials.
 
 The Aiena et al. (2014) data used in our previous example was first filtered to only college students, as we have already noted that clinical samples show slightly different intercepts for at least two of the items from student samples. The Chen et al. (2020) data also included college students, which allows us to test a comparable sample that varies on translation and culture. The test of measurement invariance indicated that the factor structure and loadings were invariant across groups. Much like our test of clinical versus student samples, the results indicated that the intercepts were not consistent across groups. Within the English clinical/student sample, partial invariance could be achieved by relaxing two item intercept constraints (item 6 and 7). To achieve ``partial'' invariance between the Chinese and English speaking samples, we would need to relax more than half of the items (specifically, eight items: 1, 2, 3, 4, 10, 11, 12, 14), and it would be difficult to suggest partial invariance given this finding. \(d_{MACS}\) values range from 0.26 to 0.32 for the eight items which could be interpreted a small to medium given Nye et al. (2019)'s simulation study. Figure \ref{fig:rs14-chinese-pic} portrays the results from the second item on the RS14 (\emph{life accomplishments}).
 
@@ -622,23 +638,23 @@ The results of model bootstrapping indicated that the effect of the loadings was
 
 \begin{figure}
 \centering
-\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs14-chinese-pic-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/rs14-chinese-RS2.png}}
 \caption{\label{fig:rs14-chinese-pic}The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left-hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group.}
 \end{figure}
 
 \begin{figure}
 \centering
-\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs14-chinese-effect-pic-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/rs14-chinese-effect_invariance_plot.png}}
 \caption{\label{fig:rs14-chinese-effect-pic}Effect size differences for item intercepts on the English versus Chinese samples for the RS14.}
 \end{figure}
 
 \section{Discussion}\label{discussion}
 
-In this tutorial, we examined how to use multiple tools to examine measurement invariance and its potential replication. Model fit comparisons and statistics can be paired with the proposed effect size measures, and a visualization to examine individual items and the overall latent mean scores. The impact of potential replication was estimated on the overall model and the individual parameters. Using real data, the effect of two non-invariant item intercepts was examined and visualized. This tutorial manuscript has provided a concrete way to plan for pre-registration and/or registered reports. Researchers could simulate results based on published or previously collected data to determine the likelihood and size of potential replication. They could plan and pre-register a smallest effect of interest. For example, we may determine that an \(h_{nmi_p}\) value above .20 represents an important level of non-invariance for our model overall, while \(h_{nmi_p}\) \textgreater{} .30 for any individual parameter warrant caution against invariance for groups. Others have begun to discuss the importance of focusing on effects in the scale of the data and their practical importance (Anvari \& Lakens, 2021; Cumming, 2012).
+In this tutorial, we examined how to use multiple tools to examine measurement invariance and its potential replication. Model fit comparisons and statistics can be paired with the proposed effect size measures, and visualizations to examine individual items and the overall latent mean scores. The impact of potential replication was estimated on the overall model and the individual parameters. Using real data, the effect of two non-invariant item intercepts was examined and visualized. This tutorial manuscript has provided a concrete way to plan for pre-registration and/or registered reports. Researchers could simulate results based on published or previously collected data to determine the likelihood and size of potential replication. They could plan and pre-register a smallest effect of interest. For example, we may determine that an \(h_{nmi_p}\) value above .20 represents an important level of non-invariance for our model overall, while \(h_{nmi_p}\) \textgreater{} .30 for any individual parameter warrant caution against invariance for groups. Others have begun to discuss the importance of focusing on effects in the scale of the data and their practical importance (Anvari \& Lakens, 2021; Cumming, 2012).
 
 From the example, our interpretation may be that the difference between group's latent means is large, as a 0.72 change on a 7 point scale is approximately 10\% more resiliency for students when compared to the clinical sample. Practically, 10\% in resiliency for an area of the United States (Mississippi) often hit with natural disasters (hurricanes, tornadoes, floods) and high levels of poverty would be very important. Even the smaller difference of .5 point on each individual item could translate into increases in resiliency, and these results may elucidate avenues for further exploration into areas of focus within resiliency, given the items. The secondary example showed that we can extend these results to other samples to examine other potentially impactful variables on assessment. The findings replicate in the sense that the scale shows the same invariant issues with intercepts on a Chinese versus English sample comparison. However, in this analysis, it is clear that the differences in items averages are much larger and across all items, rather than a few.
 
-What do the results of a study on measurement invariance with these results tell us about replication, generalizability, and validity overall? If a researcher decides their effects are large, they should likely caution against suggesting that these scores are directly comparable without weighting or other adjustment. Let's consider a scenario wherein the change metric between models picked (i.e., \(\Delta\)CFI, \(\Delta\)RMSEA) indicates a ``significant'' change in model fit. However, if both the effect size and a visual inspection of the invariance indicates a small difference, we may decide to lessen the practical importance of those results, much like ``just significant'' \emph{p}-values with small effect sizes are treated now. The results from our Chinese versus English comparison show us the other scenario: non-invariant results that clearly indicate differences with a large effect size on both replication and item average differences. Given that the goal of measurement invariance is to compare \emph{estimates}, we should expect some differences across samples due to the nature of sampling and estimation. It may be that many of the published models presented represent these effects - small variations between groups due to sampling error or other small crud - but do not represent a fundamental problem with the measurement or generalizability of the results. The \texttt{visualizemi} package is one useful tool to help sort out if findings are this small sampling error or differences in samples due to other variables.
+What do the results of a study on measurement invariance with these results tell us about replication, generalizability, and validity overall? If a researcher decides their effects are large, they should likely caution against suggesting that these scores are directly comparable without weighting or other adjustment. Let's consider a scenario wherein the change metric between models picked (i.e., \(\Delta\)CFI, \(\Delta\)RMSEA) indicates a ``significant'' change in model fit. However, if both the effect size and a visual inspection of the invariance indicates a small difference, we may decide to lessen the practical importance of those results, much like ``just significant'' \emph{p}-values with small effect sizes are treated now. The results from our Chinese versus English comparison show us the other scenario: non-invariant results that clearly indicate differences with a large effect size on both replication and item average differences. Overall, given that the goal of measurement invariance is to compare parameter \emph{estimates}, we should expect some differences across samples due to the nature of sampling and estimation. It may be that many of the published models presented represent these effects - small variations between groups due to sampling error or other small crud - but do not represent a fundamental problem with the measurement or generalizability of the results. The \texttt{visualizemi} package is one useful tool to help sort out if findings are this small sampling error or differences in samples due to other variables.
 
 \newpage
 
@@ -1495,7 +1511,7 @@ After examining the overall model potential replication effect size, the individ
 ## [4] "boot_DF"                "boot_summary"           "boot_effects"
 \end{verbatim}
 
-The saved output includes several dataframes and plots. The first is the \texttt{boot\_DF} which the summary of each run in a dataframe for plotting or summarization. This dataframe includes the estimate for each paramter (\texttt{term}) separated by group and type (\texttt{boot\_1}, \texttt{boot\_2} are the bootstrapped estimates for group 1 and group 2, while the same \texttt{random} columns indicate the randomly assigned groups). The fit index used to determine invariance is included for bootstrapped and random estimates, and then the differences between groups and if they were ``invariant'' or not given the researcher supplied rule.
+The saved output includes several dataframes and plots. The first is the \texttt{boot\_DF} which the summary of each run in a dataframe for plotting or summarization. This dataframe includes the estimate for each parameter (\texttt{term}) separated by group and type (\texttt{boot\_1}, \texttt{boot\_2} are the bootstrapped estimates for group 1 and group 2, while the same \texttt{random} columns indicate the randomly assigned groups). The fit index used to determine invariance is included for bootstrapped and random estimates, and then the differences between groups and if they were ``invariant'' or not given the researcher supplied rule.
 
 \small
 
@@ -1606,6 +1622,8 @@ Plots of the results from dataframes can be found within the \texttt{bootstrap\_
 \end{figure}
 
 \section{Simulation Study}\label{simulation-study}
+
+The code for building and running simulations can be found in \emph{simulate\_boot\_rr.Rmd}, \emph{simulate\_boot\_partial.Rmd}, and \emph{simulate\_combine.Rmd}.
 
 \subsection{Design and Analysis}\label{design-and-analysis}
 
@@ -2242,10 +2260,10 @@ lv \textasciitilde{}\textasciitilde{} lv & 0.559 & 0.137\\
 
 \begin{verbatim}
 ## # A tibble: 2 x 2
-##   group       sample
-##   <chr>        <int>
-## 1 Chen          1010
-## 2 Schulenberg   1765
+##   group sample
+##   <chr>  <int>
+## 1 Aiena   1765
+## 2 Chen    1010
 \end{verbatim}
 
 \subsection{MGCFA}\label{mgcfa-1}
@@ -2453,7 +2471,7 @@ With the bootstrap summary, we see that no invariant intercept runs are found (n
 
 \pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/unnamed-chunk-123-1.pdf}}
 
-The examination of the density plot shows how group 1 (Schulenberg English) tends to show lower average scores than group 2 (Chen Chinese) for most but not all items.
+The examination of the density plot shows how group 1 (Aiena English) tends to show lower average scores than group 2 (Chen Chinese) for most but not all items.
 
 We can view the mean difference or standardized mean difference by using:
 

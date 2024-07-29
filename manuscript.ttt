@@ -56,7 +56,12 @@ RS7  Intercept & 0.961 & 0.013 & 2.515 & 0.801\\
 RS8  Intercept & 0.986 & 0.013 & 2.676 & 0.852\\
 RS9  Intercept & 0.978 & 0.013 & 2.615 & 0.832\\
 \bottomrule
+\addlinespace
 \end{tabular}
+
+\begin{tablenotes}[para]
+\normalsize{\textit{Note.} Non-Invariant and Random Non-Invariant columns represent the proportion of non-invariant simulations of out the total simulations, representing our non-replication rate. These values are converted into an effect size difference in the final two columns.}
+\end{tablenotes}
 
 \end{threeparttable}
 \end{center}

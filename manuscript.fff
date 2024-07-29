@@ -3,7 +3,7 @@
 
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{figures/invariant-visual.png}}
-\caption{\label{fig:invariant-pic}Invariant Model Visualization}
+\caption{\label{fig:invariant-pic}Invariant model visualization demonstrating the components of the \texttt{plot\_mi()} function in \emph{visualizemi}.}
 \end{figure*}
 \efloatseparator
  
@@ -12,7 +12,7 @@
 
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{figures/boot-partial-invariance.png}}
-\caption{\label{fig:invariance-partial-fig}Visualization of the difference score between groups by parameter for invariant and non-invariant bootstrapped and randomly assigned group data.}
+\caption{\label{fig:invariance-partial-fig}Visualization of the difference score between groups by parameter for invariant and non-invariant bootstrapped and randomly assigned group data on simulated data.}
 \end{figure*}
 \efloatseparator
  
@@ -21,7 +21,7 @@
 
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{figures/boot-partial-density.png}}
-\caption{\label{fig:density-partial-fig}Visualization of the number of estimates for each group by bootstrapped and randomly assigned group runs by their invariance decision.}
+\caption{\label{fig:density-partial-fig}Visualization of the number of estimates for each group by bootstrapped and randomly assigned group runs by their invariance decision on simulated data.}
 \end{figure*}
 \efloatseparator
  
@@ -39,7 +39,7 @@
 
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs7-img-1.pdf}}
-\caption{\label{fig:rs7-img}RS7 Item Invariance Visualization}
+\caption{\label{fig:rs7-img}RS7 item non-invariance visualization showing differences in the item intercepts and latent variable.}
 \end{figure*}
 \efloatseparator
  
@@ -48,7 +48,7 @@
 
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs6-img-1.pdf}}
-\caption{\label{fig:rs6-img}RS6 Item Invariance Visualization}
+\caption{\label{fig:rs6-img}RS6 item non-invariance visualization similar results to RS7 with differences in item intercepts.}
 \end{figure*}
 \efloatseparator
  
@@ -74,7 +74,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs14-chinese-pic-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/rs14-chinese-RS2.png}}
 \caption{\label{fig:rs14-chinese-pic}The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left-hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group.}
 \end{figure*}
 \efloatseparator
@@ -83,6 +83,6 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs14-chinese-effect-pic-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/rs14-chinese-effect_invariance_plot.png}}
 \caption{\label{fig:rs14-chinese-effect-pic}Effect size differences for item intercepts on the English versus Chinese samples for the RS14.}
 \end{figure*}
