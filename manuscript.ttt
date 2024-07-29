@@ -40,21 +40,21 @@ Residuals & 126,466.241 & 126,727.438 & 0.780 & 0.793 & 0.156 & 0.086\\
 \toprule
 Term & Non-Invariant & Random Non-Invariant & $h_{nmi}$ & $h_{nmi_p}$\\
 \midrule
-RS  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
-RS1  Intercept & 0.989 & 0.007 & 2.764 & 0.880\\
-RS10  Intercept & 0.988 & 0.007 & 2.755 & 0.877\\
-RS11  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
-RS12  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
-RS13  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
-RS14  Intercept & 0.990 & 0.007 & 2.774 & 0.883\\
-RS2  Intercept & 0.985 & 0.007 & 2.728 & 0.869\\
-RS3  Intercept & 0.988 & 0.007 & 2.755 & 0.877\\
-RS4  Intercept & 0.990 & 0.007 & 2.774 & 0.883\\
-RS5  Intercept & 0.984 & 0.007 & 2.720 & 0.866\\
-RS6  Intercept & 0.979 & 0.007 & 2.683 & 0.854\\
-RS7  Intercept & 0.974 & 0.007 & 2.650 & 0.844\\
-RS8  Intercept & 0.991 & 0.007 & 2.784 & 0.886\\
-RS9  Intercept & 0.987 & 0.007 & 2.746 & 0.874\\
+RS  Intercept & 0.989 & 0.013 & 2.703 & 0.860\\
+RS1  Intercept & 0.979 & 0.013 & 2.622 & 0.835\\
+RS10  Intercept & 0.981 & 0.013 & 2.636 & 0.839\\
+RS11  Intercept & 0.988 & 0.013 & 2.694 & 0.857\\
+RS12  Intercept & 0.986 & 0.013 & 2.676 & 0.852\\
+RS13  Intercept & 0.984 & 0.013 & 2.659 & 0.847\\
+RS14  Intercept & 0.986 & 0.013 & 2.676 & 0.852\\
+RS2  Intercept & 0.971 & 0.012 & 2.580 & 0.821\\
+RS3  Intercept & 0.981 & 0.012 & 2.646 & 0.842\\
+RS4  Intercept & 0.989 & 0.012 & 2.712 & 0.863\\
+RS5  Intercept & 0.976 & 0.013 & 2.602 & 0.828\\
+RS6  Intercept & 0.970 & 0.013 & 2.565 & 0.816\\
+RS7  Intercept & 0.961 & 0.013 & 2.515 & 0.801\\
+RS8  Intercept & 0.986 & 0.013 & 2.676 & 0.852\\
+RS9  Intercept & 0.978 & 0.013 & 2.615 & 0.832\\
 \bottomrule
 \end{tabular}
 

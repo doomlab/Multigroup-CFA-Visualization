@@ -35,7 +35,7 @@ DF <- DF
 DF <- DF %>% 
   # make it comparable by only testing students
   filter(DF$sample == "Student") %>% 
-  mutate(group = "Schulenberg") %>% 
+  mutate(group = "Aiena") %>% 
   dplyr::select(RS1:RS14, group) 
 
 # Chen et al.
@@ -183,6 +183,8 @@ boot.model.rs <-
     group.equal = c("loadings", "intercepts")
 )
 
+# export(boot.model.rs, "manu_data/boot.model.rs.appendix7.csv")
+
 boot.model.rs
 ```
 
@@ -211,6 +213,8 @@ boot.partial.rs <-
     partial_step = "intercepts",
     group.equal = c("loadings", "intercepts")
 )
+
+saveRDS(boot.partial.rs, "manu_data/boot.partial.rs.appendix7.Rdata")
 ```
 
 ```{r echo = F}
@@ -256,7 +260,7 @@ ggsave(paste0("figures/rs14-chinese-density_plot.png"),
        units = "in")
 ```
 
-The examination of the density plot shows how group 1 (Schulenberg English) tends to show lower average scores than group 2 (Chen Chinese) for most but not all items. 
+The examination of the density plot shows how group 1 (Aiena English) tends to show lower average scores than group 2 (Chen Chinese) for most but not all items. 
 
 We can view the mean difference or standardized mean difference by using: 
 

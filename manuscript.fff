@@ -2,7 +2,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/invariant-pic-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/invariant-visual.png}}
 \caption{\label{fig:invariant-pic}Invariant Model Visualization}
 \end{figure*}
 \efloatseparator
@@ -11,97 +11,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/small-load-pic-1.pdf}
-\caption{\label{fig:small-load-pic}Small Loadings Model Visualization}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/med-load-pic-1.pdf}
-\caption{\label{fig:med-load-pic}Medium Loadings Model Visualization}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/large-load-pic-1.pdf}
-\caption{\label{fig:large-load-pic}Large Loadings Model Visualization}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/small-int-pic-1.pdf}
-\caption{\label{fig:small-int-pic}Small Intercepts Model Visualization}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/med-int-pic-1.pdf}
-\caption{\label{fig:med-int-pic}Medium Intercepts Model Visualization}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/large-int-pic-1.pdf}
-\caption{\label{fig:large-int-pic}Large Intercepts Model Visualization}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/small-res-pic-1.pdf}
-\caption{\label{fig:small-res-pic}Small Residuals Model Visualization}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/med-res-pic-1.pdf}
-\caption{\label{fig:med-res-pic}Medium Residuals Model Visualization}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/large-res-pic-1.pdf}
-\caption{\label{fig:large-res-pic}Large Residuals Model Visualization}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/boot-rr-pic-1.pdf}
-\caption{\label{fig:boot-rr-pic}Visualization of the effect size of bootstrapped replication proportions on simulated data. Each panel indicates the simulated data type, colors represent the differences in the strength of the non-invariance, and the bars on the x-axis represent the effect size for the equality constraint.}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/invariance-partial-fig-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/boot-partial-invariance.png}}
 \caption{\label{fig:invariance-partial-fig}Visualization of the difference score between groups by parameter for invariant and non-invariant bootstrapped and randomly assigned group data.}
 \end{figure*}
 \efloatseparator
@@ -110,7 +20,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/density-partial-fig-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/boot-partial-density.png}}
 \caption{\label{fig:density-partial-fig}Visualization of the number of estimates for each group by bootstrapped and randomly assigned group runs by their invariance decision.}
 \end{figure*}
 \efloatseparator
@@ -119,7 +29,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/effect-partial-fig-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{figures/boot-partial-effects.png}}
 \caption{\label{fig:effect-partial-fig}Visualization of effect size between groups by parameter for invariant and non-invariant bootstrapped and randomly assigned group data. The size of the dots indicate the number of data points for that estimate.}
 \end{figure*}
 \efloatseparator
@@ -128,25 +38,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/effect-large-loading-pic-1.pdf}
-\caption{\label{fig:effect-large-loading-pic}Bootstrapped and Random Group effect size differences in loadings for the Large Loading difference simulation. The size of the point reprensents the number of data points included in that calculation.}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/density-large-loading-pic-1.pdf}
-\caption{\label{fig:density-large-loading-pic}Bootstrapped and Random density plots for invariant and non-invariant bootstrapped partial effects examining only large loadings.}
-\end{figure*}
-\efloatseparator
- 
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{manuscript_files/figure-latex/rs7-img-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs7-img-1.pdf}}
 \caption{\label{fig:rs7-img}RS7 Item Invariance Visualization}
 \end{figure*}
 \efloatseparator
@@ -155,7 +47,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/rs6-img-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs6-img-1.pdf}}
 \caption{\label{fig:rs6-img}RS6 Item Invariance Visualization}
 \end{figure*}
 \efloatseparator
@@ -164,7 +56,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/rs-partial-pic-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs-partial-pic-1.pdf}}
 \caption{\label{fig:rs-partial-pic}RS-14 scale invariance for item intercepts. The left panel indicates the raw score difference between groups and items, while the right panel indicates the effect size for group differences based on invariance.}
 \end{figure*}
 \efloatseparator
@@ -173,7 +65,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/rs-partial-pic2-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs-partial-pic2-1.pdf}}
 \caption{\label{fig:rs-partial-pic2}RS-14 scale invariance density plots, illustrating invariant versus non-invariant bootstrapped and random runs for each parameter.}
 \end{figure*}
 \efloatseparator
@@ -182,7 +74,7 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/rs14-chinese-pic-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs14-chinese-pic-1.pdf}}
 \caption{\label{fig:rs14-chinese-pic}The differences in intercepts for the second item on the RS14 by language sample. The differences between intercepts are shown on the left-hand side with a clear separation between lines. The latent means also show a clear difference between groups where the English group appears to have lower scores overall than the Chinese group.}
 \end{figure*}
 \efloatseparator
@@ -191,6 +83,6 @@
 \ifnextchar[{\eatarg}{}
 
 \centering
-\includegraphics{manuscript_files/figure-latex/rs14-chinese-effect-pic-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{manuscript_files/figure-latex/rs14-chinese-effect-pic-1.pdf}}
 \caption{\label{fig:rs14-chinese-effect-pic}Effect size differences for item intercepts on the English versus Chinese samples for the RS14.}
 \end{figure*}
