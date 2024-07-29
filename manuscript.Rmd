@@ -179,7 +179,7 @@ The `partial_mi()` function aids in the calculation of partial invariance for a 
 5)  `group.equal`: The equality constraints including in your original multigroup tests.
 6)  `partial_step`: The level of partial invariance you wish to test.
 
-In this function, each parameter with the appropriate *lavaan* syntax is relaxed individually (i.e., `~1` for intercepts, `~~` for residuals, etc.). The fitted models are saved in the `models` output, and the `fit_table` output includes all fit indices for each model to investigate potential areas of partial invariance based on the researcher's desired criterion. 
+In this function, each parameter with the appropriate *lavaan* syntax is relaxed individually (i.e., `~1` for intercepts, `~~` for residuals, etc.). The fitted models are saved in the `models` output, and the `fit_table` output includes all fit indices for each model to investigate potential areas of partial invariance based on the researcher's desired criterion.
 
 ## Visualization of Invariance: `plot_mi()` Function
 
@@ -236,7 +236,7 @@ After examining the overall model potential replication effect size, the individ
 
 The saved output includes several dataframes and plots. The first is the `boot_DF` which is the summary of each bootstrapped run in a dataframe for plotting or summarization. This dataframe includes the estimate for each parameter (`term`) separated by group and type (`boot_1`, `boot_2` are the bootstrapped estimates for group 1 and group 2, while the same `random` columns indicate the randomly assigned groups). The fit index used to determine invariance is included for bootstrapped and random estimates, and then the differences between groups and if they were "invariant" or not given the researcher supplied rule.
 
-Next, the `boot_summary` includes a summarized form of the bootstrapped results separated by bootstrapped data versus randomized data and then invariant/non-invariant outcomes. The $d_s$ for between groups Cohen's $d$ is included [@lakens2013]. Effect sizes are only calculated when the number of bootstrapped estimates is at least 10% of the data - therefore, you would not receive effect sizes with almost no bootstrapped runs. This dataframe should be used to determine which parameter may be different and the effect size potential between groups in a replication of the study. The `boot_effects` table creates a summary similar to the overall model replication table based on the proportion of runs that were considered invariant versus not for each parameter. 
+Next, the `boot_summary` includes a summarized form of the bootstrapped results separated by bootstrapped data versus randomized data and then invariant/non-invariant outcomes. The $d_s$ for between groups Cohen's $d$ is included [@lakens2013]. Effect sizes are only calculated when the number of bootstrapped estimates is at least 10% of the data - therefore, you would not receive effect sizes with almost no bootstrapped runs. This dataframe should be used to determine which parameter may be different and the effect size potential between groups in a replication of the study. The `boot_effects` table creates a summary similar to the overall model replication table based on the proportion of runs that were considered invariant versus not for each parameter.
 
 Plots of the results from dataframes can be found within the `bootstrap_partial()` function. Figure \@ref(fig:invariance-partial-fig) shows the difference between parameters for groups in the bootstrapped and randomly assigned group runs in simulated data. Figure \@ref(fig:density-partial-fig) shows the density plot of the estimates for each group organized by bootstrapped and randomly assigned groups and the invariance decision for each bootstrapped run. Last, Figure \@ref(fig:effect-partial-fig) indicates the $d_s$ value between groups with an indication of the number of data points in each estimate (i.e., dot size). These visualizations should allow a researcher to understand the likelihood of replication for each parameter, as well as the potential size of the differences. Therefore, one could indicate a specific smallest effect size of interest, rather than a invariance cut-off rule of thumb when planning a replication or registered report.
 
@@ -384,7 +384,7 @@ plot_mi(
 )$complete
 ```
 
-```{r rs7-img, echo = F, include = T, size = "small", fig.cap="RS7 item non-invariance visualization showing differences in the item intercepts and latent variable.", fig.height=8}
+```{r rs7-img, echo = F, include = T, size = "small", fig.cap="RS7 item non-invariance visualization showing differences in the item intercepts and latent variable."}
 # plot the image for RS7
 plot_mi(
   data_coef = partial.rs.2$model_coef, 
@@ -400,6 +400,7 @@ plot_mi(
 
 ggsave("figures/rs7-visual.png", dpi = 300, 
        width = 8, 
+       height = 6,
        units = "in")
 ```
 
@@ -418,7 +419,7 @@ plot_mi(
 )$complete
 ```
 
-```{r rs6-img, echo = F, include = T, size = "small", fig.cap="RS6 item non-invariance visualization similar results to RS7 with differences in item intercepts.", fig.height=8}
+```{r rs6-img, echo = F, include = T, size = "small", fig.cap="RS6 item non-invariance visualization similar results to RS7 with differences in item intercepts."}
 plot_mi(
   data_coef = partial.rs.2$model_coef, 
   model_step = "intercepts", 
@@ -433,10 +434,11 @@ plot_mi(
 
 ggsave("figures/rs6-visual.png", dpi = 300, 
        width = 8, 
+       height = 6, 
        units = "in")
 ```
 
-Next, we would examine our replication potential for this model. Given our current results, we may not expect our intercepts to replicate. Given the order of desired steps in the  `group.equal` argument, the boot function will select the first non-invariant step (as defined by the user) in the calculation of the effect size for potential replication. In our output, we do not see a loadings effect size, and this result occurs when *none* of the bootstrapped or random results are non-invariant. Therefore, we would expect the loadings to replicate (and the effect size would be 0 difference between bootstrapped and random, both showing invariance). The intercepts show a large (i.e., close to the max possible value) non-invariant effect, $h_{nmi}$ = `r apa_num(boot.model.rs$h_nmi[1])` ($h_{mni}_p$ = `r apa_num(boot.model.rs$h_nmi_p[1])`), and therefore, we should not expect this model to show invariance in a replication.
+Next, we would examine our replication potential for this model. Given our current results, we may not expect our intercepts to replicate. Given the order of desired steps in the `group.equal` argument, the boot function will select the first non-invariant step (as defined by the user) in the calculation of the effect size for potential replication. In our output, we do not see a loadings effect size, and this result occurs when *none* of the bootstrapped or random results are non-invariant. Therefore, we would expect the loadings to replicate (and the effect size would be 0 difference between bootstrapped and random, both showing invariance). The intercepts show a large (i.e., close to the max possible value) non-invariant effect, $h_{nmi}$ = `r apa_num(boot.model.rs$h_nmi[1])` ($h_{mni_p}$ = `r apa_num(boot.model.rs$h_nmi_p[1])`), and therefore, we should not expect this model to show invariance in a replication.
 
 ```{r model-boot-RS, include = F, echo = F, results = "small", eval = F}
 boot.model.rs <- 
@@ -457,7 +459,7 @@ saveRDS(boot.model.rs, "manu_data/boot.model.rs.RData")
 boot.model.rs
 ```
 
-Next, we would examine the strength of the effects of replication on each parameter at the intercept level. By examining Table \@ref(tab:table-boot-effects), it is clear that most of the item means are unlikely to replicate, even though two particular items can be used to create partial invariance. Figures \@ref(fig:rs-partial-pic) and \@ref(fig:rs-partial-pic2) display the three plots provided in the `bootstrap_partial()` function. In general, we should expect $M_{D}$ = `r apa_num(boot.partial.rs$boot_summary %>% filter(invariant) %>% pull(mean_boot_difference) %>% mean())` when items are invariant and $M_{D}$ = `r apa_num(boot.partial.rs$boot_summary %>% filter(!invariant) %>% pull(mean_boot_difference) %>% mean())` when items are not invariant. The effect size of non-invariant items ranges from $d_s$ ~ `r apa_num(boot.partial.rs$boot_summary %>% filter(!invariant) %>% pull(d_boot) %>% min(., na.rm = T))` to `r apa_num(boot.partial.rs$boot_summary %>% filter(!invariant) %>% pull(d_boot) %>% max(., na.rm = T))`.
+Next, we would examine the strength of the effects of replication on each parameter at the intercept level. By examining Table \@ref(tab:table-boot-effects), it is clear that most of the item means are unlikely to replicate, even though two particular items can be used to create partial invariance. Figures \@ref(fig:rs-partial-pic) and \@ref(fig:rs-partial-pic2) display the three plots provided in the `bootstrap_partial()` function. In general, we should expect $M_{D}$ = `r apa_num(boot.partial.rs$boot_summary %>% filter(invariant) %>% pull(mean_boot_difference) %>% mean())` when items are invariant and $M_{D}$ = `r apa_num(boot.partial.rs$boot_summary %>% filter(!invariant) %>% pull(mean_boot_difference) %>% mean())` when items are not invariant. The effect size of non-invariant items ranges from $d_s$ \~ `r apa_num(boot.partial.rs$boot_summary %>% filter(!invariant) %>% pull(d_boot) %>% min(., na.rm = T))` to `r apa_num(boot.partial.rs$boot_summary %>% filter(!invariant) %>% pull(d_boot) %>% max(., na.rm = T))`.
 
 The density plot shown at the bottom of Figure \@ref(fig:rs-partial-pic) illustrates the likely reasons for the differences found in the top plots. It appears that many items show a bimodal distribution within group 1 (Clinical Sample) and when items are invariant, the intercept averages to the same intercept as group 2 (Student Sample). In non-invariant estimates, the same bimodal distributions are found, but they are more extreme than the student samples, and therefore, item show different averages due to the presence of two separate means of data. Further, some items also appear to show two separate student item averages within the data. This result suggests that it would be fruitful to understand a potential predictor of these differences or other confounding variable that separates these samples, creating differences in item averages.
 
