@@ -1,0 +1,715 @@
+---
+appendix: appendix_1.Rmd
+bibliography: includes/references.bib
+output: word_document
+csl: "/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/papaja/rmd/apa7.csl"
+---
+
+# Code Examples 
+
+```{r echo = F, include = F}
+library(dplyr)
+library(lavaan)
+library(visualizemi)
+library(dmacs)
+library(ggplot2)
+library(papaja)
+```
+
+```{r create-models, echo = F, message = F}
+# overall model
+model.overall <- "lv =~ q1 + q2 + q3 + q4 + q5
+q1 ~ 0*1
+lv ~ 1"
+
+# build invariant model one factor
+model.invariant.g1 <- "lv =~ .8*q1 + .4*q2 + .6*q3 + .3*q4 + .6*q5 
+q4 ~~ 1*q4
+q4 ~ 0*1
+q1 ~ 0*1
+lv ~ 1"
+model.invariant.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~~ 1*q4
+q4 ~ 0*1
+q1 ~ 0*1
+lv ~ 1"
+
+# loadings .5, .8, 1.1
+model.small.load.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .5*q4 + .61*q5
+q1 ~ 0*1
+lv ~ 1"
+model.med.load.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .8*q4 + .61*q5
+q1 ~ 0*1
+lv ~ 1"
+model.large.load.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + 1.1*q4 + .61*q5
+q1 ~ 0*1
+lv ~ 1"
+
+# build invariance on intercepts .25, .50, and .75
+model.small.int.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~ .25*1
+q1 ~ 0*1
+lv ~ 1"
+model.med.int.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~ .5*1
+q1 ~ 0*1
+lv ~ 1"
+model.large.int.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~ .75*1
+q1 ~ 0*1
+lv ~ 1"
+
+# build invariance on residuals .25, .50, and .75
+model.small.res.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~~ .75*q4
+q1 ~ 0*1
+lv ~ 1"
+model.med.res.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~~ .5*q4
+q1 ~ 0*1
+lv ~ 1"
+model.large.res.g2 <- "lv =~ .81*q1 + .41*q2 + .61*q3 + .31*q4 + .61*q5
+q4 ~~ .25*q4
+q1 ~ 0*1
+lv ~ 1"
+```
+
+```{r create-data, echo = F, message = F}
+# simulate data invariant
+df.invariant <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.invariant.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data small load
+df.small.load <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.small.load.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data med load
+df.med.load <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.med.load.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data large load
+df.large.load <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.large.load.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data small int
+df.small.int <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.small.int.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data med int
+df.med.int <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.med.int.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data large int
+df.large.int <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.large.int.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data small res
+df.small.res <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.small.res.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data med res
+df.med.res <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.med.res.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+
+# simulate data large res
+df.large.res <- bind_rows(
+  simulateData(model.invariant.g1, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 1"), 
+  simulateData(model.large.res.g2, sample.nobs = 250, 
+               meanstructure = T, model.type = "cfa",
+               seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+```
+
+```{r run-cfa, echo = F, message = F}
+# invariant CFA
+results.invariant <- 
+  mgcfa(model = model.overall, 
+        data = df.invariant,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+
+d_invariant <- lavaan_dmacs(
+  results.invariant$model_configural, 
+  RefGroup = "Group 1")
+
+# loadings
+results.small.load <- 
+  mgcfa(model = model.overall, 
+        data = df.small.load,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+
+results.med.load <- 
+  mgcfa(model = model.overall, 
+        data = df.med.load,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+results.large.load <- 
+  mgcfa(model = model.overall, 
+        data = df.large.load,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+
+d_small_load <- 
+  lavaan_dmacs(results.small.load$model_configural, 
+               RefGroup = "Group 1")
+d_med_load <- 
+  lavaan_dmacs(results.med.load$model_configural, 
+               RefGroup = "Group 1")
+d_large_load <- 
+  lavaan_dmacs(results.large.load$model_configural, 
+               RefGroup = "Group 1")
+
+# intercepts
+results.small.int <- 
+  mgcfa(model = model.overall, 
+        data = df.small.int,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+results.med.int <- 
+  mgcfa(model = model.overall, 
+        data = df.med.int,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+results.large.int <- 
+  mgcfa(model = model.overall, 
+        data = df.large.int,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+
+d_small_int <- 
+  lavaan_dmacs(results.small.int$model_configural, 
+               RefGroup = "Group 1")
+d_med_int <- 
+  lavaan_dmacs(results.med.int$model_configural, 
+               RefGroup = "Group 1")
+d_large_int <- 
+  lavaan_dmacs(results.large.int$model_configural, 
+               RefGroup = "Group 1")
+
+# residuals
+results.small.res <-
+  mgcfa(model = model.overall, 
+        data = df.small.res,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+results.med.res <- 
+  mgcfa(model = model.overall, 
+        data = df.med.res,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+results.large.res <- 
+  mgcfa(model = model.overall, 
+        data = df.large.res,
+        group = "group",
+        group.equal = c("loadings", "intercepts", "residuals"),
+        meanstructure = T)
+
+d_small_res <- 
+  lavaan_dmacs(results.small.res$model_configural, 
+               RefGroup = "Group 1")
+d_med_res <- 
+  lavaan_dmacs(results.med.res$model_configural,
+               RefGroup = "Group 1")
+d_large_res <- 
+  lavaan_dmacs(results.large.res$model_configural, 
+               RefGroup = "Group 1")
+```
+
+## Simulating from Models
+
+Here's an example of how to simulate directly from a `lavaan` model:
+
+```{r echo = T, eval = F, size = "small"}
+# first build your model
+# this example is separate for each group
+model.invariant.g1 <- "
+# loadings
+lv =~ .8*q1 + .4*q2 + .6*q3 + .3*q4 + .6*q5 
+# set the residual for invariance on q4
+q4 ~~ 1*q4
+# set the intercept for invariance on q4
+q4 ~ 0*1
+# set the intercept to zero for df purposes
+q1 ~ 0*1
+# allow the latent mean to be estimated 
+lv ~ 1"
+model.invariant.g2 <- "lv =~ .77*q1 + .43*q2 + .58*q3 + .3*q4 + .61*q5
+q4 ~~ 1*q4
+q4 ~ 0*1
+q1 ~ 0*1
+lv ~ 1"
+
+# simulate data invariant separately for each group
+df.invariant <- bind_rows(
+  # lavaan function 
+  simulateData(
+    # model with estimates 
+    model = model.invariant.g1, 
+    # how many data points
+    sample.nobs = 250, 
+    # mean structure for mgcfa models 
+    meanstructure = T, 
+    # model type
+    model.type = "cfa",
+    # set seed for reproducibility 
+    seed = 1234) %>% 
+    # add a group label to the data 
+    mutate(group = "Group 1"), 
+  simulateData(
+    model = model.invariant.g2, 
+    sample.nobs = 250, 
+    meanstructure = T, 
+    model.type = "cfa",
+    seed = 1234) %>% 
+    mutate(group = "Group 2") 
+)
+```
+
+\newpage
+
+## Simulating from Matrices
+
+Here's an example of how to simulate using `MASS` and covariance or correlation matrices. 
+
+```{r echo = T, eval = T, size = "small"}
+library(MASS)
+
+# covariance matrix
+university.cov <- lav_matrix_lower2full(
+    c(169.00, 
+      73.710, 182.2500,
+      73.229, 88.4250, 171.6100,
+      63.375, 72.5625, 127.7250, 156.2500,
+      42.120, 67.4325, 122.0265, 123.1875, 182.2500,
+      57.226, 63.2610, 117.1926, 154.4250, 138.0240, 201.6400,
+      30.875, 32.0625, 60.9805, 62.9375, 76.9500, 79.5910, 90.2500,
+      36.075, 38.9610, 61.0722, 58.2750, 65.9340, 70.9290, 81.1965, 123.2100,
+      18.096, 21.1410, 26.2131, 39.1500, 44.6310, 46.9452, 48.7635, 56.0106, 75.6900))
+
+# give it names
+rownames(university.cov) <-
+    colnames(university.cov) <-
+    c("class", "social", "learn", "chronic", "physical", "sex", 
+      "depression", "anxiety", "stress")
+
+# means - you need standard deviation if you only have a correlation matrix 
+university.means <- c(3.4, 4.3, 3.7, 3.2, 4.5, 1.2, 4.0, 3.5, 4.2)
+
+# use mass function
+DF <- mvrnorm(n = 200, mu = university.means, Sigma = university.cov)
+
+head(DF)
+```
+
+\newpage
+
+## MGCFA: `mgcfa()` Function
+
+In this example, we make our example model using *lavaan* syntax. The `lv` latent variable predicts the five measured variables, which are present as columns in our `df.invariant` data set. 
+
+ *lavaan* automatically sets the mean (i.e., the intercept) for latent variables to zero. If we wish to visualize the impact of the changes in parameter estimates across groups on the latent means, we need to allow the latent mean estimation with `lv ~ 1`. However, adding this estimation into our model will create a non-identified model. To solve this problem, you can set one of the intercepts of another variable to a value to scale the model. Here we will set the scale of the model by using `q1 ~ 0*1`, thus, scaling the expected means to zero. With simulation, this step is easy to know which variable to pick - we set the intercept on the variable we know did not show differences. In real data, you may wish to run the model steps *without* setting this option, examine the results of a configural or separate models, and then add the option for the values most similar. Additionally, you could complete partial invariance steps to determine which value appears most consistent to fix the estimate.
+
+```{r model-example-app, eval = T, include = T, echo = T, size = "small"}
+# create lavaan model
+model.overall <- "
+# overall one-factor model
+lv =~ q1 + q2 + q3 + q4 + q5
+# set the intercept (mean) of q1 to zero
+q1 ~ 0*1
+# allow the lv intercept to be freely estimated
+lv ~ 1"
+# look at the data
+head(df.invariant)
+```
+
+The `mgcfa()` function is designed to flexibly allow you to leverage *lavaan*'s package functions to calculate multiple measurement steps at once. You would include:
+
+1)  the model syntax in the `model` argument
+2)  the dataframe in the `data` argument of our function
+3)  the name of the grouping variable in quotes for `group`
+4)  and the equality constraints you would like to impose in order in `group.equal`
+5)  `...` any other *lavaan* arguments you would like to use such as `meanstructure` or `estimator`.
+
+Note: you can also use `sample.cov`, `sample.mean`, `sample.nobs` in this step for estimation of multigroup models, but simulated dataframes are needed for bootstrapping replication estimates.
+
+```{r mgcfa-example-app, echo = T, size = "small"}
+# run our mgcfa function to run all models
+results.invariant <- 
+  # name of the saved model syntax
+  mgcfa(model = model.overall, 
+        # name of the dataframe
+        data = df.invariant,
+        # name of the grouping variable
+        group = "group",
+        # equality constraints to impose in order
+        group.equal = c("loadings", "intercepts", "residuals"),
+        # other options to send to lavaan cfa function
+        meanstructure = T)
+
+# what is saved for you
+names(results.invariant)
+```
+
+1)  `model_coef`: The parameter estimates for each model with the model step included in a *model* column. This set of coefficients can be used for other functions. This dataframe is created with *broom*'s `tidy()` function if you wish to recreate this table without running the `mgcfa()` function [@robinson2023].
+
+```{r mgcfa-output1-app, echo = T, include = T, size = "small"}
+results.invariant$model_coef[1:10 , ]
+```
+
+2)  `model_fit`: The model fit indices from `fitmeasures()` to review for overall model fit and invariance judgments. The name of the model is included in a *model* column.
+
+```{r mgcfa-output2-app, echo = T, include = T, size = "small"}
+head(results.invariant$model_fit)
+```
+
+3)  `model_overall`: A saved *lavaan* fitted model of all groups together without any equality constraints or grouping variables. These objects can be used with any function that normally takes a saved model: `parameterEstimates()`, `modificationIndices()`, `semPlot::semPaths()`, and so on [@epskamp2022].
+
+```{r mgcfa-output3-app, echo = T, include = T, size = "small"}
+class(results.invariant$model_overall)
+```
+
+4)  `group_models`: A list of saved fitted models for each group separately.
+
+```{r mgcfa-output4-app, echo = T, include = T, size = "small"}
+names(results.invariant$group_models)
+```
+
+5)  `model_configural`: A saved fitted model for the configural model that nests together each group into one model with no other constraints.
+
+```{r mgcfa-output5-app, echo = T, include = T, size = "small"}
+class(results.invariant$model_configural)
+```
+
+6)  `invariance_models`: A list of saved fitted models that consecutively adds `group.equal` constraints.
+
+```{r mgcfa-output6-app, echo = T, include = T, size = "small"}
+names(results.invariant$invariance_models)
+```
+
+\newpage
+
+## Partial Invariance: `partial_mi()` Function
+
+The `partial_mi()` function aids in the calculation of partial invariance for a specific step of the MGCFA process. The function includes the following arguments:
+
+1)  `saved_model`: The saved *lavaan* model with the equality constraints at the level of measurement invariance you would like to examine for partial invariance.
+2)  `data`: The dataframe where the model was estimated.
+3)  `model`: The model syntax for the overall model.
+4)  `group`: The grouping variable column in the dataframe.
+5)  `group.equal`: The equality constraints including in your original multigroup tests.
+6)  `partial_step`: The level of partial invariance you wish to test.
+
+```{r partial-example-app, echo = T, size = "small"}
+partial.invariant <-
+  partial_mi(
+    # saved model output with constraints
+    saved_model = results.invariant$invariance_models$model.residuals,
+    # dataframe from model 
+    data = df.invariant,
+    # model syntax 
+    model = model.overall,
+    # group column name 
+    group = "group",
+    # group equality constraints from your mgcfa
+    group.equal = c("loadings", "intercepts", "residuals"),
+    # which step you want to examine for partial invariance
+    partial_step = "residuals"
+    )
+
+names(partial.invariant)
+```
+
+In this function, each parameter with the appropriate *lavaan* syntax is relaxed individually (i.e., `~1` for intercepts, `~~` for residuals, etc.). The fitted models are saved in the `models` output, and the `fit_table` output includes all fit indices for each model to investigate potential areas of partial invariance based on the researcher's desired criterion.
+
+```{r partial-example1-app, echo = T, size = "small"}
+names(partial.invariant$models)
+```
+
+```{r partial-example2-app, echo = T, size = "small"}
+head(partial.invariant$fit_table %>% 
+       dplyr::select(free.parameter, cfi, rmsea))
+```
+
+Note: the `partial_step` function is used to determine which types of `op` or operators to freely estimate between groups. If one chooses residuals, you will also freely estimate the residual for the latent variable or any other residuals found in the model. These items may be ignored if they were not meant to be included.
+
+\newpage
+
+## Visualization of Invariance: `plot_mi()` Functions
+
+Once we know which items are non-invariant, the `model_coef` output from the `mgcfa()` can be used directly in `plot_mi()`. The plot outputs will be described below. First, here are the arguments for the function:
+
+1)  `data_coef`: A tidy dataframe of the parameter estimates from the models. This function assumes you have used `broom::tidy()` on the saved model from *lavaan* and added a column called "model" with the name of the model step [@robinson2023]. This function will only run for models that have used the grouping function (i.e., configural, metric, scalar, and strict or other combinations/steps you wish to examine).
+2)  `model_step`: Which model do you want to plot? You should match this name to the one you want to extract from your model column in the `data_coef`.
+3)  `item_name`: Which observed variable from your model syntax do you want to plot? Please list this variable name exactly how it appears in the model.
+4)  `x_limits`: What do you want the x-axis limits to be for your invariance plot? The default option is to assume the latent variable is standardized, and therefore, -1 to 1 is recommended. Use only two numbers, a lower and upper limit. This value also constrains the latent mean diagram to help zoom in on group differences because the scale of latent means is usually centered over zero. You can use this parameter to zoom out to a more traditional histogram using `c(-2, 2)`.
+5)  `y_limits`: What do you want the y-axis limits to be for your invariance plot? Given that the latent variable is used to predict the observed values in the data, you could use the minimum and maximum values found in the data. If that range is large, consider reducing this value to be able to visualize the results (i.e., otherwise it may be too zoomed out to judge group differences). Use only two numbers, a lower and upper limit.
+6)  `conf.level`: What confidence limit do you want to plot? Use 1 - $\alpha$.
+7)  `model_results`: In this argument, include the saved *lavaan* output for the model listed in the `model_step` argument.
+8)  `lv_name`: Include the name of the latent variable, exactly how it is listed in your *lavaan* syntax. You should plot the latent variable that the `item_name` is linked to. If you have items that load onto multiple latent variables, you will need to make multiple plots.
+9)  `plot_groups`: If you include more than two groups in a multigroup model, the automatic assumption is that you want the first two groups for this visualization. If not, include the names of the groups here to plot.
+
+```{r plot-example-app, eval = T, echo = T, include = T, size = "small"}
+invariant.plot <- 
+  plot_mi(
+    # output from model_coef
+    data_coef = results.invariant$model_coef, 
+    # which model do you want to plot
+    model_step = "Configural", 
+    # name of observed item
+    item_name = "q4", 
+    # latent variable limits to graph
+    x_limits = c(-1,1), 
+    # Y min and max in data 
+    y_limits = c(min(df.invariant$q4), max(df.invariant$q4)),
+    # what ci do you want
+    conf.level = .95, 
+    # what model results do you want 
+    model_results = results.invariant$model_configural,
+    # which latent variable do you want 
+    lv_name = "lv" 
+)
+
+names(invariant.plot)
+```
+
+The outputs from this function are several *ggplot2* objects that can be edited or saved directly using *ggplot2* functionality [@R-ggplot2].
+
+1)  `complete`: The output from this model can be found in Figure \@ref(fig:invariant-pic). On the left-hand side, the item invariance is plotted, and on the right-hand side, the latent mean distributions for the two groups are plotted. In the item invariance sub-plot, the visualization includes all three components traditionally seen in MGCFA testing steps: loadings, intercepts, and residuals. Each visualization element was designed to match the traditional visualization for that type of output. All parameter estimates are plotted on the unstandardized estimates and their confidence interval based on the standard error of the estimate. All plots are made with *ggplot2* and *cowplot* [@wilke2020].
+
+```{r invariant-pic-app, include = T, fig.cap = "Invariant Model Visualization"}
+invariant.plot$complete
+
+ggsave("figures/invariant-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+2) `intercept`: Only the left-hand side of the complete plot designed to represent intercepts and factor loadings. Factor loadings represent the slope of the regression equation for the latent variable predicting the scores on the observed variable ($\hat{Y} \sim b_0 + b_1X + \epsilon$). The y-axis indicates the observed variable scores, and here, the plot includes the entire range of the scale of the data for item four. The coefficient ($b_1$) for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "=~") %>% slice_tail() %>% pull(estimate))`. The ribbon bands around the plotted slopes indicate the confidence interval for that estimate. In this plot, while the coefficients for each group are not literally equal, the overlapping and parallel slope bands indicate they are not different practically.
+
+The item intercepts ($b_0$) are plotted on the middle line where they would cross the y-axis at a latent variable score of zero. These are represented by a dot with a set of confidence error bars around the point. The intercept for group 1 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate))`, while the coefficient for group 2 was `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))`. In this invariant depiction, the overlap in the intercepts is clear, indicating they are not different. You can use `y_limits` to zoom in on the graph if these are too small to be distinguishable.
+
+3)  `mean`: The right-hand side of the complete plot graphing the latent variable means and density from the data. The latent variable is shown on the x-axis using standardized values (i.e., *z*-scores) where -1 indicates one standard deviation below the mean for the latent variable, 0 indicates the mean for the latent variable and so on. The lines indicate the means of the latent variables from the simulated dataset. Group labels are represented in the figure caption on the bottom. Group 1 is usually the group that is alphabetically first in the data set or whichever group is the first that appears when using the `levels()` command.
+
+4)  `variance`: A split geom violin plot indicating the variance distribution of the plotted item. Residuals are trickier to plot, as they are the left over error when predicting the observed variables $\epsilon$. It is tempting to plot this value as the confidence band around the slope, however, that defeats the purpose of understanding that the slopes are estimated separately from the residuals, and both have an associated variability around their parameter estimate. Therefore, residuals are represented in the inset picture at the bottom right of the item invariance plot. The black bars represent the estimated residual for each group (group 1: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_head() %>% pull(estimate))`, group 2: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("q4", term)) %>% filter(op == "~~") %>% slice_tail() %>% pull(estimate))`). The distributions are plotted to represent the normal spread of values using the standard error of the residuals. The violin plot allows for direct comparison of those residuals and their potential distributions. Note that the placement has nothing to do with the x or y-axis and is designed to always show in the same location, regardless of size/value. The plots are included separately so they can be arranged in a different fashion if desired.
+
+\newpage
+
+## Model Replication and Effect Sizes: `bootstrap_model()` Function
+
+The `bootstrap_model` function in *visualizemi* was designed to estimate the likely replication of overall model invariance with the assumption that the data used for the estimation represents the larger population. The following arguments are used:
+
+1)  `saved_configural`: a saved fitted model at the configural level with no equality constraints. This model should include all other lavaan settings you would like to use, such as estimator or ordered.
+2)  `data`: The dataframe where the model was estimated.
+3)  `model`: The model syntax for the overall model.
+4)  `group`: The grouping variable column in the dataframe.
+5)  `nboot`: The number of bootstraps to run.
+6)  `invariance_index`: The fit index you would like to use to determine invariance. Please use options and labeling from *lavaan* - see `fitmeasures()` for options.
+7)  `invariance_rule`: The invariance difference score you would like to use as your rule.
+8)  `group.equal`: The equality constraints including in your original multigroup tests.
+
+```{r boot-rr-app, echo = T, eval = F, size = "small"}
+boot.model.invariant <- 
+  bootstrap_model(
+    # saved configural model 
+    saved_configural = results.invariant$model_configural,
+    # dataframe
+    data = df.invariant,
+    # model syntax
+    model = model.overall, 
+    # group variable column in dataframe
+    group = "group",
+    # number of bootstraps
+    nboot = 1000, 
+    # which fit index you would like to use
+    invariance_index = "cfi",
+    # what is your criterion for that fit index
+    invariance_rule = .01,
+    # what equality constraints are you testing 
+    group.equal = c("loadings", "intercepts", "resduals")
+  )
+```
+
+The data included in this function will be sampled, with replacement, at the same size as the current dataset, and the included invariance equality constraints are estimated. Each step will be compared to the previous step using the invariance index and comparison rule entered. The output is a dataframe of the proportion of non-invariant bootstraps from the real data and the same bootstrapped dataset with the group labels randomly assigned. The effect size comparison of proportions, $h$, for non-invariant comparisons:
+
+$$h_{nmi} = 2 \times (asin\sqrt{p_{data}} - asin\sqrt{p_{random}})$$
+
+The alternative, $h_{mi}$, for effect size of measurement invariance replication would simply be the inverse sign of $h_{nmi}$ and is also included in the table. Two additional columns $h_{nmi_p}$ and $h_{nmi_p}$ represent the $h$ values divided by the upper bound of $h$ (i.e., $\pi$), to help with interpretation of the effect size (thus, bounding $h$ to -1 to 1).
+
+\newpage
+
+## Parameter Replication and Effect Sizes: `bootstrap_partial()` Function
+
+After examining the overall model potential replication effect size, the individual parameters within a model can be bootstrapped for partial invariance to with that parameter relaxed (overall partial model statistics) and the difference in group parameter estimates (parameter effect size). This function uses arguments seen in other functions, so they will not be repeated here. The general setup consists of using the model you think could be partially invariant in the `saved_model` argument and the fit index for comparison for the model with less constraints in `invariance_compare`. This example examines the loadings in the invariant model, so `saved_model` uses the `mgcfa` output for equality constraints present on the loadings and compares that model to the configural model with no equality constraints on the loadings. The `partial_step` argument will be used to determine which operation syntax (i.e. `=~` for loadings) to relax for modeling.
+
+```{r boot-partial-app, echo = T, size = "small", eval = F}
+boot.partial.invariant <- 
+      bootstrap_partial(
+        # saved model you want to examine the partial loadings for 
+        saved_model = results.invariant$invariance_models$model.loadings,
+        # the dataset 
+        data = df.invariant, 
+        # the model 
+        model = model.overall,
+        # the group variable in the dataset
+        group = "group", 
+        # number of bootstraps
+        nboot = 1000,
+        # which fit index you would like to use to determine partial invariance
+        invariance_index = "cfi", 
+        # what is the invariance rule 
+        invariance_rule = .01, 
+        # what are we comparing the saved model fit index to 
+        invariance_compare = fitmeasures(results.invariant$model_configural, "cfi"), 
+        # what step are we using for invariance
+        partial_step = "loadings", 
+        # what equality constraints should be imposed 
+        group.equal = c("loadings")
+      )
+```
+
+```{r echo = F, eval = F}
+saveRDS(boot.partial.invariant, "manu_data/boot.partial.invariant.RData")
+```
+
+```{r echo = F}
+boot.partial.invariant <- readRDS("manu_data/boot.partial.invariant.RData")
+```
+
+```{r partial-boot-print-app, echo = T, size = "small"}
+names(boot.partial.invariant)
+```
+
+The saved output includes several dataframes and plots. The first is the `boot_DF` which the summary of each run in a dataframe for plotting or summarization. This dataframe includes the estimate for each parameter (`term`) separated by group and type (`boot_1`, `boot_2` are the bootstrapped estimates for group 1 and group 2, while the same `random` columns indicate the randomly assigned groups). The fit index used to determine invariance is included for bootstrapped and random estimates, and then the differences between groups and if they were "invariant" or not given the researcher supplied rule.
+
+```{r boot-partial-DF-app, echo = T, size = "small"}
+head(boot.partial.invariant$boot_DF)
+```
+
+Next, the `boot_summary` includes a summarized form of the bootstrapped results from separated by bootstrapping versus random and invariant/non-invariant. The $d_s$ for between groups Cohen's $d$ is shown below, and the non-central confidence interval is included. Effect sizes are only calculated when the number of bootstrapped estimates is at least 10% of the data - therefore, you would not receive effect sizes with almost no bootstrapped runs. This dataframe should be used to determine which parameter may be different and at what size between groups in a replication of the study.
+
+```{r boot-summary-DF-app, echo = T, size = "small"}
+boot.partial.invariant$boot_summary %>% 
+  dplyr::select(term, d_boot, d_random)
+```
+
+The `boot_effects` table creates a summary similar to the overall model replication table based on the proportion of runs that were considered invariant versus not for each parameter. Note that the effects match the overall results, such that simulated invariant data appears to still show the likelihood that loadings may not replicate in a similar dataset.
+
+```{r boot-effects-DF-app, echo = T, size = "small"}
+boot.partial.invariant$boot_effects
+```
+
+Plots of the results from dataframes can be found within the `bootstrap_partial()` function. Figure \@ref(fig:invariance-partial-fig) shows the difference between parameters for groups in the bootstrapped and randomly assigned group runs. Figure \@ref(fig:density-partial-fig) shows the density plot of the estimates for each group organized by bootstrapped and randomly assigned groups and the invariance decision for each bootstrapped run. Last, Figure \@ref(fig:effect-partial-fig) indicates the $d_s$ value between groups with an indication of the number of data points in each estimate (i.e., dot size). These visualizations should allow a researcher to understand the likelihood of replication for each parameter, as well as the potential size of the differences. Therefore, one could indicate a specific smallest effect size of interest, rather than a invariance cut-off rule of thumb when planning a replication or registered report.
+
+```{r invariance-partial-fig-app, include = T, fig.cap = "Visualization of the difference score between groups by parameter for invariant and non-invariant bootstrapped and randomly assigned group data."}
+boot.partial.invariant$invariance_plot
+
+ggsave("figures/boot-partial-invariance.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+```{r density-partial-fig-app, include = T, fig.cap = "Visualization of the number of estimates for each group by bootstrapped and randomly assigned group runs by their invariance decision."}
+suppressMessages(boot.partial.invariant$density_plot)
+
+ggsave("figures/boot-partial-density.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+```{r effect-partial-fig-app, include = T, fig.cap = "Visualization of effect size between groups by parameter for invariant and non-invariant bootstrapped and randomly assigned group data. The size of the dots indicate the number of data points for that estimate."}
+boot.partial.invariant$effect_invariance_plot
+
+ggsave("figures/boot-partial-effects.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+# References
+
+<div id="refs"></div>

@@ -1,0 +1,481 @@
+---
+appendix: "appendix_2.Rmd"
+bibliography: includes/references.bib
+output: word_document
+csl: "/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/papaja/rmd/apa7.csl"
+---
+
+# Simulation Study 
+
+```{r}
+library(dplyr)
+library(lavaan)
+library(visualizemi)
+library(dmacs)
+library(ggplot2)
+library(papaja)
+library(tidyr)
+library(ggridges)
+```
+
+```{r setup, include=FALSE, echo = F}
+knitr::opts_chunk$set(fig.path = as.character("figures/"))
+knitr::knit('appendix_1_fixrefs.Rmd')
+boot_rr_DF <- rio::import("manu_data/boot_rr_DF.csv")
+boot.df.full <- rio::import("manu_data/boot_DF_full.csv")
+boot.partial.summary.full <- rio::import("manu_data/boot_partial_summary_DF_full.csv")
+boot.effects.summary.full <- rio::import("manu_data/boot_effects_summary_DF_full.csv")
+```
+
+The code for building and running simulations can be found in *simulate_boot_rr.Rmd*, *simulate_boot_partial.Rmd*, and *simulate_combine.Rmd*. 
+
+## Design and Analysis
+
+Data was simulated using the `simulateData` function in the *R* package *lavaan* [@rosseel2012] assuming multivariate normality using a $\mu$ of 0 and $\sigma$ of 1 for the data. This function allows you to write *lavaan* syntax for your model with estimated values to generate data for observed variables (see supplemental for examples). The data included two groups of individuals ("Group 1", "Group 2") for a multigroup confirmatory factor analysis ($n_{group}$ = 250, *N* = 500). The latent variables were assumed to be continuous normal (the package functions do not require this assumption). The model consisted of five observed items predicted by one latent variable (`lv =~ q1 + q2 + q3 + q4 + q5`); however, the demonstration in this manuscript extends to multiple latent variables and other combinations of observed variables. Each item was assumed to be related to the latent variable with loadings approximately equal to .40 to .80, except when cases of non-invariance on the loadings was simulated.
+
+The @brown2015 steps of testing measurement invariance are demonstrated in this manuscript for illustration purposes, but in line with @stark2006 suggestions, the visualizations show the impact of loadings and intercepts together. A convenience function `mgcfa` is used for these steps or other measurement invariance test orders and combinations. Fit indices for the steps for multigroup models are presented in the appendix for comparison of cutoff rules of thumb [@cheung2002] to effect sizes and visualizations presented in this manuscript. Fit indices include Akaike Information Criterion [AIC, @akaike1998], Bayesian Information Criterion [BIC, @schwarz1978], Comparative Fit Index [CFI, @bentler1990], Tucker Lewis Index [TLI, @tucker1973], root mean squared error of approximation RMSEA [@steiger1990], and standardized root mean square residual [SRMR, @bentler1995].
+
+The data was then simulated to represent invariance across all model steps, small, medium, and large invariance using $d_{MACS}$ estimated sizes from @nye2019. While $d_{MACS}$ is used primarily for an effect size of the (non)-invariance for intercepts and loadings together, a similar approach was taken for the estimation of small, medium, and large effects on the residuals. The effect size is presented for all models, calculated from the *dmacs* package [@dueber2023; @nye2011]. Only one item in each model was manipulated from the invariant model to create the non-invariant models. Given the data was simulated with a *z*-score scaling, the loading values were simulated at .30 points apart (given $d_{MACS}$ suggestions of .2, .4, .7), the intercepts at .25 points apart, and the residuals at .25 points apart. To plan a simulation for your own study, these values can be used to simulate small, medium, and large non-invariance effects by first converting data into *z*-score.
+
+## Visualize Parameter Differences
+
+The $d_{MACS}$ value for item 4 in the invariant model was `r apa_num(d_invariant)$DMACS[4]`, representing a nil or unimportant difference in this manuscript. It is important to note that while @nye2019 suggests specific sizes for small, medium, and large, each researcher should determine for themselves what effects represent. Figure \@ref(fig:small-load-pic) displays the results from the small ($d_{MACS}$ = `r apa_num(d_small_load)$DMACS[4]`) difference in loadings, while Figure \@ref(fig:med-load-pic) displays the results from the medium ($d_{MACS}$ = `r apa_num(d_med_load)$DMACS[4]`) difference in loadings, and Figure \@ref(fig:large-load-pic) shows the large ($d_{MACS}$ = `r apa_num(d_large_load)$DMACS[4]`) differences. When investigating the slope values, we can clearly see the change in the loading for the second group (the only manipulated variable, although random data set generation may also change intercepts and residuals slightly). At the medium effect size, we see that the confidence bands do not overlap (at the edges), and at the large effect size, we can see a clear separation of two lines. Note that the intercepts in this model are estimated as equal so the loading representation will not literally separate, but the steepness of the lines is the indicator of the difference between the slopes. You can imagine these lines are interpreted like a simple slopes analysis for interactions in regression [@cohen2003]. When simple slopes for interactions are plotted, if they are parallel, there is no interaction, and if they cross, then there is an interaction. Here, we can use this same logic. If they are parallel, there is likely invariance (they are the same), and the further from parallel they become, the larger the effect size for the differences between group loadings.
+
+The latent means in Figure \@ref(fig:large-load-pic) do appear to show differences, albeit visually small. The latent means diagram shows the impact of any group differences that aren't constrained, and this image shows the configural model (as the metric model would force them to be equal). In the simulated model, the *only* manipulated parameter is question 4's loading. In real models, the differences may be larger due to other variation found in the parameter estimates. Therefore, once you discover items you believe would make a model "partially" invariant, you may wish to estimate that model and graph the item again using the partially invariant model to see only the effect of the non-invariant items. Additionally, consider that we set the scaling of the model to 0. The estimate for the lv mean in the large loading model was group 1: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate))`, and group 2: `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))`, which results in `r apa_num(results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_head() %>% pull(estimate) - results.invariant$model_coef %>% filter(model == "Configural") %>% filter(grepl("lv", term)) %>% filter(op == "~1") %>% slice_tail() %>% pull(estimate))` difference in group means. The practical implications of this difference will depend on the research and interpretations of the researcher.
+
+```{r small-load-pic, include = T, fig.cap = "Small Loadings Model Visualization"}
+plot_mi(
+  data_coef = results.small.load$model_coef, # output from model_coef
+  model_step = "Configural", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.small.load$q4), max(df.small.load$q4)), # Y min and max in data 
+  conf.level = .95, # what ci do you want
+  model_results = results.small.load$model_configural, # what model results do you want 
+  lv_name = "lv"
+)$complete
+
+ggsave("figures/small-load-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+```{r med-load-pic, include = T, fig.cap = "Medium Loadings Model Visualization"}
+plot_mi(
+  data_coef = results.med.load$model_coef, # output from model_coef
+  model_step = "Configural", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.med.load$q4), max(df.med.load$q4)), # Y min and max in data 
+  conf.level = .95, # what ci do you want
+  model_results = results.med.load$model_configural, # what model results do you want 
+  lv_name = "lv"
+)$complete
+
+ggsave("figures/med-load-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+```{r large-load-pic, include = T, fig.cap = "Large Loadings Model Visualization"}
+plot_mi(
+  data_coef = results.large.load$model_coef, # output from model_coef
+  model_step = "Configural", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.large.load$q4), max(df.large.load$q4)), # Y min and max in data 
+  conf.level = .95, # what ci do you want
+  model_results = results.large.load$model_configural, # what model results do you want 
+  lv_name = "lv"
+)$complete
+
+ggsave("figures/large-load-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+For intercepts, the small (Figure \@ref(fig:small-int-pic)), medium (Figure \@ref(fig:med-int-pic)), and large (Figure \@ref(fig:large-int-pic)) depictions represent $d_{MACS}$ values of `r apa_num(d_small_int)$DMACS[4]`, `r apa_num(d_med_int)$DMACS[4]`, and `r apa_num(d_large_int)$DMACS[4]`, respectively. Intercept differences can be clearly seen represented by the spacing out of the intercept locations (and thus, the overall line as well). While the changes in intercept do not appear to change the latent means, the caveat to this simulation is that only item four was manipulated. An example is provided below that demonstrates large changes in latent means.
+
+```{r small-int-pic, include = T, fig.cap = "Small Intercepts Model Visualization"}
+plot_mi(
+  data_coef = results.small.int$model_coef, # output from model_coef
+  model_step = "loadings", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.small.int$q4), max(df.small.int$q4)), # Y min and max in data 
+  conf.level = .95, # what ci do you want
+  model_results = results.small.int$invariance_models$model.loadings, # what model results do you want 
+  lv_name = "lv"
+)$complete
+
+ggsave("figures/small-int-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+```{r med-int-pic, include = T, fig.cap = "Medium Intercepts Model Visualization"}
+plot_mi(
+  data_coef = results.med.int$model_coef, # output from model_coef
+  model_step = "loadings", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.med.int$q4), max(df.med.int$q4)), # Y min and max in data 
+  conf.level = .95, # what ci do you want
+  model_results = results.med.int$invariance_models$model.loadings, # what model results do you want 
+  lv_name = "lv"
+)$complete
+
+ggsave("figures/med-int-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+```{r large-int-pic, include = T, fig.cap = "Large Intercepts Model Visualization"}
+plot_mi(
+  data_coef = results.large.int$model_coef, # output from model_coef
+  model_step = "loadings", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.large.int$q4), max(df.large.int$q4)), # Y min and max in data 
+  conf.level = .95, # what ci do you want
+  model_results = results.large.int$invariance_models$model.loadings, # what model results do you want 
+  lv_name = "lv"
+)$complete
+
+ggsave("figures/large-int-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+Last, the effect of the residuals is plotted in small (Figure \@ref(fig:small-res-pic)), medium (Figure \@ref(fig:med-res-pic)), and large (Figure \@ref(fig:large-res-pic)) formats. While $d_{MACS}$ values are not technically available for the residuals, our models showed `r apa_num(d_small_res)$DMACS[4]`, `r apa_num(d_med_res)$DMACS[4]`, and `r apa_num(d_large_res)$DMACS[4]`, respectively. These differences in values are variable due to the random generation of data sets for each measurement invariance manipulation. At first glance, the differences in the small chart may seem large, because the black lines are not touching, but notice that the distributions overlap, indicating a likely small difference. The medium and large differences better illustrate differences in residuals across groups. Further, the impact of the residuals on the shape of the latent mean distribution can also been seen (and unintentionally, in the first figures as well due to random variation). The impact is due to the standard error of the residuals, as smaller standard errors represent lepokurtic distributions (taller), and larger standard errors represent platykurtic distributions (flatter). The effect size difference of the residuals does not appear to change the effects in the latent means.
+
+```{r small-res-pic, include = T, fig.cap = "Small Residuals Model Visualization"}
+plot_mi(
+  data_coef = results.small.res$model_coef, # output from model_coef
+  model_step = "intercepts", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.small.res$q4), max(df.small.res$q4)), # Y min and max in data 
+  conf.level = .95, # what ci do you want
+  model_results = results.small.res$invariance_models$model.intercepts, # what model results do you want 
+  lv_name = "lv"
+)$complete
+
+ggsave("figures/small-res-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+```{r med-res-pic, include = T, fig.cap = "Medium Residuals Model Visualization"}
+plot_mi(
+  data_coef = results.med.res$model_coef, # output from model_coef
+  model_step = "intercepts", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.med.res$q4), max(df.med.res$q4)), # Y min and max in data 
+  conf.level = .95, # what ci do you want
+  model_results = results.med.res$invariance_models$model.intercepts, # what model results do you want 
+  lv_name = "lv"
+)$complete
+
+ggsave("figures/med-res-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+```{r large-res-pic, include = T, fig.cap = "Large Residuals Model Visualization"}
+plot_mi(
+  data_coef = results.large.res$model_coef, # output from model_coef
+  model_step = "intercepts", # which model
+  item_name = "q4", # name of observed item
+  x_limits = c(-1,1), # LV limits to graph
+  y_limits = c(min(df.large.res$q4), max(df.large.res$q4)), # Y min and max in data 
+  conf.level = .95, # what ci do you want
+  model_results = results.large.res$invariance_models$model.intercepts, # what model results do you want 
+  lv_name = "lv"
+)$complete
+
+ggsave("figures/large-res-visual.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+## Model Replication and Effect Size
+
+Figure \@ref(fig:boot-rr-pic) portrays the $h_{nmi_p}$ values by simulated non-invariance, strength of non-invariance, and type of equality constraint. This image represents 100 simulations of data by 1000 bootstrapped runs (averaged) to explore the expected pattern of results. The bars are arranged to show what a researcher might inspect when thinking about replication possibilities and their effect sizes (i.e., only three bars for each equality constraint would be calculated).
+
+```{r boot-rr-pic, include = T, fig.cap = "Visualization of the effect size of bootstrapped replication proportions on simulated data. Each panel indicates the simulated data type, colors represent the differences in the strength of the non-invariance, and the bars on the x-axis represent the effect size for the equality constraint. "}
+
+boot_rr_DF <- boot_rr_DF %>% 
+  mutate(type_size = ifelse(
+    type == "Invariant", "None", ifelse(
+      grepl("Small", type), "Small", ifelse(
+        grepl("Medium", type), "Medium", "Large"
+      )
+    )
+  ),
+  type_type = ifelse(
+    type == "Invariant", "Invariant", ifelse(
+      grepl("Loadings", type), "Loadings", ifelse(
+        grepl("Intercepts", type), "Intercepts", "Residuals"
+      )
+    ) 
+  ),
+  model = factor(model, 
+                 levels = c("loadings", "intercepts", "residuals"),
+                 labels = c("Loadings", "Intercepts", "Residuals")),
+  type_size = factor(type_size, 
+                     levels = c("None", "Small", "Medium", "Large")),
+  type_type = factor(type_type, 
+                     levels = c("Invariant", "Loadings", "Intercepts", "Residuals")))
+
+prop_boot_rr <- ggplot(boot_rr_DF %>% 
+                         filter(type_type != "Invariant"), 
+                       aes(x = model, 
+                       y = h_nmi_p,
+                       fill = type_size)) + 
+  stat_summary(fun = "mean", 
+               position = "dodge", 
+               geom = "bar") + 
+  stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar", 
+               position = position_dodge(width = .9),
+               width = .2) + 
+  theme_classic() + 
+  facet_grid(type_type~type_size) + 
+  scale_fill_discrete(name = "Size of Non-Invariance") + 
+  xlab("Equality Constraints") + 
+  ylab("Normalized Effect Size") + 
+  theme(legend.position = "bottom") + 
+  geom_hline(yintercept = 0) +
+  # geom_hline(yintercept = 1) + 
+  NULL
+
+prop_boot_rr
+
+means_invariant <- boot_rr_DF %>% filter(type == "Invariant") %>% group_by(model) %>% summarize(mean_h = mean(h_nmi_p))
+
+ggsave("figures/prop-boot-rr.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+In the data that was simulated to be invariant between groups, effect sizes are still non-zero (loadings $h_{nmi_p}$ = `r apa_num(means_invariant$mean_h[1])`, intercepts = $h_{nmi_p}$ = `r apa_num(means_invariant$mean_h[2])`, $h_{nmi_p}$ = `r apa_num(means_invariant$mean_h[3])`). This result mirrors the effects found in the literature - that often, many models fail to show invariance, and potentially not because measurement is poor but because of natural random variation in parameter estimates. This result also indicates the need to be able to identify if specific parameters are driving the differences, which is shown in the next section.
+
+Next, Figure \@ref(fig:boot-rr-pic) demonstrates the patterns one might find for small, medium, and large effects at each type of invariance when data is simulated with *one* difference. For loadings, the pattern shows a larger effect for loadings with zero or negative effect sizes for other effect sizes. The intercept simulations show non-zero effect sizes in the loadings and intercepts, likely for the same reasons $d_{MACS}$ is interpreted as a combined effect size. When intercepts are changed, loadings may naturally shift with those means. Last, the residual results present an unexpected pattern, wherein the effect is primarily seen in the loadings, rather than the residuals step. However, when distributions of error variance are different, one may expect that those effects are pushed toward the loadings as well (as values can vary more, thus potentially weakening the relationship between observed and latent variable).
+
+An example of interpretation on real data is given in a later section. From a research study, only one effect size for each equality constraint would be calculated. The interpretation will often be up to the researcher's smallest effect of interest, and this simulation gives some guidance that the values should not be interpreted with traditional rules of thumb. The pattern of effects is potentially the most useful information: 1) positive effects on the loadings with negative or very close to zero effects on the other parameters may indicate a non-replication in loadings, 2) equal effects on loadings and intercepts with smaller or negative effects may indicate intercepts may be an issue, and 3) residuals may be determined by the same pattern as loadings but with a smaller ratio of loadings to residuals effect (i.e., loadings $h_{nmi}$ / residuals $h_{nmi}$. The "size" could be determined by the ratio of effect sizes for each constraint. Of course, this represents one simulation study, and results from many studies in a meta-analysis would be fruitful for future work.
+
+## Parameter Replication and Effect Size
+
+```{r create-plot-partial, echo = F, message = F}
+# make all the graphs boot long ----
+boot_long <- 
+  bind_rows(boot.df.full %>% 
+              dplyr::select(term, boot_difference, boot_index_difference, type) %>% 
+              rename(difference = boot_difference, index_difference = boot_index_difference) %>%
+              mutate(type_estimate = "Bootstrapped"), 
+            boot.df.full %>% 
+              dplyr::select(term, random_difference, random_index_difference, type) %>% 
+              rename(difference = random_difference, index_difference = random_index_difference) %>% 
+              mutate(type_estimate = "Random")) %>% 
+  mutate(type_together = paste0(type, " " , type_estimate ))
+
+label_graph <- c(`TRUE` = "Invariant", `FALSE` = "Non-Invariant")
+
+# make all the graphs summary long ----
+# summarize the overall
+boot.partial.summary <- boot.partial.summary.full %>% 
+  dplyr::select(-run_number, computer) %>% 
+  group_by(term, invariant, type) %>% 
+  summarize(across(c(mean_boot_1:d_random_high), ~mean(., na.rm = TRUE)))
+ 
+boot_summary_long <- 
+  bind_rows(boot.partial.summary %>% 
+              dplyr::select(term, invariant, n_boot, type, starts_with("d_boot")) %>% 
+              rename(n = n_boot, 
+                     d_low = d_boot_low, 
+                     d = d_boot, 
+                     d_high = d_boot_high) %>% 
+              mutate(type_estimate = "Bootstrapped"), 
+            boot.partial.summary %>% 
+              dplyr::select(term, invariant, n_random, type,
+                                    starts_with("d_random")) %>% 
+              rename(n = n_random, 
+                     d_low = d_random_low, 
+                     d = d_random, 
+                     d_high = d_random_high) %>% 
+              mutate(type_estimate = "Random"))
+
+## make all the graphs effects long ----
+# summarize the effects
+boot.effects.summary <- boot.effects.summary.full %>% 
+  dplyr::select(-run_number, -computer) %>% 
+  group_by(term, type) %>% 
+  summarize(across(c(non_invariant:h_mi_p), ~mean(., na.rm = TRUE)))
+
+density_long <- 
+  bind_rows(
+    boot.df.full %>% 
+      dplyr::select(term, boot_index_difference, boot_1, boot_2, type) %>% 
+      pivot_longer(cols = c(boot_1, boot_2), 
+                   names_to = "group", 
+                   values_to = "estimate") %>% 
+      rename(invariant = boot_index_difference) %>% 
+      mutate(type_estimate = "Bootstrapped"), 
+    boot.df.full %>% 
+      dplyr::select(term, random_index_difference, random_1, random_2, type) %>% 
+      pivot_longer(cols = c(random_1, random_2), 
+                   names_to = "group", values_to = "estimate") %>% 
+      rename(invariant = random_index_difference) %>% 
+      mutate(type_estimate = "Random")) %>% 
+  mutate(group = gsub("boot_1|random_1", "Group 1", group), 
+         group = gsub("boot_2|random_2", "Group 2", group), 
+         invariant = factor(invariant, 
+                            levels = c("TRUE", "FALSE"), 
+                            labels = c("Invariant", "Non-Invariant")))
+
+```
+
+Figure \@ref(fig:effect-large-loading-pic) shows the effect size differences within large loadings simulations. The results demonstrate that most of the loadings were considered non-invariant in the bootstrapped models (while holdings all others equal). This result is partially due to simulating very good data, so small changes in loadings results in a drop in fit for our chosen invariance index. However, we can use this graph to show that question four shows a possible effect size ranging from `r boot_summary_long %>% filter(type == "Large Loadings") %>% filter(invariant == FALSE) %>% filter(term == "lv =~ q4") %>% filter(type_estimate == "Bootstrapped") %>% pull(d_low) %>% apa_num()` to `r boot_summary_long %>% filter(type == "Large Loadings") %>% filter(invariant == FALSE) %>% filter(term == "lv =~ q4") %>% filter(type_estimate == "Bootstrapped") %>% pull(d_high) %>% apa_num()`. The $h_{nmi_p}$ value for question four was `r boot.effects.summary %>% filter(type == "Large Loadings") %>% filter(term == "lv =~ q4") %>% pull(h_nmi_p) %>% apa_num()`, representing about a quarter of a possible total effect. Last, the density plot in Figure \@ref(fig:density-large-loading-pic) shows the separation of the two different groups loadings in item four, thus, illustrating group differences in the findings for their loadings. Each of the other combination of plots can be found in the supplemental materials.
+
+```{r effect-large-loading-pic, include = T, fig.cap="Bootstrapped and Random Group effect size differences in loadings for the Large Loading difference simulation. The size of the point reprensents the number of data points included in that calculation."}
+effect_invariance_plot <- 
+  ggplot(boot_summary_long %>% 
+           filter(type == "Large Loadings"), 
+         aes(term, d, color = type_estimate)) + 
+  theme_classic() + 
+  facet_wrap(~invariant, labeller = as_labeller(label_graph)) +
+  scale_color_discrete(name = "Type of Estimate") + 
+  geom_point(aes(size = n)) + 
+  geom_errorbar(aes(ymin = d_low, ymax = d_high), width = 0.2) + 
+  xlab("Estimated Item") + 
+  ylab("Group Effect Size") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), 
+        legend.position = "bottom") + 
+  geom_hline(yintercept = 0) + 
+  coord_flip() 
+
+suppressWarnings(effect_invariance_plot)
+
+ggsave("figures/partial-large-loading-effect.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+```{r density-large-loading-pic, include = T,  fig.cap="Bootstrapped and Random density plots for invariant and non-invariant bootstrapped partial effects examining only large loadings."}
+density_plot <- ggplot(density_long %>% 
+                        filter(type == "Large Loadings"), 
+                       aes(x = estimate, y = term, fill = group)) + 
+  geom_density_ridges(alpha = 0.7, scale = 0.9) + 
+  facet_grid(invariant ~ type_estimate) + 
+  theme_classic() + 
+  xlab("Estimated Score") + 
+  ylab("Parameter") + 
+  scale_fill_discrete(name = "Group")
+
+suppressMessages(density_plot)
+
+ggsave("figures/partial-large-loading-density.png", dpi = 300, 
+       width = 8, 
+       units = "in")
+```
+
+## MGCFA Model Fit Statistics
+
+Model fit statistics are provided for each of the ten model combinations (invariant, three sizes for each loadings, intercepts, and residuals). These tables could be used to examine the traditional change in fit statistics cutoff rules of thumb [@cheung2002], such as $\Delta$ CFI or $\Delta$ RMSEA, to the visualizations presented in the manuscript.
+
+```{r tab1, results='asis'}
+apa_table(results.invariant$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)),
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Invariant Model")
+```
+
+```{r tab2, results='asis'}
+apa_table(results.small.load$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Small Differences in Loadings")
+```
+
+```{r tab3, results='asis'}
+apa_table(results.med.load$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Medium Differences in Loadings")
+```
+
+```{r tab4, results='asis'}
+apa_table(results.large.load$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)),
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Large Differences in Loadings")
+```
+
+```{r tab5, results='asis'}
+apa_table(results.small.int$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Small Differences in Intercepts")
+```
+
+```{r tab6, results='asis'}
+apa_table(results.med.int$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)),
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Medium Differences in Intercepts")
+```
+
+```{r tab7, results='asis'}
+apa_table(results.large.int$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)),
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Large Differences in Intercepts")
+```
+
+```{r tab8, results='asis'}
+apa_table(results.small.res$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Small Differences in Residuals")
+```
+
+```{r tab9, results='asis'}
+apa_table(results.med.res$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Medium Differences in Residuals")
+```
+
+```{r tab10, results='asis'}
+apa_table(results.large.res$model_fit %>% 
+            dplyr::select(model, AIC, BIC, cfi, tli, rmsea, srmr) %>% 
+            mutate(model = tools::toTitleCase(model)), 
+          digits = 3, 
+          col.names = c("Model", "AIC", "BIC", "CFI", "TLI", "RMSEA", "SRMR"),
+          caption = "Model Fit for Large Differences in Residuals")
+```
+
+
+# References
+
+<div id="refs"></div>
